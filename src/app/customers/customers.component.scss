@@ -1,0 +1,48 @@
+@import './../../styles/base/_variables.scss';
+
+.customers {
+  width: 100%;
+  max-height: 385px;
+  overflow: scroll;
+  border-top: 1px solid $dark-gray;
+  border-bottom: 1px solid $dark-gray;
+}
+
+.mat {
+  &-table {
+    border-left: 1px solid $dark-gray;
+    border-right: 1px solid $dark-gray;
+  }
+
+  &-row {
+    min-height: 24px;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  &-cell {
+    border: 1px solid $dark-gray;
+    min-height: 40px;
+    color: $base-text-color;
+    text-align: center;
+    font-size: 16px;
+    padding: 0 10px;
+  }
+
+  &-header {
+    &-row {
+      min-height: 40px;
+      border-bottom: none;
+      padding: 0;
+    }
+    &-cell {
+      border: 1px solid $dark-gray;
+      min-height: 40px;
+      line-height: 40px;
+      font-size: 18px;
+      background-color: $gray;
+      color: $base-text-color;
+      text-align: center !important;
+    }
+  }
+}

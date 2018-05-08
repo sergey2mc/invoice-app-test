@@ -1,0 +1,25 @@
+<div class="customers">
+  <mat-table class="customers-table mat-elevation-z8" [dataSource]="dataSource">
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Customer Name</mat-header-cell>
+      <mat-cell *matCellDef="let customer">{{ customer.name }}</mat-cell>
+    </ng-container>
+
+    <!-- Address Column -->
+    <ng-container matColumnDef="address">
+      <mat-header-cell *matHeaderCellDef>Customer Address</mat-header-cell>
+      <mat-cell *matCellDef="let customer">{{ customer.address }}</mat-cell>
+    </ng-container>
+
+    <!-- Phone Column -->
+    <ng-container matColumnDef="phone">
+      <mat-header-cell *matHeaderCellDef>Customer Phone number</mat-header-cell>
+      <mat-cell *matCellDef="let customer">{{ customer.phone }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>
