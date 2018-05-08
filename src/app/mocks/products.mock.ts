@@ -1,14 +1,14 @@
 import { Product } from '../interfaces/products.interface';
 
 export const productsData: Product[] = [
-    {name: 'Hydrogen', price: 10},
-    {name: 'Helium', price: 5},
-    {name: 'Lithium', price: 8},
-    {name: 'Beryllium', price: 9},
-    {name: 'Boron', price: 16},
-    {name: 'Carbon', price: 12},
-    {name: 'Beryllium', price: 9},
-    {name: 'Boron', price: 16},
-    {name: 'Carbon', price: 12},
-    {name: 'Lithium', price: 8}
+    {id: 0, name: 'Hydrogen', price: 10, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Helium', price: 5, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Lithium', price: 8, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Beryllium', price: 9, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Boron', price: 16, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Carbon', price: 12, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Beryllium', price: 9, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Boron', price: 16, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Carbon', price: 12, createdAt: '', updatedAt: ''},
+    {id: 0, name: 'Lithium', price: 8, createdAt: '', updatedAt: ''}
 ];
