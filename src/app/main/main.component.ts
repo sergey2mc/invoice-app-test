@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { invoicesData } from '../mocks/invoices.mock';
-import { Invoice } from '../interfaces/invoices.interface';
+import { Invoice } from '../shared/interfaces/invoices.interface';
 
 @Component({
   selector: 'app-main',
@@ -16,6 +16,7 @@ export class MainComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    console.log('Main-page');
     this.dataSource = new MatTableDataSource(invoicesData);
   }
 }

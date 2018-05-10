@@ -1,4 +1,4 @@
-import { Customer } from '../interfaces/customers.interface';
+import { Customer } from '../shared/interfaces/customers.interface';
 
 export const customersData: Customer[] = [
     {id: 0, name: 'Hydrogen', address: 'Hydrogen', phone: 1504346534534, createdAt: '', updatedAt: ''},

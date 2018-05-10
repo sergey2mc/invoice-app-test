@@ -1,12 +1,4 @@
-@import './../../styles/base/_variables.scss';
-
-.customers {
-  width: 100%;
-  max-height: 385px;
-  overflow: scroll;
-  border-top: 1px solid $dark-gray;
-  border-bottom: 1px solid $dark-gray;
-}
+@import './../../../styles/base/_variables.scss';
 
 .mat {
   &-table {
@@ -22,11 +14,12 @@
 
   &-cell {
     border: 1px solid $dark-gray;
-    min-height: 40px;
+    height: 40px;
     color: $base-text-color;
     text-align: center;
     font-size: 16px;
     padding: 0 10px;
+    overflow: hidden;
   }
 
   &-header {
@@ -47,17 +40,52 @@
   }
 
   &-column {
-    &-name {
-      flex: 0 0 150px;
+    &-id {
+      flex: 0 0 100px;
     }
 
-    &-address {
-      flex: 0 0 280px;
+    &-name {
+      flex: 0 0 150px;
       text-align: left;
     }
 
-    &-phone {
+    &-discount {
+      flex: 0 0 120px;
+    }
 
+    &-total {
+      flex: 0 0 70px;
+    }
+
+    &-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
+}
+
+.button {
+  padding: 0 8px;
+  line-height: 24px;
+  border-radius: 0;
+  min-width: 58px;
+  margin-right: 5px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &--view {
+    background-color: $light-blue;
+  }
+
+  &--edit {
+    background-color: $orange;
+  }
+
+  &--delete {
+    background-color: $red;
+  }
+
 }

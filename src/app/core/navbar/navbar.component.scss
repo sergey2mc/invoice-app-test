@@ -25,7 +25,6 @@
     &__item {
       height: 100%;
       width: calc(100% / 3);
-      background-color: $gray;
 
       &-link {
         display: inline-block;
@@ -34,7 +33,13 @@
         text-align: center;
         line-height: 30px;
         text-decoration: none;
-        color: $base-text-color
+        color: $base-text-color;
+        background-color: $gray;
+        transition: all .2s ease-in-out;
+
+        &_active {
+          background-color: $dark-gray;
+        }
       }
     }
   }

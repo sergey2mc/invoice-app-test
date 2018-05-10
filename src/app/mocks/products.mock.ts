@@ -1,4 +1,4 @@
-import { Product } from '../interfaces/products.interface';
+import { Product } from '../shared/interfaces/products.interface';
 
 export const productsData: Product[] = [
     {id: 0, name: 'Hydrogen', price: 10, createdAt: '', updatedAt: ''},

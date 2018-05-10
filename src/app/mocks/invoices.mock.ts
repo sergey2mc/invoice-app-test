@@ -1,4 +1,4 @@
-import { Invoice } from '../interfaces/invoices.interface';
+import { Invoice } from '../shared/interfaces/invoices.interface';
 
 export const invoicesData: Invoice[] = [
     {id: 1, customer_id: 2, discount: 10, total: 150, createdAt: '', updatedAt: ''},
