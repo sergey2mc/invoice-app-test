@@ -1,5 +1,9 @@
-import { ApiService } from './api.service';
+import { CustomerService } from './customer.service';
+import { ProductService } from './product.service';
+import { InvoiceService } from './invoice.service';
 
 export const APP_SERVICE_PROVIDERS = [
-    ApiService
+    CustomerService,
+    ProductService,
+    InvoiceService
 ];

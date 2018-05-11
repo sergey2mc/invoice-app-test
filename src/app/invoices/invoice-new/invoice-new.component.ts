@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
-import { Subscription } from 'rxjs';
-import { ApiService } from '../../core/services/api.service';
+import { Subscription } from 'rxjs/Subscription';
+import { CustomerService } from '../../core/services/customer.service';
+import { ProductService } from '../../core/services/product.service';
+import { InvoiceService } from '../../core/services/invoice.service';
 import { Customer } from '../../shared/interfaces/customers.interface';
 import { Product } from '../../shared/interfaces/products.interface';
-import { InvoiceItems } from '../../shared/interfaces/invoiceItems.interface';
+import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
 import { Basket } from '../../shared/interfaces/basket.interface';
 import 'rxjs/add/operator/mergeMap';
 
@@ -15,11 +17,13 @@ import 'rxjs/add/operator/mergeMap';
 })
 export class InvoiceNewComponent implements OnInit, OnDestroy {
 
-    subs: Subscription;
+    getProductsSubscription: Subscription;
+    getCustomersSubscription: Subscription;
+    addInvoiceSubscription: Subscription;
     customersList: Customer[];
     productsList: Product[];
     invoice: Invoice;
-    invoiceItems: InvoiceItems[] = [];
+    invoiceItems: InvoiceItem[] = [];
     currentProducts: Basket[] = [];
 
     @ViewChild('customer') customer: ElementRef;
@@ -29,20 +33,11 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
     @ViewChild('discount') discount: ElementRef;
     total = 0;
 
-    constructor(private api: ApiService) {}
-
-    ngOnInit() {
-        console.log('Invoices-new-page');
-
-        this.subs = this.api.customers.get().mergeMap((res: Customer[]) => {
-            this.getCustomersHandler(res);
-            return this.api.products.get();
-        }).subscribe(this.getProductsHandler.bind(this));
-    }
-
-    ngOnDestroy() {
-        this.subs.unsubscribe();
-    }
+    constructor(
+        private customerService: CustomerService,
+        private productService: ProductService,
+        private invoiceService: InvoiceService
+    ) {}
 
     private checkInput() {
         return (
@@ -52,18 +47,33 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
         );
     }
 
-    private getCustomersHandler(res: Customer[]) {
-        console.log('Customers:', res);
-        this.customersList = res;
+    private getCustomersHandler() {
+        return (res: Customer[]) => {
+            console.log('Customers:', res);
+            this.customersList = res;
+        };
     }
 
-    private getProductsHandler(res: Product[]) {
-        console.log('Products:', res);
-        this.productsList = res;
+    private getProductsHandler() {
+        return (res: Product[]) => {
+            console.log('Products:', res);
+            this.productsList = res;
+        };
     }
 
     private applyDiscount() {
         this.total = Number((this.total - this.total * this.discount.nativeElement.value * 0.01).toFixed(2));
+    }
+
+    ngOnInit() {
+        console.log('Invoices-new-page');
+        this.getProductsSubscription = this.productService.getProducts().subscribe(this.getProductsHandler());
+        this.getCustomersSubscription = this.customerService.getCustomers().subscribe(this.getCustomersHandler());
+    }
+
+    ngOnDestroy() {
+        this.getProductsSubscription.unsubscribe();
+        this.getCustomersSubscription.unsubscribe();
     }
 
     inputProductHandler(e) {
@@ -84,7 +94,7 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
         this.applyDiscount();
     }
 
-    saveHandler() {
+    saveButtonHandler() {
         if (this.currentProducts.length) {
             this.currentProducts.forEach(item => this.invoiceItems.push({product_id: item.id, quantity: item.quantity}));
             this.invoice = {
@@ -93,14 +103,17 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
                 discount: Number(this.discount.nativeElement.value),
                 items: this.invoiceItems
             };
-            this.subs.add(this.api.invoices.add(this.invoice).subscribe(
-                res => console.log(res),
-                err => console.log(err))
+            this.addInvoiceSubscription = this.invoiceService.addInvoice(this.invoice).subscribe(
+            res => {
+                    console.log(res);
+                    this.addInvoiceSubscription.unsubscribe();
+                },
+            err => console.log(err)
             );
         }
     }
 
-    addHandler() {
+    addButtonHandler() {
         if (this.checkInput()) {
             this.currentProducts.push({
                 id: Number(this.product.nativeElement.value),
@@ -112,13 +125,12 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
         this.calcTotal();
     }
 
-    removeHandler(productID) {
-        const currentProductsFiltered = this.currentProducts.filter(item => item.id !== productID);
-        this.currentProducts = currentProductsFiltered;
+    removeButtonHandler(productID) {
+        this.currentProducts = this.currentProducts.filter(item => item.id !== productID);
         this.calcTotal();
     }
 
-    changeValuesHandler(event, operation) {
+    changeValuesButtonHandler(event, operation) {
         const element = event.target.parentNode.children[0];
         if (operation === '++') {
             element.value++;

@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 // import { productsData } from '../mocks/products.mock';
 import { Product } from '../shared/interfaces/products.interface';
-import { ApiService } from '../core/services/api.service';
-import { Subscription } from 'rxjs';
+import { ProductService } from '../core/services/product.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-products',
@@ -16,19 +16,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource();
   subs: Subscription;
 
-  constructor(private api: ApiService) {}
+  constructor(private productService: ProductService) {}
 
   ngOnInit() {
     console.log('Products-page');
-    this.subs = this.api.products.get().subscribe(this.productsHandler.bind(this));
+    this.subs = this.productService.getProducts().subscribe(this.productsHandler.bind(this));
   }
 
   ngOnDestroy() {
-      this.subs.unsubscribe();
+    this.subs.unsubscribe();
   }
 
-  productsHandler(response: Product[]) {
+  productsHandler() {
+    return (response: Product[]) => {
       console.log(response);
       this.dataSource.data = response;
+    };
   }
 }

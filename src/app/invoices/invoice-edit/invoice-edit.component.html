@@ -1,9 +1,8 @@
 <div class="new">
   <div class="new-body">
     <div class="new-body__data">
-      <div class="new-body__data-invoice">Invoice #6</div>
-      <select class="new-body__data-customer" #customer>
-        <option value="">Select name</option>
+      <div class="new-body__data-invoice">Invoice #{{invoice?.id}}</div>
+      <select class="new-body__data-customer" (change)="inputCustomerHandler($event)" #customer>
         <option *ngFor="let customer of customersList" [value]="customer.id">
           {{ customer.name }}
         </option>
@@ -35,8 +34,8 @@
         </div>
       </div>
       <div class="new-invoice__products">
-        <div class="new-invoice__products-item" *ngFor="let item of currentProducts">
-          <div class="new-invoice__products-product">{{ item.product }}</div>
+        <div class="new-invoice__products-item" *ngFor="let item of invoice?.items">
+          <div class="new-invoice__products-product">{{ item.name }}</div>
           <div class="new-invoice__products-quantity">{{ item.quantity }}</div>
           <div class="new-invoice__products-price">{{ item.price }}</div>
           <button class="new-invoice__products-button" mat-raised-button (click)="removeButtonHandler(item.id)">-</button>
@@ -46,9 +45,9 @@
     <div class="new-body__discount">
       <div class="new-body__discount-label">Discount %</div>
       <div class="new-body__discount-control">
-        <input class="new-body__discount-input" type="text" value="0" (input)="calcTotal()" #discount>
-        <div class="controls-button controls-button_more" (click)="changeValuesHandler($event, '++')"></div>
-        <div class="controls-button controls-button_less" (click)="changeValuesHandler($event, '--')"></div>
+        <input class="new-body__discount-input" (input)="calcTotal()" [(ngModel)]="invoice.discount">
+        <div class="controls-button controls-button_more" (click)="changeValuesButtonHandler($event, '++')"></div>
+        <div class="controls-button controls-button_less" (click)="changeValuesButtonHandler($event, '--')"></div>
       </div>
     </div>
   </div>
@@ -57,6 +56,6 @@
       <div class="new-footer__total-label">Total</div>
       <div class="new-footer__total-value">${{ total }}</div>
     </div>
-    <button class="new-footer__button" mat-raised-button (click)="saveButtonHandler()">Save Invoice</button>
+    <button class="new-footer__button" mat-raised-button (click)="saveButtonHandler()">Save changes</button>
   </div>
 </div>

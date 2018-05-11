@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { MainModule } from './main/main.module';
 import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from './core/core.module';
+import { httpInterceptorProviders } from './core/http-interceptors';
 
 @NgModule({
   declarations: [ AppComponent ],
@@ -20,7 +21,8 @@ import { CoreModule } from './core/core.module';
     AppRoutingModule
   ],
   providers: [
-    {provide: APP_BASE_HREF, useValue: '/'}
+    {provide: APP_BASE_HREF, useValue: '/'},
+    httpInterceptorProviders
   ],
   bootstrap: [ AppComponent ]
 })

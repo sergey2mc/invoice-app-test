@@ -2,8 +2,8 @@
 
 .invoices {
   width: 100%;
-  max-height: 385px;
-  //overflow: scroll;
+  max-height: 390px;
+  overflow: auto;
   //border-top: 1px solid $dark-gray;
   //border-bottom: 1px solid $dark-gray;
 }

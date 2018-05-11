@@ -9,7 +9,7 @@
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-    <mat-cell *matCellDef="let invoice">{{ invoice.customer_id }}</mat-cell>
+    <mat-cell *matCellDef="let invoice">{{ invoice.name }}</mat-cell>
   </ng-container>
 
   <!-- Discount Column -->
@@ -29,8 +29,8 @@
     <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
     <mat-cell *matCellDef="let invoice">
       <button class="button button--view" mat-raised-button>View</button>
-      <button class="button button--edit" mat-raised-button>Edit</button>
-      <button class="button button--delete" mat-raised-button>Delete</button>
+      <button class="button button--edit" mat-raised-button (click)="editButtonHandler(invoice)">Edit</button>
+      <button class="button button--delete" mat-raised-button (click)="deleteButtonHandler(invoice)">Delete</button>
     </mat-cell>
   </ng-container>
 
