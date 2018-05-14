@@ -1,0 +1,34 @@
+<div *ngIf="mode === 'removeItemFromInvoiceItems'">
+  <h2 mat-dialog-title>Delete from invoice</h2>
+  <mat-dialog-content>Are you sure?</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="false">No</button>
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-button [mat-dialog-close]="true">Yes</button>
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="mode === 'deleteInvoiceFromInvoicesList'">
+  <h2 mat-dialog-title>Delete Invoice #{{ data.id }}</h2>
+  <mat-dialog-content>Are you sure?</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="false">No</button>
+    <button mat-button [mat-dialog-close]="true">Yes</button>
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="mode === 'invoiceCreated'">
+  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
+  <mat-dialog-content>Successfully created</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="true">Ok</button>
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="mode === 'invoiceEdited'">
+  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
+  <mat-dialog-content>Successfully saved</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="true">Ok</button>
+  </mat-dialog-actions>
+</div>

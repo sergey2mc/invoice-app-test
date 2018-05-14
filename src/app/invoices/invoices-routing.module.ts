@@ -9,10 +9,10 @@ const invoicesRoutes: Routes = [
         path: '',
         component: InvoicesComponent,
         children: [
-            { path: '', component: InvoicesListComponent, pathMatch: 'full', resolve: { invoices: InvoicesResolver } },
-            // { path: '', loadChildren: './invoices-list/invoices-list.module#InvoicesListModule' },
+            { path: '', component: InvoicesListComponent, pathMatch: 'full', resolve: {invoices: InvoicesResolver} },
             { path: 'new', loadChildren: './invoice-new/invoice-new.module#InvoiceNewModule' },
-            { path: 'edit/:id', loadChildren: './invoice-edit/invoice-edit.module#InvoiceEditModule' }
+            { path: 'edit/:id', loadChildren: './invoice-edit/invoice-edit.module#InvoiceEditModule' },
+            { path: 'view/:id', loadChildren: './invoice-view/invoice-view.module#InvoiceViewModule' }
         ]
     }
 ];

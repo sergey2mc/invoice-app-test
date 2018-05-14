@@ -1,7 +1,6 @@
 @import './../../../styles/base/_variables.scss';
 
-.edit {
-  height: 390px;
+.view {
 
   &-body {
     display: flex;
@@ -10,11 +9,12 @@
     align-items: flex-start;
     border-bottom: 2px solid $gray;
     width: 100%;
-    height: 70%;
+    height: 300px;
 
     &__data {
       width: 75%;
       height: 100%;
+      overflow-y: hidden;
 
       &-invoice {
         padding-right: 40px;
@@ -27,6 +27,7 @@
         background-color: $light-blue-2;
         border: 1px solid $dark-gray;
         font-size: 18px;
+        padding: 0 10px;
         margin-bottom: 10px;
         margin-right: 40px;
       }
@@ -134,70 +135,9 @@
       }
     }
 
-    &__controls {
-      position: relative;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      height: 30px;
-      padding-right: 40px;
-      margin-bottom: 10px;
-
-      &-product {
-        width: 280px;
-        height: 100%;
-      }
-
-      &-quantity {
-        position: relative;
-        width: 80px;
-        height: 100%;
-      }
-
-      &-price {
-        width: 80px;
-        height: 100%;
-      }
-
-      &-select {
-        width: 100%;
-        height: 100%;
-        background-color: $light-blue-2;
-        border: 1px solid $dark-gray;
-        font-size: 18px;
-        text-align: center;
-      }
-
-      &-input {
-        width: 100%;
-        height: 100%;
-        border: 1px solid $dark-gray;
-        background-color: $light-blue-2;
-        font-size: 18px;
-        text-align: center;
-      }
-
-      &-button {
-        position: absolute;
-        top: 2px;
-        right: 0px;
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        line-height: 28px;
-        font-size: 18px;
-        padding: 0;
-        border: 1px solid $dark-gray;
-        background-color: $light-green;
-      }
-    }
-
     &__products {
       width: 100%;
-      min-height: 30px;
-      max-height: 135px;
+      height: 160px;
       overflow-y: auto;
 
       &-item {
@@ -235,41 +175,6 @@
         border: 1px solid $dark-gray;
         background-color: $gray;
       }
-
-      &-button {
-        position: absolute;
-        top: 2px;
-        right: 0;
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        line-height: 28px;
-        font-size: 18px;
-        padding: 0;
-        border: 1px solid $dark-gray;
-        background-color: $red;
-      }
     }
-  }
-}
-
-.controls-button {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  right: 5px;
-  cursor: pointer;
-
-  &_more {
-    border-width: 0 7.5px 10px 7.5px;
-    border-color: transparent transparent $dark-gray transparent;
-    top: 4px;
-  }
-
-  &_less {
-    border-width: 10px 7.5px 0 7.5px;
-    border-color: $dark-gray transparent transparent transparent;
-    bottom: 4px;
   }
 }

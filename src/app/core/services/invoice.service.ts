@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
-import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
 
 @Injectable()
 export class InvoiceService {
@@ -11,10 +10,6 @@ export class InvoiceService {
 
     getInvoices(id: string | number = ''): Observable<Invoice[] | Invoice> {
         return this.http.get<Invoice[] | Invoice>(`/invoices/${id}`);
-    }
-
-    getInvoiceItems(id: string | number): Observable<InvoiceItem[]> {
-        return this.http.get<InvoiceItem[]>(`/invoices/${id}/items`);
     }
 
     addInvoice(newInvoice: Invoice): Observable<Invoice> {

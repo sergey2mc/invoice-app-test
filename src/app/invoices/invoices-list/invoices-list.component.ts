@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material';
+import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { Customer } from '../../shared/interfaces/customers.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
@@ -20,22 +22,22 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
     dataSource = new MatTableDataSource();
     getInvoicesSubscription: Subscription;
     deleteInvoicesSubscription: Subscription;
+    modalDialogSubscription: Subscription;
 
     constructor(
         private invoiceService: InvoiceService,
         private customerService: CustomerService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        public dialog: MatDialog
     ) {}
 
     private getInvoicesHandler(response: Invoice[]) {
-        console.log(response);
         this.dataSource.data = response;
     }
 
     private getCustomersHandler() {
         return (response: Customer[]) => {
-            console.log(response);
             this.dataSource.data.forEach((item: Invoice, index) => {
                 const currentCustomer = response.filter(customer => customer.id === item.customer_id);
                 this.dataSource.data[index]['name'] = currentCustomer.length ? currentCustomer[0].name : '';
@@ -53,7 +55,6 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        console.log('Invoices-page');
         this.getInvoicesSubscription = this.route.snapshot.data.invoices.mergeMap((res: Invoice[]) => {
             this.getInvoicesHandler(res);
             return this.customerService.getCustomers();
@@ -64,11 +65,28 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
         this.getInvoicesSubscription.unsubscribe();
     }
 
+    openDialog(data) {
+        return this.dialog.open(ModalDialogComponent, {
+            width: '235px',
+            data: data
+        });
+    }
+
+    viewButtonHandler(invoice: Invoice) {
+        this.router.navigate([`invoices/view/`, invoice.id]);
+    }
+
     editButtonHandler(invoice: Invoice) {
         this.router.navigate([`invoices/edit/`, invoice.id]);
     }
 
     deleteButtonHandler(invoice: Invoice) {
-        this.deleteInvoicesSubscription = this.invoiceService.deleteInvoice(invoice.id).subscribe(this.deleteInvoiceHandler());
+        const dialogRef = this.openDialog({ id: invoice.id, mode: 'deleteInvoiceFromInvoicesList'});
+        this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.deleteInvoicesSubscription = this.invoiceService.deleteInvoice(invoice.id).subscribe(this.deleteInvoiceHandler());
+            }
+            this.modalDialogSubscription.unsubscribe();
+        });
     }
 }

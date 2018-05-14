@@ -2,10 +2,9 @@
 
 .customers {
   width: 100%;
-  max-height: 385px;
-  overflow: scroll;
-  border-top: 1px solid $dark-gray;
-  border-bottom: 1px solid $dark-gray;
+  height: 385px;
+  overflow: auto;
+  position: relative;
 }
 
 .mat {

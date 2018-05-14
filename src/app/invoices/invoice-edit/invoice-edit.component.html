@@ -1,61 +1,55 @@
-<div class="new">
-  <div class="new-body">
-    <div class="new-body__data">
-      <div class="new-body__data-invoice">Invoice #{{invoice?.id}}</div>
-      <select class="new-body__data-customer" (change)="inputCustomerHandler($event)" #customer>
-        <option *ngFor="let customer of customersList" [value]="customer.id">
-          {{ customer.name }}
-        </option>
+<div class="edit">
+  <div class="edit-body">
+    <div class="edit-body__data">
+      <div class="edit-body__data-invoice">Invoice #{{invoice?.id}}</div>
+      <select class="edit-body__data-customer" (change)="selectCustomerHandler($event)" #customer>
+        <option *ngFor="let customer of customersList" [value]="customer.id">{{ customer.name }}</option>
       </select>
-      <div class="new-invoice">
-        <div class="new-invoice__header">
-          <div class="new-invoice__header-product">Products</div>
-          <div class="new-invoice__header-quantity">Qty</div>
-          <div class="new-invoice__header-price">Price</div>
+      <div class="edit-invoice">
+        <div class="edit-invoice__header">
+          <div class="edit-invoice__header-product">Products</div>
+          <div class="edit-invoice__header-quantity">Qty</div>
+          <div class="edit-invoice__header-price">Price</div>
         </div>
-        <div class="new-invoice__controls">
-          <div class="new-invoice__controls-product">
-            <select class="new-invoice__controls-select" (change)="inputProductHandler($event)" #product>
-              <option value="">Add Product</option>
-              <option *ngFor="let product of productsList" [value]="product.id">
-                {{ product.name }}
-              </option>
-            </select>
+        <div class="edit-invoice__products">
+          <div class="edit-invoice__products-item" *ngFor="let item of invoice?.items">
+            <div class="edit-invoice__products-product">{{ item.name }}</div>
+            <div class="edit-invoice__products-quantity">{{ item.quantity }}</div>
+            <div class="edit-invoice__products-price">{{ item.price }}</div>
+            <button class="edit-invoice__products-button" mat-raised-button (click)="removeInvoiceItemButtonHandler(item.id)">-</button>
           </div>
-          <div class="new-invoice__controls-quantity">
-            <input class="new-invoice__controls-input" type="text" value="0" (input)="calcTotal()" #quantity>
-            <div class="controls-button controls-button_more" (click)="changeValuesButtonHandler($event, '++')"></div>
-            <div class="controls-button controls-button_less" (click)="changeValuesButtonHandler($event, '--')"></div>
+          <div class="edit-invoice__controls">
+            <div class="edit-invoice__controls-product">
+              <select class="edit-invoice__controls-select" (change)="selectProductHandler($event)" #product>
+                <option value="">Add Product</option>
+                <option *ngFor="let product of productsList" [value]="product.id">{{ product.name }}</option>
+              </select>
+            </div>
+            <div class="edit-invoice__controls-quantity">
+              <input class="edit-invoice__controls-input" type="text" value="0" (input)="calcTotal()" #quantity>
+              <div class="controls-button controls-button_more" (click)="changeValuesButtonHandler($event, '++')"></div>
+              <div class="controls-button controls-button_less" (click)="changeValuesButtonHandler($event, '--')"></div>
+            </div>
+            <div class="edit-invoice__controls-price">
+              <input class="edit-invoice__controls-input" type="text" value="0.00" disabled #price>
+            </div>
+            <button class="edit-invoice__controls-button" mat-raised-button (click)="addInvoiceItemButtonHandler()">+</button>
           </div>
-          <div class="new-invoice__controls-price">
-            <input class="new-invoice__controls-input" type="text" value="0.00" disabled #price>
-          </div>
-          <button class="new-invoice__controls-button" mat-raised-button (click)="addButtonHandler()">+</button>
-        </div>
-      </div>
-      <div class="new-invoice__products">
-        <div class="new-invoice__products-item" *ngFor="let item of invoice?.items">
-          <div class="new-invoice__products-product">{{ item.name }}</div>
-          <div class="new-invoice__products-quantity">{{ item.quantity }}</div>
-          <div class="new-invoice__products-price">{{ item.price }}</div>
-          <button class="new-invoice__products-button" mat-raised-button (click)="removeButtonHandler(item.id)">-</button>
         </div>
       </div>
     </div>
-    <div class="new-body__discount">
-      <div class="new-body__discount-label">Discount %</div>
-      <div class="new-body__discount-control">
-        <input class="new-body__discount-input" (input)="calcTotal()" [(ngModel)]="invoice.discount">
-        <div class="controls-button controls-button_more" (click)="changeValuesButtonHandler($event, '++')"></div>
-        <div class="controls-button controls-button_less" (click)="changeValuesButtonHandler($event, '--')"></div>
+    <div class="edit-body__discount">
+      <div class="edit-body__discount-label">Discount %</div>
+      <div class="edit-body__discount-control">
+        <input class="edit-body__discount-input" disabled [(ngModel)]="invoice.discount">
       </div>
     </div>
   </div>
-  <div class="new-footer">
-    <div class="new-footer__total">
-      <div class="new-footer__total-label">Total</div>
-      <div class="new-footer__total-value">${{ total }}</div>
+  <div class="edit-footer">
+    <div class="edit-footer__total">
+      <div class="edit-footer__total-label">Total</div>
+      <div class="edit-footer__total-value">${{ invoice.total }}</div>
     </div>
-    <button class="new-footer__button" mat-raised-button (click)="saveButtonHandler()">Save changes</button>
+    <button class="edit-footer__button" mat-raised-button (click)="saveInvoiceButtonHandler()">Save changes</button>
   </div>
 </div>

@@ -1,4 +1,5 @@
 body {
+  box-sizing: border-box;
   font-family: Arial;
   color: $base-text-color;
   font-size: 18px;
@@ -6,7 +7,18 @@ body {
   line-height: 1.8em;
 }
 
+input, select, button, a {
+  cursor: pointer;
+}
+
 ::-webkit-scrollbar {
   width: 0;  /* remove scrollbar space */
   background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-100%, -50%);
 }

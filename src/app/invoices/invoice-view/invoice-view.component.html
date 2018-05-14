@@ -1,0 +1,34 @@
+<div class="view">
+  <div class="view-body">
+    <div class="view-body__data">
+      <div class="view-body__data-invoice">Invoice #{{ invoice.id }}</div>
+      <input class="view-body__data-customer" disabled #customer>
+      <div class="view-invoice">
+        <div class="view-invoice__header">
+          <div class="view-invoice__header-product">Products</div>
+          <div class="view-invoice__header-quantity">Qty</div>
+          <div class="view-invoice__header-price">Price</div>
+        </div>
+        <div class="view-invoice__products">
+          <div class="view-invoice__products-item" *ngFor="let item of invoice.items">
+            <div class="view-invoice__products-product">{{ item.name }}</div>
+            <div class="view-invoice__products-quantity">{{ item.quantity }}</div>
+            <div class="view-invoice__products-price">{{ item.price }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="view-body__discount">
+      <div class="view-body__discount-label">Discount %</div>
+      <div class="view-body__discount-control">
+        <input class="view-body__discount-input" disabled #discount>
+      </div>
+    </div>
+  </div>
+  <div class="view-footer">
+    <div class="view-footer__total">
+      <div class="view-footer__total-label">Total</div>
+      <div class="view-footer__total-value">${{ invoice.total }}</div>
+    </div>
+  </div>
+</div>

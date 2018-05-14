@@ -19,8 +19,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   constructor(private productService: ProductService) {}
 
   ngOnInit() {
-    console.log('Products-page');
-    this.subs = this.productService.getProducts().subscribe(this.productsHandler.bind(this));
+    this.subs = this.productService.getProducts().subscribe(this.productsHandler());
   }
 
   ngOnDestroy() {
@@ -29,7 +28,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   productsHandler() {
     return (response: Product[]) => {
-      console.log(response);
       this.dataSource.data = response;
     };
   }

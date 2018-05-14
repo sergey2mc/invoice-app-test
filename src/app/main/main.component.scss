@@ -2,10 +2,9 @@
 
 .main {
   width: 100%;
-  max-height: 385px;
-  overflow: scroll;
-  border-top: 1px solid $dark-gray;
-  border-bottom: 1px solid $dark-gray;
+  height: 390px;
+  overflow: auto;
+  position: relative;
 }
 
 .mat {
@@ -61,7 +60,7 @@
     }
 
     &-total {
-      flex: 0 0 70px;
+      flex: 0 0 90px;
     }
 
     &-actions {

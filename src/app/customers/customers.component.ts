@@ -19,7 +19,6 @@ export class CustomersComponent implements OnInit, OnDestroy {
   constructor(private customerService: CustomerService) {}
 
   ngOnInit() {
-      console.log('Customers-page');
       this.subs = this.customerService.getCustomers().subscribe(this.customersHandler());
   }
 
@@ -29,7 +28,6 @@ export class CustomersComponent implements OnInit, OnDestroy {
 
   customersHandler() {
       return (response: Customer[]) => {
-          console.log(response);
           this.dataSource.data = response;
       };
   }
