@@ -2,7 +2,7 @@
   <div class="view-body">
     <div class="view-body__data">
       <div class="view-body__data-invoice">Invoice #{{ invoice.id }}</div>
-      <input class="view-body__data-customer" disabled [value]="customer">
+      <div class="view-body__data-customer" (click)="customerClickHandler()">{{ customer }}</div>
       <div class="view-invoice">
         <div class="view-invoice__header">
           <div class="view-invoice__header-product">Products</div>

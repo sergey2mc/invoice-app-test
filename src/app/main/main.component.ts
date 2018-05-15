@@ -44,8 +44,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
   private formatResponse(res) {
       const data = [];
-      res.forEach(item => {
-          item.total = item.total.toFixed(2);
+      res.forEach((item: Invoice) => {
+          item.total = +item.total.toFixed(2);
           data.push(item);
       });
       return data;

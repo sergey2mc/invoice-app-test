@@ -27,7 +27,7 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 
     saveInvoiceSubscription: Subscription;
 
-    saveInvoiceItemsObservable: Observable<any>[] = [];
+    saveInvoiceItemsObservables: Observable<InvoiceItem | InvoiceItem[]>[] = [];
     saveInvoiceItemsSubscription: Subscription;
     deleteInvoiceItemsSubscriptions: Subscription[] = [];
 
@@ -75,18 +75,6 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 
     private applyDiscount() {
         this.invoice.total = +(this.invoice.total - this.invoice.total * this.invoice.discount * 0.01).toFixed(2);
-    }
-
-    private calcTotal() {
-        if (this.invoice.items.length === 0) {
-            this.invoice.total = +this.tmpProduct.price * +this.tmpProduct.quantity;
-        } else if (this.invoice.items.length === 1) {
-            this.invoice.total = this.invoice.items[0].quantity * this.invoice.items[0].price;
-        } else {
-            this.invoice.total = 0;
-            this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
-        }
-        this.applyDiscount();
     }
 
     private checkInput() {
@@ -184,6 +172,18 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         }
     }
 
+    calcTotal() {
+        if (this.invoice.items.length === 0) {
+            this.invoice.total = +this.tmpProduct.price * +this.tmpProduct.quantity;
+        } else if (this.invoice.items.length === 1) {
+            this.invoice.total = this.invoice.items[0].quantity * this.invoice.items[0].price;
+        } else {
+            this.invoice.total = 0;
+            this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
+        }
+        this.applyDiscount();
+    }
+
     selectProductHandler(event) {
         const product: Product[] = this.productsList.filter(item => item.id === Number(event.target.value));
         this.tmpProduct.price = product[0].price;
@@ -200,12 +200,12 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
     saveInvoiceButtonHandler() {
         if (this.invoice.items.length) {
             this.invoice.items.forEach((item: InvoiceItem) => {
-                this.saveInvoiceItemsObservable.push(this.invoiceItemsService.updateInvoiceItem(this.invoice.id, item));
+                this.saveInvoiceItemsObservables.push(this.invoiceItemsService.updateInvoiceItem(this.invoice.id, item));
             });
 
             const zip$ = (array$) => zip(...array$);
 
-            this.saveInvoiceItemsSubscription = zip$(this.saveInvoiceItemsObservable).subscribe(res => {
+            this.saveInvoiceItemsSubscription = zip$(this.saveInvoiceItemsObservables).subscribe(res => {
                 this.saveInvoice();
                 this.saveInvoiceItemsSubscription.unsubscribe();
             });

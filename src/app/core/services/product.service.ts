@@ -2,13 +2,23 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { Product } from '../../shared/interfaces/products.interface';
+import 'rxjs/add/operator/shareReplay';
 
 @Injectable()
 export class ProductService {
 
+    allProducts$: Observable<Product[] | Product>;
+
     constructor(private http: HttpClient) {}
 
     getProducts(id: string | number = ''): Observable<Product[] | Product> {
-        return this.http.get<Product[] | Product>(`/products/${id}`);
+        if (id) {
+            return this.http.get<Product[] | Product>(`/products/${id}`);
+        } else {
+            if (!this.allProducts$) {
+                return this.allProducts$ = this.http.get<Product[] | Product>(`/products`).shareReplay(10);
+            }
+            return this.allProducts$;
+        }
     }
 }

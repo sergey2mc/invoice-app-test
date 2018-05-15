@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
@@ -22,9 +22,10 @@ export class InvoiceViewComponent implements OnInit {
     getInvoiceSubscription: Subscription;
     getCustomersAndInvoiceItemsSubscription: Subscription;
     getProductsSubscription: Subscription;
-    getProductsObservables: Observable<any>[] = [];
+    getProductsObservables: Observable<Product | Product[]>[] = [];
     getHttpParamsSubscription: Subscription;
     customer = '';
+
     invoice: Invoice = {
         id: 0,
         customer_id: 0,
@@ -38,6 +39,7 @@ export class InvoiceViewComponent implements OnInit {
         private productService: ProductService,
         private invoiceService: InvoiceService,
         private invoiceItemsService: InvoiceItemsService,
+        private router: Router,
         private route: ActivatedRoute
     ) {}
 
@@ -84,5 +86,9 @@ export class InvoiceViewComponent implements OnInit {
 
     ngOnInit() {
         this.getHttpParamsSubscription = this.route.paramMap.subscribe(this.getHttpParamsHandler());
+    }
+
+    customerClickHandler() {
+        this.router.navigate(['customers']);
     }
 }

@@ -24,12 +24,15 @@
       &-customer {
         width: calc(100% - 40px);
         height: 30px;
+        line-height: 30px;
+        color: $dark-gray;
         background-color: $light-blue-2;
         border: 1px solid $dark-gray;
         font-size: 18px;
         padding: 0 10px;
         margin-bottom: 10px;
         margin-right: 40px;
+        cursor: pointer;
       }
     }
 
