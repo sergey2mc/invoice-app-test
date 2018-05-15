@@ -2,7 +2,7 @@
   <div class="view-body">
     <div class="view-body__data">
       <div class="view-body__data-invoice">Invoice #{{ invoice.id }}</div>
-      <input class="view-body__data-customer" disabled #customer>
+      <input class="view-body__data-customer" disabled [value]="customer">
       <div class="view-invoice">
         <div class="view-invoice__header">
           <div class="view-invoice__header-product">Products</div>
@@ -21,7 +21,7 @@
     <div class="view-body__discount">
       <div class="view-body__discount-label">Discount %</div>
       <div class="view-body__discount-control">
-        <input class="view-body__discount-input" disabled #discount>
+        <input class="view-body__discount-input" disabled [value]="invoice.discount">
       </div>
     </div>
   </div>

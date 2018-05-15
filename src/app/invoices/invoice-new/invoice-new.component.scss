@@ -65,6 +65,7 @@
 
   &-footer {
     height: 30%;
+    position: relative;
 
     &__total {
       display: flex;
@@ -96,6 +97,21 @@
       border: 1px solid $gray;
       background-color: $light-green;
       font-size: 18px;
+    }
+
+    &__errors {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 50%;
+
+      &-item {
+        width: 100%;
+        color: $red;
+        font-size: 14px;
+        line-height: 16px;
+        text-align: right;
+      }
     }
   }
 

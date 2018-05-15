@@ -1,13 +1,14 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { Customer } from '../../shared/interfaces/customers.interface';
+import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
 import { Product } from '../../shared/interfaces/products.interface';
 import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
 import { zip } from 'rxjs/observable/zip';
 import 'rxjs/add/operator/mergeMap';
 
@@ -18,8 +19,12 @@ import 'rxjs/add/operator/mergeMap';
 })
 export class InvoiceViewComponent implements OnInit {
 
-    getDataSubscription: Subscription;
+    getInvoiceSubscription: Subscription;
+    getCustomersAndInvoiceItemsSubscription: Subscription;
+    getProductsSubscription: Subscription;
+    getProductsObservables: Observable<any>[] = [];
     getHttpParamsSubscription: Subscription;
+    customer = '';
     invoice: Invoice = {
         id: 0,
         customer_id: 0,
@@ -27,9 +32,6 @@ export class InvoiceViewComponent implements OnInit {
         total: 0,
         items: []
     };
-
-    @ViewChild('customer') customer: ElementRef;
-    @ViewChild('discount') discount: ElementRef;
 
     constructor(
         private customerService: CustomerService,
@@ -41,31 +43,42 @@ export class InvoiceViewComponent implements OnInit {
 
     private getHttpParamsHandler() {
         return (params) => {
-            this.getDataSubscription = zip(
-                this.invoiceService.getInvoices(params.get('id')),
-                this.customerService.getCustomers(),
-                this.productService.getProducts(),
-                this.invoiceItemsService.getInvoiceItems(params.get('id'))
-            ).subscribe(this.getDataHandler());
+            this.getInvoiceSubscription = this.invoiceService.getInvoices(params.get('id')).subscribe(this.getInvoiceHandler());
         };
     }
 
-    private getDataHandler() {
-        return (res) => { // [0] - invoice, [1] - customers array, [2] - products array, [3] - invoice-items array
-            this.invoice = res[0];
-            this.discount.nativeElement.value = this.invoice.discount;
+    private getInvoiceHandler() {
+        return (res) => {
+            this.invoice = res;
+            this.getCustomersAndInvoiceItemsSubscription = zip(
+                this.customerService.getCustomers(res.customer_id),
+                this.invoiceItemsService.getInvoiceItems(res.id)
+            ).subscribe(this.getCustomersAndInvoiceItemsHandler());
+        };
+    }
 
-            const customer = res[1].filter((cust: Customer) => cust.id === this.invoice.customer_id);
-            this.customer.nativeElement.value = customer[0].name;
+    private getCustomersAndInvoiceItemsHandler() {
+        return (res) => { // [0] - customers array, [1] - invoice-items array
+            this.customer = res[0].name;
 
-            this.invoice.items = res[3];
-            this.invoice.items.forEach((item, index) => {
-                const prod: Product[] = res[2].filter((product: Product) => product.id === item.product_id);
-                this.invoice.items[index].name = prod.length ? prod[0].name : '';
-                this.invoice.items[index].price = prod.length ? prod[0].price : 0;
+            this.invoice.items = res[1];
+
+            this.invoice.items.forEach((item: InvoiceItem) => {
+                this.getProductsObservables.push(this.productService.getProducts(item.product_id));
+            });
+            const zip$ = (array$) => zip(...array$);
+            this.getProductsSubscription = zip$(this.getProductsObservables).subscribe(prod => {
+                if (prod && prod.length) {
+                    this.invoice.items.forEach((item: InvoiceItem, index: number) => {
+                        const currentProduct = prod.filter((product: Product) => item.product_id === product.id);
+                        this.invoice.items[index]['name'] = currentProduct[0]['name'];
+                        this.invoice.items[index]['price'] = currentProduct[0]['price'];
+                    });
+                }
+                this.getProductsSubscription.unsubscribe();
             });
 
-            this.getDataSubscription.unsubscribe();
+            this.getCustomersAndInvoiceItemsSubscription.unsubscribe();
         };
     }
 

@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
 import { CustomerService } from '../../core/services/customer.service';
@@ -10,6 +10,7 @@ import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { Customer } from '../../shared/interfaces/customers.interface';
 import { Product } from '../../shared/interfaces/products.interface';
 import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
+import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { zip } from 'rxjs/observable/zip';
 import 'rxjs/add/operator/mergeMap';
@@ -24,15 +25,17 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
     getHttpParamsSubscription: Subscription;
     getDataSubscription: Subscription;
 
-    editInvoiceSubscription: Subscription;
+    saveInvoiceSubscription: Subscription;
 
-    setInvoiceItemsSubscription: Subscription;
-    deleteInvoiceItemsSubscription: Subscription;
+    saveInvoiceItemsObservable: Observable<any>[] = [];
+    saveInvoiceItemsSubscription: Subscription;
+    deleteInvoiceItemsSubscriptions: Subscription[] = [];
 
     modalDialogSubscription: Subscription;
 
     customersList: Customer[];
     productsList: Product[];
+    invoiceItemsToRemove: InvoiceItem[] = [];
     invoice: Invoice = {
         id: 0,
         customer_id: 0,
@@ -40,17 +43,19 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         total: 0,
         items: []
     };
-    @ViewChild('discount') discount: ElementRef;
-    @ViewChild('customer') customer: ElementRef;
-    @ViewChild('product') product: ElementRef;
-    @ViewChild('quantity') quantity: ElementRef;
-    @ViewChild('price') price: ElementRef;
+    tmpProduct: InvoiceItem = {
+        name: 'Add Product',
+        product_id: -1,
+        quantity: 0,
+        price: 0
+    };
 
     constructor(
         private customerService: CustomerService,
         private productService: ProductService,
         private invoiceService: InvoiceService,
         private invoiceItemsService: InvoiceItemsService,
+        private router: Router,
         private route: ActivatedRoute,
         public dialog: MatDialog
     ) {}
@@ -72,20 +77,39 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         this.invoice.total = +(this.invoice.total - this.invoice.total * this.invoice.discount * 0.01).toFixed(2);
     }
 
+    private calcTotal() {
+        if (this.invoice.items.length === 0) {
+            this.invoice.total = +this.tmpProduct.price * +this.tmpProduct.quantity;
+        } else if (this.invoice.items.length === 1) {
+            this.invoice.total = this.invoice.items[0].quantity * this.invoice.items[0].price;
+        } else {
+            this.invoice.total = 0;
+            this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
+        }
+        this.applyDiscount();
+    }
+
     private checkInput() {
         return (
-            this.customer.nativeElement.value !== '' &&
-            this.product.nativeElement.value !== '' &&
-            +this.quantity.nativeElement.value > 0
+            this.invoice.customer_id > -1 &&
+            this.tmpProduct.product_id > -1 &&
+            this.tmpProduct.quantity > 0
         );
     }
 
     private getCustomersAndProductsHandler() {
         return (res) => { // [0] - customers array, [1] - products array
             this.productsList = res[1];
+            this.productsList.unshift({
+                name: 'Add Product',
+                id: -1,
+                price: 0
+            });
+
             const currentCustomer = res[0].filter((customer: Customer) => customer.id === this.invoice.customer_id);
             this.customersList = res[0].filter((customer: Customer) => customer.id !== this.invoice.customer_id);
             this.customersList.unshift(currentCustomer[0]);
+
             this.addFieldsToInvoiceItems();
         };
     }
@@ -121,34 +145,32 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         };
     }
 
-    private getEditInvoiceResponseHandler() {
-        return (res) => {
+    private deleteInvoiceItems() {
+        this.invoiceItemsToRemove.forEach(item => {
+            this.deleteInvoiceItemsSubscriptions.push(this.invoiceItemsService.deleteInvoiceItem(this.invoice.id, item.id)
+                .subscribe(res => console.log(res)));
+        });
+    }
+
+    private saveInvoice() {
+        if (this.invoiceItemsToRemove.length) {
+            this.deleteInvoiceItems();
+        }
+        this.saveInvoiceSubscription = this.invoiceService.editInvoice(this.invoice).subscribe(res => {
             const dialogRef = this.openDialog({ id: this.invoice.id, mode: 'invoiceEdited'});
-            this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
-                if (result) {
-                    this.editInvoiceSubscription.unsubscribe();
-                }
+            this.modalDialogSubscription = dialogRef.afterClosed().subscribe(() => {
+                this.saveInvoiceSubscription.unsubscribe();
                 this.modalDialogSubscription.unsubscribe();
+                this.router.navigate(['invoices']);
             });
-        };
+        });
     }
 
-    private updateInvoiceItems() {
-        const invoiceItem = this.invoice.items[this.invoice.items.length - 1];
-        delete invoiceItem['name'];
-        delete invoiceItem['price'];
-        this.setInvoiceItemsSubscription = this.invoiceItemsService.updateInvoiceItem(this.invoice.id, invoiceItem)
-            .subscribe(res => {
-                this.addFieldsToInvoiceItems();
-                this.setInvoiceItemsSubscription.unsubscribe();
-            });
-    }
-
-    private deleteInvoiceItems(itemID) {
-        this.deleteInvoiceItemsSubscription = this.invoiceItemsService.deleteInvoiceItem(this.invoice.id, itemID)
-            .subscribe(res => {
-                this.deleteInvoiceItemsSubscription.unsubscribe();
-            });
+    private openDialog(data) {
+        return this.dialog.open(ModalDialogComponent, {
+            width: '235px',
+            data: data
+        });
     }
 
     ngOnInit() {
@@ -157,75 +179,72 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.getDataSubscription.unsubscribe();
+        if (this.deleteInvoiceItemsSubscriptions.length) {
+            this.deleteInvoiceItemsSubscriptions.forEach(subscriptionItem => subscriptionItem.unsubscribe());
+        }
     }
 
-    openDialog(data) {
-        return this.dialog.open(ModalDialogComponent, {
-            width: '235px',
-            data: data
-        });
-    }
-
-    selectProductHandler(e) {
-        const product: Product[] = this.productsList.filter(item => item.id === +e.target.value);
-        this.price.nativeElement.value = product[0].price;
+    selectProductHandler(event) {
+        const product: Product[] = this.productsList.filter(item => item.id === Number(event.target.value));
+        this.tmpProduct.price = product[0].price;
+        this.tmpProduct.name = product[0].name;
         this.calcTotal();
     }
 
-    selectCustomerHandler(e) {
-        const customer: Customer[] = this.customersList.filter(item => item.id === +e.target.value);
+    selectCustomerHandler(event) {
+        const customer: Customer[] = this.customersList.filter(item => item.id === +event.target.value);
         this.invoice.customer_id = customer[0].id;
         this.calcTotal();
     }
 
-    calcTotal() {
-        if (!this.invoice.items || this.invoice.items.length === 0) {
-            this.invoice.total = +this.price.nativeElement.value * +this.quantity.nativeElement.value;
-        } else if (this.invoice.items.length === 1) {
-            this.invoice.total = +this.invoice.items[0].quantity * +this.invoice.items[0].price;
-        } else {
-            this.invoice.total = 0;
-            this.invoice.items.forEach(item => this.invoice.total += +item.quantity * +item.price);
-        }
-        this.applyDiscount();
-    }
-
     saveInvoiceButtonHandler() {
-        this.editInvoiceSubscription = this.invoiceService.editInvoice(this.invoice).subscribe(this.getEditInvoiceResponseHandler());
+        if (this.invoice.items.length) {
+            this.invoice.items.forEach((item: InvoiceItem) => {
+                this.saveInvoiceItemsObservable.push(this.invoiceItemsService.updateInvoiceItem(this.invoice.id, item));
+            });
+
+            const zip$ = (array$) => zip(...array$);
+
+            this.saveInvoiceItemsSubscription = zip$(this.saveInvoiceItemsObservable).subscribe(res => {
+                this.saveInvoice();
+                this.saveInvoiceItemsSubscription.unsubscribe();
+            });
+        } else {
+            this.saveInvoice();
+        }
     }
 
     addInvoiceItemButtonHandler() {
         if (this.checkInput()) {
-            this.invoice.items.push({
-                invoice_id: +this.invoice.id,
-                product_id: +this.product.nativeElement.value,
-                quantity: +this.quantity.nativeElement.value,
-                name: this.product.nativeElement.options[this.product.nativeElement.selectedIndex].text,
-                price: +this.price.nativeElement.value
-            });
-            this.updateInvoiceItems();
+            this.invoice.items.push(this.tmpProduct);
+            this.tmpProduct = {
+                name: '',
+                product_id: -1,
+                quantity: 0,
+                price: 0
+            };
         }
         this.calcTotal();
     }
 
-    removeInvoiceItemButtonHandler(itemID) {
+    removeInvoiceItemButtonHandler(itemId) {
         const dialogRef = this.openDialog({ id: this.invoice.id, mode: 'removeItemFromInvoiceItems'});
         this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.invoice.items = this.invoice.items.filter(item => item.id !== itemID);
+                const toRemove = this.invoice.items.filter(item => item.id === itemId);
+                this.invoiceItemsToRemove.push(toRemove[0]);
+                this.invoice.items = this.invoice.items.filter(item => item.id !== itemId);
                 this.calcTotal();
-                this.deleteInvoiceItems(itemID);
             }
             this.modalDialogSubscription.unsubscribe();
         });
     }
 
-    changeValuesButtonHandler(event, operation) {
-        const element = event.target.parentNode.children[0];
+    changeQuantityHandler(operation) {
         if (operation === '++') {
-            element.value++;
-        } else if (operation === '--' && element.value > 0) {
-            element.value--;
+            this.tmpProduct.quantity++;
+        } else if (operation === '--' && this.tmpProduct.quantity > 0) {
+            this.tmpProduct.quantity--;
         }
         this.calcTotal();
     }
