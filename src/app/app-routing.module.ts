@@ -6,10 +6,7 @@ const appRoutes: Routes = [
     { path: '', component: MainComponent, pathMatch: 'full' },
     { path: 'products', loadChildren: './products/products.module#ProductsModule' },
     { path: 'customers', loadChildren: './customers/customers.module#CustomersModule' },
-    { path: 'invoices', loadChildren: './invoices/invoices.module#InvoicesModule' },
-    // { path: 'invoices/:id', loadChildren: './invoices/invoice-view/invoice-view.module#InvoiceViewModule' }
-    // { path: '404', loadChildren: './not-found/not-found.module#NotFoundModule' },
-    // { path: '**', redirectTo: '404' }
+    { path: 'invoices', loadChildren: './invoices/invoices.module#InvoicesModule' }
 ];
 
 @NgModule({

@@ -1,6 +1,6 @@
 <div class="main">
 
-  <div class="loader" *ngIf="!dataSource.data.length">
+  <div class="loader" *ngIf="dataSource.data && !dataSource.data.length">
     <mat-spinner class="loader"></mat-spinner>
   </div>
 

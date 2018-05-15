@@ -1,5 +1,5 @@
 <div class="edit">
-  <div class="edit-body">
+  <form class="edit-body" #invoiceForm="ngForm">
     <div class="edit-body__data">
       <div class="edit-body__data-invoice">Invoice #{{invoice?.id}}</div>
       <select class="edit-body__data-customer" name="customer" required #customer="ngModel"
@@ -47,7 +47,7 @@
         <input class="edit-body__discount-input" type="text" name="discount" disabled [(ngModel)]="invoice.discount">
       </div>
     </div>
-  </div>
+  </form>
   <div class="edit-footer">
     <div class="edit-footer__total">
       <div class="edit-footer__total-label">Total</div>
