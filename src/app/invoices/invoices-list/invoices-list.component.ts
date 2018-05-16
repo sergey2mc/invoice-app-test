@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material';
@@ -8,19 +8,19 @@ import { Customer } from '../../shared/interfaces/customers.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { CustomerService } from '../../core/services/customer.service';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/mergeMap';
-// import { invoicesData } from '../../mocks/invoices.mock';
+import { zip } from 'rxjs/observable/zip';
+import 'rxjs/add/operator/map';
 
 @Component({
     selector: 'app-invoices-list',
     templateUrl: './invoices-list.component.html',
     styleUrls: ['./invoices-list.component.scss'],
 })
-export class InvoicesListComponent implements OnInit, OnDestroy {
+export class InvoicesListComponent implements OnInit {
 
+    invoices$;
     displayedColumns = ['id', 'name', 'discount', 'total', 'actions'];
     dataSource = new MatTableDataSource();
-    getInvoicesSubscription: Subscription;
     deleteInvoicesSubscription: Subscription;
     modalDialogSubscription: Subscription;
 
@@ -32,19 +32,6 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
         public dialog: MatDialog
     ) {}
 
-    private getInvoicesHandler(response: Invoice[]) {
-        this.dataSource.data = response;
-    }
-
-    private getCustomersHandler() {
-        return (response: Customer[]) => {
-            this.dataSource.data.forEach((item: Invoice, index) => {
-                const currentCustomer = response.filter(customer => customer.id === item.customer_id);
-                this.dataSource.data[index]['name'] = currentCustomer.length ? currentCustomer[0].name : '';
-            });
-        };
-    }
-
     private deleteInvoiceHandler() {
         return (response: Invoice) => {
             if (response['id']) {
@@ -54,15 +41,21 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
         };
     }
 
-    ngOnInit() {
-        this.getInvoicesSubscription = this.route.snapshot.data.invoices.mergeMap((res: Invoice[]) => {
-            this.getInvoicesHandler(res);
-            return this.customerService.getCustomers();
-        }).subscribe(this.getCustomersHandler());
+    private addCustomerNames(res) {
+        const data = [];
+        res[0].forEach((invoice: Invoice) => {
+            data.push(invoice);
+            const currentCustomer = res[1].filter((customer: Customer) => customer.id === invoice.customer_id);
+            data[data.length - 1]['name'] = currentCustomer.length ? currentCustomer[0].name : '';
+        });
+        return data;
     }
 
-    ngOnDestroy() {
-        this.getInvoicesSubscription.unsubscribe();
+    ngOnInit() {
+        this.invoices$ = zip(
+                this.route.snapshot.data.invoices,
+                this.customerService.getCustomers()
+            ).map(this.addCustomerNames);
     }
 
     openDialog(data) {

@@ -1,10 +1,5 @@
 <div class="products">
-
-  <div class="loader" *ngIf="!dataSource.data.length">
-    <mat-spinner class="loader"></mat-spinner>
-  </div>
-
-  <mat-table class="products-table mat-elevation-z8" [dataSource]="dataSource" *ngIf="dataSource.data.length">
+  <mat-table class="products-table mat-elevation-z8" [dataSource]="products$ | async">
 
     <!-- Name Column -->
     <ng-container matColumnDef="name">

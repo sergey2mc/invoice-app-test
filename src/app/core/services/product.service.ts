@@ -12,7 +12,6 @@ export class ProductService {
     constructor(private http: HttpClient) {}
 
     getProducts(id: string | number = -1): Observable<Product[] | Product> {
-        console.log(this.allProducts$)
         if (id > -1) {
             return this.http.get<Product[] | Product>(`/products/${id}`);
         } else {

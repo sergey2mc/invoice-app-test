@@ -1,34 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Product } from '../shared/interfaces/products.interface';
+import { Component } from '@angular/core';
 import { ProductService } from '../core/services/product.service';
-import { Subscription } from 'rxjs/Subscription';
-// import { productsData } from '../mocks/products.mock';
+import { Product } from '../shared/interfaces/products.interface';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss'],
 })
-export class ProductsComponent implements OnInit, OnDestroy {
+export class ProductsComponent {
 
+  products$: Observable<Product | Product[]>;
   displayedColumns = ['name', 'price'];
-  dataSource = new MatTableDataSource();
-  subs: Subscription;
 
-  constructor(private productService: ProductService) {}
-
-  private getProductsHandler() {
-    return (response: Product[]) => {
-      this.dataSource.data = response;
-    };
-  }
-
-  ngOnInit() {
-    this.subs = this.productService.getProducts().subscribe(this.getProductsHandler());
-  }
-
-  ngOnDestroy() {
-    this.subs.unsubscribe();
+  constructor(private productService: ProductService) {
+      this.products$ = this.productService.getProducts();
   }
 }

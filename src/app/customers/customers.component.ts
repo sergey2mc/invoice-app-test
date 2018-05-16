@@ -1,34 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Customer } from '../shared/interfaces/customers.interface';
+import { Component } from '@angular/core';
 import { CustomerService } from '../core/services/customer.service';
-import { Subscription } from 'rxjs/Subscription';
-// import { customersData } from '../mocks/customers.mock';
+import { Customer } from '../shared/interfaces/customers.interface';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.scss'],
 })
-export class CustomersComponent implements OnInit, OnDestroy {
+export class CustomersComponent {
 
+  customers$: Observable<Customer | Customer[]>;
   displayedColumns = ['name', 'address', 'phone'];
-  dataSource = new MatTableDataSource();
-  subs: Subscription;
 
-  constructor(private customerService: CustomerService) {}
-
-  private getCustomersHandler() {
-    return (response: Customer[]) => {
-        this.dataSource.data = response;
-    };
-  }
-
-  ngOnInit() {
-    this.subs = this.customerService.getCustomers().subscribe(this.getCustomersHandler());
-  }
-
-  ngOnDestroy() {
-    this.subs.unsubscribe();
+  constructor(private customerService: CustomerService) {
+    this.customers$ = this.customerService.getCustomers();
   }
 }
