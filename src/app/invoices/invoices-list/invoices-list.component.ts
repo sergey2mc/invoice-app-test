@@ -34,8 +34,8 @@ export class InvoicesListComponent implements OnInit {
 
     private deleteInvoiceHandler() {
         return (response: Invoice) => {
-            if (response['id']) {
-                this.dataSource.data = this.dataSource.data.filter(item => item['id'] !== response.id);
+            if (response.id) {
+                this.dataSource.data = this.dataSource.data.filter((item: Invoice) => item.id !== response.id);
                 this.deleteInvoicesSubscription.unsubscribe();
             }
         };

@@ -1,9 +1,8 @@
-///<reference path="../../../../node_modules/rxjs/Observable.d.ts"/>
 import { Injectable } from '@angular/core';
 import { Router, Resolve } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
-import { InvoiceService } from './invoice.service';
+import { InvoiceService } from '../services/invoice.service';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';

@@ -2,8 +2,8 @@
 
   <app-invoice-form
     [mode]="'new'"
-    [customersList]="customersList"
-    [productsList]="productsList"
+    [customersList$]="customersList$"
+    [productsList$]="productsList$"
     [invoice]="invoice"
     [tmpProduct]="tmpProduct">
   </app-invoice-form>
@@ -15,4 +15,5 @@
     </div>
     <button class="new-footer__button" mat-raised-button (click)="saveInvoiceButtonHandler()">Save Invoice</button>
   </div>
+
 </div>

@@ -1,10 +1,11 @@
 <form class="form" #invoiceForm="ngForm">
   <div class="form-data">
-    <div class="form-title">New Invoice</div>
+    <div class="form-title" *ngIf="mode === 'new'">New Invoice</div>
+    <div class="form-title" *ngIf="mode === 'edit'">Invoice #{{ invoice?.id }}</div>
     <select class="form-customer" name="customer" required #customer="ngModel"
       [(ngModel)]="invoice.customer_id" [appValueLimit]="{min: 0}">
         <option [ngValue]="-1">Select customer</option>
-        <option *ngFor="let customer of customersList" [value]="customer.id">{{ customer.name }}</option>
+        <option *ngFor="let customer of customersList$ | async" [value]="customer.id">{{ customer.name }}</option>
     </select>
     <div class="form-products">
       <div class="form-products__header">
@@ -24,7 +25,7 @@
             <select class="form-products__controls-select" name="product" required #product="ngModel"
               [(ngModel)]="tmpProduct.product_id" (change)="selectProductHandler($event)" [appValueLimit]="{min: 0}">
                 <option [ngValue]="-1">Add product</option>
-                <option *ngFor="let product of productsList" [value]="product.id">{{ product.name }}</option>
+                <option *ngFor="let product of productsList$ | async" [value]="product.id">{{ product.name }}</option>
             </select>
           </div>
           <div class="form-products__controls-quantity">
@@ -52,16 +53,16 @@
     </div>
   </div>
   <div class="form-errors">
-    <div class="form-errors__item" *ngIf="customer.errors?.valueLimitValidator && (customer.dirty || customer.touched)">
+    <div class="form-errors__item" *ngIf="customer.errors?.valueLimitValidator">
       You need to choose customer
     </div>
-    <div class="form-errors__item" *ngIf="product.errors?.valueLimitValidator && (product.dirty || product.touched)">
+    <div class="form-errors__item" *ngIf="product.errors?.valueLimitValidator">
       You need to choose product
     </div>
-    <div class="form-errors__item" *ngIf="quantity.errors?.valueLimitValidator && (quantity.dirty || quantity.touched)">
+    <div class="form-errors__item" *ngIf="quantity.errors?.valueLimitValidator">
       Quantity must be more then 0
     </div>
-    <div class="form-errors__item" *ngIf="discount.errors?.valueLimitValidator && (discount.dirty || discount.touched)">
+    <div class="form-errors__item" *ngIf="discount.errors?.valueLimitValidator">
       Discount must be between 0 and 50%
     </div>
   </div>

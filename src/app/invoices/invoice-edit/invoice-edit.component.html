@@ -2,8 +2,8 @@
 
   <app-invoice-form
     [mode]="'edit'"
-    [customersList]="customersList"
-    [productsList]="productsList"
+    [customersList$]="customersList$"
+    [productsList$]="productsList$"
     [invoice]="invoice"
     [tmpProduct]="tmpProduct"
     [invoiceItemsToRemove]="invoiceItemsToRemove">
@@ -16,4 +16,5 @@
     </div>
     <button class="edit-footer__button" mat-raised-button (click)="saveInvoiceButtonHandler()">Save changes</button>
   </div>
+
 </div>

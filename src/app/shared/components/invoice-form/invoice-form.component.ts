@@ -3,10 +3,8 @@ import { MatDialog } from '@angular/material';
 import { ModalDialogComponent } from '../modal-dialog/modal-dialog.component';
 import { InvoiceItem } from '../../interfaces/invoiceItem.interface';
 import { Invoice } from '../../interfaces/invoices.interface';
-import { Customer } from '../../interfaces/customers.interface';
 import { Product } from '../../interfaces/products.interface';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/mergeMap';
 
 @Component({
   selector: 'app-invoice-form',
@@ -15,14 +13,12 @@ import 'rxjs/add/operator/mergeMap';
 })
 export class InvoiceFormComponent {
 
-  getProductsSubscription: Subscription;
-  getCustomersSubscription: Subscription;
   addInvoiceSubscription: Subscription;
   modalDialogSubscription: Subscription;
 
+  @Input('productsList$') productsList$;
+  @Input('customersList$') customersList$;
   @Input('mode') mode: string;
-  @Input('customersList') customersList: Customer[];
-  @Input('productsList') productsList: Product[];
   @Input('tmpProduct') tmpProduct: InvoiceItem;
   @Input('invoiceItemsToRemove') invoiceItemsToRemove: InvoiceItem[];
   @Input('invoice') invoice: Invoice;
@@ -49,10 +45,14 @@ export class InvoiceFormComponent {
   }
 
   selectProductHandler(event) {
-    const product: Product[] = this.productsList.filter(item => item.id === Number(event.target.value));
-    this.tmpProduct.price = product[0].price;
-    this.tmpProduct.name = product[0].name;
-    this.calcTotal();
+    const productsSubscription = this.productsList$
+      .map((res: Product[]) => res.filter((product: Product) => product.id === +event.target.value))
+      .subscribe((res: Product[]) => {
+        this.tmpProduct.price = res[0].price;
+        this.tmpProduct.name = res[0].name;
+        this.calcTotal();
+        productsSubscription.unsubscribe();
+      });
   }
 
   calcTotal() {
@@ -64,6 +64,7 @@ export class InvoiceFormComponent {
       this.invoice.total = 0;
       this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
     }
+    this.invoice.total = +(this.invoice.total.toFixed(2));
     this.applyDiscount();
   }
 

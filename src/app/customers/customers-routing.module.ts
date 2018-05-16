@@ -5,7 +5,7 @@ import { CustomersComponent } from './customers.component';
 const customersRoutes: Routes = [{ path: '', component: CustomersComponent, pathMatch: 'full'}];
 
 @NgModule({
-    imports: [ RouterModule.forChild(customersRoutes) ],
-    exports: [ RouterModule ]
+  imports: [ RouterModule.forChild(customersRoutes) ],
+  exports: [ RouterModule ]
 })
 export class CustomersRoutingModule { }

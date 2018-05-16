@@ -23,11 +23,15 @@ export class InvoiceService {
         return this.http.post<Invoice>('/invoices', newInvoice);
     }
 
-    editInvoice(invoice: Invoice): Observable<Invoice> {
+    updateInvoice(invoice: Invoice): Observable<Invoice> {
         return this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice);
     }
 
     deleteInvoice(id: string | number): Observable<Invoice> {
         return this.http.delete<Invoice>(`/invoices/${id}`);
+    }
+
+    clearCache() {
+        this.allInvoices$ = null;
     }
 }

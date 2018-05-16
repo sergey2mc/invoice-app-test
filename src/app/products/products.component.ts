@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ProductService } from '../core/services/product.service';
+import { ActivatedRoute } from '@angular/router';
 import { Product } from '../shared/interfaces/products.interface';
 import { Observable } from 'rxjs/Observable';
 
@@ -13,7 +13,7 @@ export class ProductsComponent {
   products$: Observable<Product | Product[]>;
   displayedColumns = ['name', 'price'];
 
-  constructor(private productService: ProductService) {
-      this.products$ = this.productService.getProducts();
+  constructor(private route: ActivatedRoute) {
+    this.products$ = this.route.snapshot.data.products;
   }
 }

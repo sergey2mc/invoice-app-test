@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CustomerService } from '../core/services/customer.service';
+import { ActivatedRoute } from '@angular/router';
 import { Customer } from '../shared/interfaces/customers.interface';
 import { Observable } from 'rxjs/Observable';
 
@@ -13,7 +13,7 @@ export class CustomersComponent {
   customers$: Observable<Customer | Customer[]>;
   displayedColumns = ['name', 'address', 'phone'];
 
-  constructor(private customerService: CustomerService) {
-    this.customers$ = this.customerService.getCustomers();
-  }
+	constructor(private route: ActivatedRoute) {
+		this.customers$ = this.route.snapshot.data.customers;
+	}
 }

@@ -15,6 +15,7 @@ export class CustomerService {
         if (id > -1) {
             return this.http.get<Customer[] | Customer>(`/customers/${id}`);
         } else {
+            // return this.allCustomers$ = this.allCustomers$ || this.http.get<Customer[] | Customer>(`/customers`).shareReplay(1);
             return this.allCustomers$ = this.allCustomers$ || this.http.get<Customer[] | Customer>(`/customers`).shareReplay(1);
         }
     }
