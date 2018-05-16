@@ -44,8 +44,8 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         items: []
     };
     tmpProduct: InvoiceItem = {
-        name: 'Add Product',
-        product_id: -1,
+        name: '',
+        product_id: 0,
         quantity: 0,
         price: 0
     };
@@ -88,11 +88,9 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
     private getCustomersAndProductsHandler() {
         return (res) => { // [0] - customers array, [1] - products array
             this.productsList = res[1];
-            this.productsList.unshift({
-                name: 'Add Product',
-                id: -1,
-                price: 0
-            });
+            if (this.productsList.length) {
+                this.tmpProduct.product_id = this.productsList[0].id;
+            }
 
             const currentCustomer = res[0].filter((customer: Customer) => customer.id === this.invoice.customer_id);
             this.customersList = res[0].filter((customer: Customer) => customer.id !== this.invoice.customer_id);

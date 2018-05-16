@@ -33,7 +33,7 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
     };
     invoice: Invoice = {
         id: 0,
-        customer_id: -1,
+        customer_id: 1,
         discount: 0,
         total: 0,
         items: []
@@ -63,23 +63,18 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
     private getCustomersHandler() {
         return (res: Customer[]) => {
             this.customersList = res;
-            this.customersList.unshift({
-                name: 'Select name',
-                id: -1,
-                phone: 0,
-                address: ''
-            });
+            if (this.customersList.length) {
+                this.invoice.customer_id = this.customersList[0].id;
+            }
         };
     }
 
     private getProductsHandler() {
         return (res: Product[]) => {
             this.productsList = res;
-            this.productsList.unshift({
-                name: 'Add Product',
-                id: -1,
-                price: 0
-            });
+            if (this.productsList.length) {
+                this.tmpProduct.product_id = this.productsList[0].id;
+            }
         };
     }
 
