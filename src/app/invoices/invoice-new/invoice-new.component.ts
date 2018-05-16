@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/components/modal-dialog/modal-dialog.component';
 import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { CustomerService } from '../../core/services/customer.service';
@@ -25,15 +25,17 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
     modalDialogSubscription: Subscription;
     customersList: Customer[];
     productsList: Product[];
+
     tmpProduct: InvoiceItem = {
-        name: 'Add Product',
+        name: '',
         product_id: -1,
         quantity: 0,
         price: 0
     };
+
     invoice: Invoice = {
         id: 0,
-        customer_id: 1,
+        customer_id: -1,
         discount: 0,
         total: 0,
         items: []
@@ -48,33 +50,15 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
         public dialog: MatDialog
     ) {}
 
-    private checkInput() {
-        return (
-            this.invoice.customer_id > -1 &&
-            this.tmpProduct.product_id > -1 &&
-            this.tmpProduct.quantity > 0
-        );
-    }
-
-    private applyDiscount() {
-        this.invoice.total = +((this.invoice.total - this.invoice.total * this.invoice.discount * 0.01).toFixed(2));
-    }
-
     private getCustomersHandler() {
         return (res: Customer[]) => {
             this.customersList = res;
-            if (this.customersList.length) {
-                this.invoice.customer_id = this.customersList[0].id;
-            }
         };
     }
 
     private getProductsHandler() {
         return (res: Product[]) => {
             this.productsList = res;
-            if (this.productsList.length) {
-                this.tmpProduct.product_id = this.productsList[0].id;
-            }
         };
     }
 
@@ -95,29 +79,6 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
         this.getCustomersSubscription.unsubscribe();
     }
 
-    selectProductHandler(event) {
-        const product: Product[] = this.productsList.filter(item => item.id === Number(event.target.value));
-        this.tmpProduct.price = product[0].price;
-        this.tmpProduct.name = product[0].name;
-        this.calcTotal();
-    }
-
-    calcTotal() {
-        if (this.invoice.items.length === 0) {
-            this.invoice.total = +this.tmpProduct.price * +this.tmpProduct.quantity;
-        } else if (this.invoice.items.length === 1) {
-            this.invoice.total = this.invoice.items[0].quantity * this.invoice.items[0].price;
-        } else {
-            this.invoice.total = 0;
-            this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
-        }
-        this.applyDiscount();
-    }
-
-    inputDiscountHandler() {
-        this.calcTotal();
-    }
-
     saveInvoiceButtonHandler() {
         if (this.invoice.items.length) {
             this.addInvoiceSubscription = this.invoiceService.addInvoice(this.invoice).subscribe(
@@ -134,41 +95,5 @@ export class InvoiceNewComponent implements OnInit, OnDestroy {
                 }
             );
         }
-    }
-
-    addInvoiceItemButtonHandler() {
-        if (this.checkInput()) {
-            this.invoice.items.push(this.tmpProduct);
-            this.tmpProduct = {
-                name: '',
-                product_id: -1,
-                quantity: 0,
-                price: 0
-            };
-        }
-        this.calcTotal();
-    }
-
-    removeInvoiceItemButtonHandler(productId) {
-        this.invoice.items = this.invoice.items.filter(item => item.product_id !== productId);
-        this.calcTotal();
-    }
-
-    changeQuantityHandler(operation) {
-        if (operation === '++') {
-            this.tmpProduct.quantity++;
-        } else if (operation === '--' && this.tmpProduct.quantity > 0) {
-            this.tmpProduct.quantity--;
-        }
-        this.calcTotal();
-    }
-
-    changeDiscountHandler(operation) {
-        if (operation === '++' && this.invoice.discount < 50) {
-            this.invoice.discount++;
-        } else if (operation === '--' && this.invoice.discount > 0) {
-            this.invoice.discount--;
-        }
-        this.calcTotal();
     }
 }

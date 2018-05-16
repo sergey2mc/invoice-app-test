@@ -5,8 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
-import { ModalDialogModule } from '../../core/modal-dialog/modal-dialog.module';
+import { ModalDialogModule } from '../../shared/components/modal-dialog/modal-dialog.module';
 import { InvoiceEditComponent } from './invoice-edit.component';
+import { InvoiceFormModule } from '../../shared/components/invoice-form/invoice-form.module';
 import { InvoicesEditRoutingModule } from './invoice-edit-routing.module';
 
 @NgModule({
@@ -19,6 +20,7 @@ import { InvoicesEditRoutingModule } from './invoice-edit-routing.module';
     MatInputModule,
     MatDialogModule,
     ModalDialogModule,
+    InvoiceFormModule,
     InvoicesEditRoutingModule
   ],
   exports: [ InvoiceEditComponent ]

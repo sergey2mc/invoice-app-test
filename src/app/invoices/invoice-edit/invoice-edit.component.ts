@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/components/modal-dialog/modal-dialog.component';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
@@ -36,6 +36,7 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
     customersList: Customer[];
     productsList: Product[];
     invoiceItemsToRemove: InvoiceItem[] = [];
+
     invoice: Invoice = {
         id: 0,
         customer_id: 0,
@@ -43,9 +44,10 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         total: 0,
         items: []
     };
+
     tmpProduct: InvoiceItem = {
         name: '',
-        product_id: 0,
+        product_id: -1,
         quantity: 0,
         price: 0
     };
@@ -70,27 +72,11 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
                 }
             });
         }
-        this.calcTotal();
-    }
-
-    private applyDiscount() {
-        this.invoice.total = +(this.invoice.total - this.invoice.total * this.invoice.discount * 0.01).toFixed(2);
-    }
-
-    private checkInput() {
-        return (
-            this.invoice.customer_id > -1 &&
-            this.tmpProduct.product_id > -1 &&
-            this.tmpProduct.quantity > 0
-        );
     }
 
     private getCustomersAndProductsHandler() {
         return (res) => { // [0] - customers array, [1] - products array
             this.productsList = res[1];
-            if (this.productsList.length) {
-                this.tmpProduct.product_id = this.productsList[0].id;
-            }
 
             const currentCustomer = res[0].filter((customer: Customer) => customer.id === this.invoice.customer_id);
             this.customersList = res[0].filter((customer: Customer) => customer.id !== this.invoice.customer_id);
@@ -170,31 +156,6 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         }
     }
 
-    calcTotal() {
-        if (this.invoice.items.length === 0) {
-            this.invoice.total = +this.tmpProduct.price * +this.tmpProduct.quantity;
-        } else if (this.invoice.items.length === 1) {
-            this.invoice.total = this.invoice.items[0].quantity * this.invoice.items[0].price;
-        } else {
-            this.invoice.total = 0;
-            this.invoice.items.forEach(item => this.invoice.total += item.quantity * item.price);
-        }
-        this.applyDiscount();
-    }
-
-    selectProductHandler(event) {
-        const product: Product[] = this.productsList.filter(item => item.id === Number(event.target.value));
-        this.tmpProduct.price = product[0].price;
-        this.tmpProduct.name = product[0].name;
-        this.calcTotal();
-    }
-
-    selectCustomerHandler(event) {
-        const customer: Customer[] = this.customersList.filter(item => item.id === +event.target.value);
-        this.invoice.customer_id = customer[0].id;
-        this.calcTotal();
-    }
-
     saveInvoiceButtonHandler() {
         if (this.invoice.items.length) {
             this.invoice.items.forEach((item: InvoiceItem) => {
@@ -210,40 +171,5 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
         } else {
             this.saveInvoice();
         }
-    }
-
-    addInvoiceItemButtonHandler() {
-        if (this.checkInput()) {
-            this.invoice.items.push(this.tmpProduct);
-            this.tmpProduct = {
-                name: '',
-                product_id: -1,
-                quantity: 0,
-                price: 0
-            };
-        }
-        this.calcTotal();
-    }
-
-    removeInvoiceItemButtonHandler(itemId) {
-        const dialogRef = this.openDialog({ id: this.invoice.id, mode: 'removeItemFromInvoiceItems'});
-        this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                const toRemove = this.invoice.items.filter(item => item.id === itemId);
-                this.invoiceItemsToRemove.push(toRemove[0]);
-                this.invoice.items = this.invoice.items.filter(item => item.id !== itemId);
-                this.calcTotal();
-            }
-            this.modalDialogSubscription.unsubscribe();
-        });
-    }
-
-    changeQuantityHandler(operation) {
-        if (operation === '++') {
-            this.tmpProduct.quantity++;
-        } else if (operation === '--' && this.tmpProduct.quantity > 0) {
-            this.tmpProduct.quantity--;
-        }
-        this.calcTotal();
     }
 }

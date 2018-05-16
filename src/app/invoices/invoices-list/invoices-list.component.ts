@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material';
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/components/modal-dialog/modal-dialog.component';
 import { Invoice } from '../../shared/interfaces/invoices.interface';
 import { Customer } from '../../shared/interfaces/customers.interface';
 import { InvoiceService } from '../../core/services/invoice.service';

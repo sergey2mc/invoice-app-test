@@ -1,66 +1,19 @@
 <div class="edit">
-  <form class="edit-body" #invoiceForm="ngForm">
-    <div class="edit-body__data">
-      <div class="edit-body__data-invoice">Invoice #{{invoice?.id}}</div>
-      <select class="edit-body__data-customer" name="customer" required #customer="ngModel"
-        (change)="selectCustomerHandler($event)" [(ngModel)]="invoice.customer_id" [appValueLimit]="{min: 0}">
-          <option *ngFor="let customer of customersList" [value]="customer.id">{{ customer.name }}</option>
-      </select>
-      <div class="edit-invoice">
-        <div class="edit-invoice__header">
-          <div class="edit-invoice__header-product">Products</div>
-          <div class="edit-invoice__header-quantity">Qty</div>
-          <div class="edit-invoice__header-price">Price</div>
-        </div>
-        <div class="edit-invoice__products">
-          <div class="edit-invoice__products-item" *ngFor="let item of invoice?.items">
-            <div class="edit-invoice__products-product">{{ item.name }}</div>
-            <div class="edit-invoice__products-quantity">{{ item.quantity }}</div>
-            <div class="edit-invoice__products-price">{{ item.price }}</div>
-            <button class="edit-invoice__products-button" mat-raised-button (click)="removeInvoiceItemButtonHandler(item.id)">-</button>
-          </div>
-          <div class="edit-invoice__controls">
-            <div class="edit-invoice__controls-product">
-              <select class="edit-invoice__controls-select" name="product" required #product="ngModel"
-                [(ngModel)]="tmpProduct.product_id" (change)="selectProductHandler($event)" [appValueLimit]="{min: 0}">
-                  <option *ngFor="let product of productsList" [value]="product.id">{{ product.name }}</option>
-              </select>
-            </div>
-            <div class="edit-invoice__controls-quantity">
-              <input class="edit-invoice__controls-input" type="text" name="quantity" required #quantity="ngModel"
-                (input)="calcTotal()" [(ngModel)]="tmpProduct.quantity" [appValueLimit]="{min: 1}">
-              <div class="controls-button controls-button_more" (click)="changeQuantityHandler('++')"></div>
-              <div class="controls-button controls-button_less" (click)="changeQuantityHandler('--')"></div>
-            </div>
-            <div class="edit-invoice__controls-price">
-              <input class="edit-invoice__controls-input" type="text" name="price" disabled
-                [(ngModel)]="tmpProduct.price">
-            </div>
-            <button class="edit-invoice__controls-button" mat-raised-button (click)="addInvoiceItemButtonHandler()">+</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="edit-body__discount">
-      <div class="edit-body__discount-label">Discount %</div>
-      <div class="edit-body__discount-control">
-        <input class="edit-body__discount-input" type="text" name="discount" disabled [(ngModel)]="invoice.discount">
-      </div>
-    </div>
-  </form>
+
+  <app-invoice-form
+    [mode]="'edit'"
+    [customersList]="customersList"
+    [productsList]="productsList"
+    [invoice]="invoice"
+    [tmpProduct]="tmpProduct"
+    [invoiceItemsToRemove]="invoiceItemsToRemove">
+  </app-invoice-form>
+
   <div class="edit-footer">
     <div class="edit-footer__total">
       <div class="edit-footer__total-label">Total</div>
       <div class="edit-footer__total-value">${{ invoice.total }}</div>
     </div>
     <button class="edit-footer__button" mat-raised-button (click)="saveInvoiceButtonHandler()">Save changes</button>
-    <div class="edit-footer__errors">
-      <div class="edit-footer__errors-item" *ngIf="product.errors?.valueLimitValidator && (product.dirty || product.touched)">
-        You need to choose product
-      </div>
-      <div class="edit-footer__errors-item" *ngIf="quantity.errors?.valueLimitValidator && (quantity.dirty || quantity.touched)">
-        Quantity must be more then 0
-      </div>
-    </div>
   </div>
 </div>

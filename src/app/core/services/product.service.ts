@@ -11,14 +11,12 @@ export class ProductService {
 
     constructor(private http: HttpClient) {}
 
-    getProducts(id: string | number = ''): Observable<Product[] | Product> {
-        if (id) {
+    getProducts(id: string | number = -1): Observable<Product[] | Product> {
+        console.log(this.allProducts$)
+        if (id > -1) {
             return this.http.get<Product[] | Product>(`/products/${id}`);
         } else {
-            if (!this.allProducts$) {
-                return this.allProducts$ = this.http.get<Product[] | Product>(`/products`).shareReplay(10);
-            }
-            return this.allProducts$;
+            return this.allProducts$ = this.allProducts$ || this.http.get<Product[] | Product>(`/products`).shareReplay(1);
         }
     }
 }

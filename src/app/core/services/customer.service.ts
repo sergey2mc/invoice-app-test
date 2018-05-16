@@ -11,14 +11,11 @@ export class CustomerService {
 
     constructor(private http: HttpClient) {}
 
-    getCustomers(id: string | number = ''): Observable<Customer[] | Customer> {
-        if (id) {
+    getCustomers(id: string | number = -1): Observable<Customer[] | Customer> {
+        if (id > -1) {
             return this.http.get<Customer[] | Customer>(`/customers/${id}`);
         } else {
-            if (!this.allCustomers$) {
-                return this.allCustomers$ = this.http.get<Customer[] | Customer>(`/customers`).shareReplay(1);
-            }
-            return this.allCustomers$;
+            return this.allCustomers$ = this.allCustomers$ || this.http.get<Customer[] | Customer>(`/customers`).shareReplay(1);
         }
     }
 }

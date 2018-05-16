@@ -11,14 +11,11 @@ export class InvoiceService {
 
     constructor(private http: HttpClient) {}
 
-    getInvoices(id: string | number = ''): Observable<Invoice[] | Invoice> {
-        if (id) {
+    getInvoices(id: string | number = -1): Observable<Invoice[] | Invoice> {
+        if (id > -1) {
             return this.http.get<Invoice[] | Invoice>(`/invoices/${id}`);
         } else {
-            if (!this.allInvoices$) {
-                return this.allInvoices$ = this.http.get<Invoice[] | Invoice>(`/invoices`).shareReplay(10);
-            }
-            return this.allInvoices$;
+            return this.allInvoices$ = this.allInvoices$ || this.http.get<Invoice[] | Invoice>(`/invoices`).shareReplay(1);
         }
     }
 
