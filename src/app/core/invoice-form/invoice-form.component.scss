@@ -1,4 +1,4 @@
-@import '../../../../styles/base/variables';
+@import '../../../styles/base/variables';
 
 .form {
   display: flex;
@@ -7,7 +7,7 @@
   align-items: flex-start;
   border-bottom: 2px solid $gray;
   width: 100%;
-  height: 70%;
+  height: 75%;
 
   &-data {
     width: 75%;
@@ -16,17 +16,12 @@
 
   &-title {
     padding-right: 40px;
-    margin-bottom: 10px;
   }
 
   &-customer {
-    width: calc(100% - 40px);
-    height: 30px;
-    background-color: $light-blue-2;
-    border: 1px solid $dark-gray;
+    width: 100%;
     font-size: 18px;
     margin-bottom: 10px;
-    margin-right: 40px;
   }
 
   &-products {
@@ -62,11 +57,32 @@
       }
     }
 
-    &__list {
+
+
+    &__table {
       width: 100%;
-      min-height: 30px;
-      max-height: 135px;
       overflow-y: auto;
+      max-height: 235px;
+      margin-bottom: 20px;
+
+      .mat-column-name {
+        min-width: 250px;
+      }
+
+      .mat-column-quantity {
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .mat-column-price {
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .mat-column-actions {
+        min-width: 25px;
+        text-align: center;
+      }
 
       &-item {
         position: relative;
@@ -123,27 +139,40 @@
       position: relative;
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       width: 100%;
-      height: 30px;
-      padding-right: 40px;
       margin-bottom: 10px;
 
       &-product {
-        width: 280px;
+        width: 265px;
         height: 100%;
+        margin-right: 10px;
+
+        .mat-form-field {
+          width: 100%;
+        }
       }
 
       &-quantity {
         position: relative;
         width: 80px;
         height: 100%;
+
+        .mat-form-field {
+          width: 100%;
+          padding: 0 10px;
+        }
       }
 
       &-price {
-        width: 80px;
+        width: 100px;
         height: 100%;
+
+        .mat-form-field {
+          width: 100%;
+          padding: 0 10px;
+        }
       }
 
       &-select {
@@ -165,17 +194,26 @@
       }
 
       &-button {
-        position: absolute;
-        top: 2px;
-        right: 0px;
         width: 28px;
         min-width: 28px;
         height: 28px;
         line-height: 28px;
         font-size: 18px;
         padding: 0;
-        border: 1px solid $dark-gray;
-        background-color: $light-green;
+        border: 1px solid $gray;
+        border-radius: 50%;
+
+        &_add {
+          position: absolute;
+          top: 50%;
+          right: 0;
+          transform: translateY(-50%);
+          background-color: $light-green;
+        }
+
+        &_delete {
+          background-color: $red;
+        }
       }
     }
   }
@@ -183,30 +221,20 @@
   &-discount {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     width: 25%;
     height: 100%;
-
-    &__label {
-      background-color: $light-blue;
-      text-align: center;
-      width: 75%;
-      margin-bottom: 30px;
-    }
+    padding-top: 32px;
 
     &__control {
       position: relative;
       width: 75%;
-      border: 1px solid $light-blue;
-    }
 
-    &__input {
-      width: 100%;
-      height: 35px;
-      border: none;
-      text-align: center;
-      font-size: 18px;
+      .mat-form-field {
+        width: 100%;
+        padding: 0 10px;
+      }
     }
   }
 

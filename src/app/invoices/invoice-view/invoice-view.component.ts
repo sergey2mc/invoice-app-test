@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Invoice } from '../../shared/interfaces/invoices.interface';
+import { Invoice } from '../../core/interfaces/invoice.interface';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
-import { Product } from '../../shared/interfaces/products.interface';
+import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
+import { Product } from '../../core/interfaces/product.interface';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { zip } from 'rxjs/observable/zip';
@@ -45,7 +45,7 @@ export class InvoiceViewComponent implements OnInit {
 
     private getHttpParamsHandler() {
         return (params) => {
-            this.getInvoiceSubscription = this.invoiceService.getInvoices(params.get('id')).subscribe(this.getInvoiceHandler());
+            this.getInvoiceSubscription = this.invoiceService.getInvoice(params.get('id')).subscribe(this.getInvoiceHandler());
         };
     }
 
@@ -53,7 +53,7 @@ export class InvoiceViewComponent implements OnInit {
         return (res) => {
             this.invoice = res;
             this.getCustomersAndInvoiceItemsSubscription = zip(
-                this.customerService.getCustomers(res.customer_id),
+                this.customerService.getCustomer(res.customer_id),
                 this.invoiceItemsService.getInvoiceItems(res.id)
             ).subscribe(this.getCustomersAndInvoiceItemsHandler());
         };
@@ -66,7 +66,7 @@ export class InvoiceViewComponent implements OnInit {
             this.invoice.items = res[1];
 
             this.invoice.items.forEach((item: InvoiceItem) => {
-                this.getProductsObservables.push(this.productService.getProducts(item.product_id));
+                this.getProductsObservables.push(this.productService.getProduct(item.product_id));
             });
             const zip$ = (array$) => zip(...array$);
             this.getProductsSubscription = zip$(this.getProductsObservables).subscribe(prod => {

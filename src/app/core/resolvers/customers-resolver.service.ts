@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Customer } from '../../shared/interfaces/customers.interface';
+import { Customer } from '../interfaces/customer.interface';
 import { CustomerService } from '../services/customer.service';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';

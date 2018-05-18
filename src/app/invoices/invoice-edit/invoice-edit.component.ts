@@ -1,19 +1,22 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
-import { ModalDialogComponent } from '../../shared/components/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { Invoice } from '../../shared/interfaces/invoices.interface';
-import { Customer } from '../../shared/interfaces/customers.interface';
-import { Product } from '../../shared/interfaces/products.interface';
-import { InvoiceItem } from '../../shared/interfaces/invoiceItem.interface';
+import { Invoice } from '../../core/interfaces/invoice.interface';
+import { Customer } from '../../core/interfaces/customer.interface';
+import { Product } from '../../core/interfaces/product.interface';
+import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { zip } from 'rxjs/observable/zip';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/pluck';
+import 'rxjs/add/operator/switchMap';
+
 
 @Component({
 	selector: 'app-invoice-edit',
@@ -50,10 +53,13 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 	};
 
 	tmpProduct: InvoiceItem = {
-		name: '',
+		invoice_id: 0,
 		product_id: -1,
 		quantity: 0,
-		price: 0
+		product: {
+			name: '',
+			price: 0
+		}
 	};
 
 	constructor(
@@ -70,20 +76,22 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 	}
 
 	private addFieldsToInvoiceItems() {
-		if (this.invoice.items && this.invoice.items.length) {
-			this.invoice.items.forEach((item: InvoiceItem, index: number) => {
-				if (!this.invoice.items[index].name) {
-					this.productsSubscriptions.push(this.productsList$
-						.map((res: Product[]) => res.filter((product: Product) => product.id === item.product_id))
-						.subscribe(
-							(res: Product[]) => {
-								this.invoice.items[index].name = res.length ? res[0].name : '';
-								this.invoice.items[index].price = res.length ? res[0].price : 0;
-							},
-							console.error
-						));
-				}
-			});
+		return () => {
+			if (this.invoice.items && this.invoice.items.length) {
+				this.invoice.items.forEach((item: InvoiceItem, index: number) => {
+					if (!this.invoice.items[index].product.name) {
+						this.productsSubscriptions.push(this.productsList$
+							.map((res: Product[]) => res.filter((product: Product) => product.id === item.product_id))
+							.subscribe(
+								(res: Product[]) => {
+									this.invoice.items[index].product.name = res.length ? res[0].name : '';
+									this.invoice.items[index].product.price = res.length ? res[0].price : 0;
+								},
+								console.error
+							));
+					}
+				});
+			}
 		}
 	}
 
@@ -93,24 +101,7 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 
 	private invoiceItemsHandler(res) {
 		this.invoice.items = <InvoiceItem[]>[...this.invoice.items, ...res];
-	}
-
-	private getHttpParamsHandler() {
-		return (params) => {
-			this.dataStream$ = zip(
-				this.invoiceService.getInvoices(params.get('id')),
-				this.invoiceItemsService.getInvoiceItems(params.get('id'))
-			).map(res => {
-				this.invoiceHandler(res[0]);
-				this.invoiceItemsHandler(res[1]);
-				return res;
-			});
-
-			this.getDataSubscription = this.dataStream$.subscribe(
-				() => this.addFieldsToInvoiceItems(),
-				console.error,
-				() => this.getDataSubscription.unsubscribe());
-		};
+		console.log(this.invoice.items)
 	}
 
 	private deleteInvoiceItems() {
@@ -143,7 +134,23 @@ export class InvoiceEditComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.getHttpParamsSubscription = this.route.paramMap.subscribe(this.getHttpParamsHandler());
+		this.getHttpParamsSubscription = this.route.params.pluck('id')
+			.switchMap((id: number) => {
+				return zip(
+					this.invoiceService.getInvoice(id),
+					this.invoiceItemsService.getInvoiceItems(id)
+				)
+			})
+			.map(([invoices, invoiceItems]) => {
+				this.invoiceHandler(invoices);
+				this.invoiceItemsHandler(invoiceItems);
+				return null;
+			})
+			.subscribe(
+				this.addFieldsToInvoiceItems,
+				console.error,
+				() => this.getHttpParamsSubscription.unsubscribe()
+			);
 	}
 
 	ngOnDestroy() {

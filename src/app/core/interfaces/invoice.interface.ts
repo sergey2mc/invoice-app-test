@@ -1,4 +1,5 @@
 import { InvoiceItem } from './invoiceItem.interface';
+import { Customer } from './customer.interface';
 
 export interface Invoice {
     id?: number;
@@ -6,6 +7,5 @@ export interface Invoice {
     discount: number;
     total: number;
     items?: InvoiceItem[];
-    createdAt?: string;
-    updatedAt?: string;
+    customer?: Customer;
 }

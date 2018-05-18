@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
-import { ModalDialogModule } from '../../shared/components/modal-dialog/modal-dialog.module';
-import { InvoiceFormModule } from '../../shared/components/invoice-form/invoice-form.module';
+import { ModalDialogModule } from '../../core/modal-dialog/modal-dialog.module';
+import { InvoiceFormModule } from '../../core/invoice-form/invoice-form.module';
 import { InvoiceNewComponent } from './invoice-new.component';
 import { InvoicesNewRoutingModule } from './invoice-new-routing.module';
 

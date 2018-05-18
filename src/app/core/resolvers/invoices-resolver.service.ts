@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Invoice } from '../../shared/interfaces/invoices.interface';
+import { Invoice } from '../interfaces/invoice.interface';
 import { InvoiceService } from '../services/invoice.service';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';

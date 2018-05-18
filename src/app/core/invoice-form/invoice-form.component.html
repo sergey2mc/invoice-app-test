@@ -1,0 +1,105 @@
+<form class="form" [formGroup]="invoiceForm">
+  <div class="form-data">
+
+    <div class="form-title" *ngIf="mode === 'new'">New Invoice</div>
+    <div class="form-title" *ngIf="mode === 'edit'">Invoice #{{ invoice?.id }}</div>
+
+    <mat-form-field class="form-customer">
+      <mat-select placeholder="Select customer" formControlName="customer_id">
+        <mat-option *ngFor="let customer of customersList$ | async" [value]="customer.id">
+          {{ customer.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="form-products">
+      <div class="form-products__table" *ngIf="tableDataSource.data.length">
+        <mat-table class="mat-elevation-z8" [dataSource]="tableDataSource">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+            <mat-cell *matCellDef="let item">{{ item.product.name }}</mat-cell>
+          </ng-container>
+
+          <!-- Quantity Column -->
+          <ng-container matColumnDef="quantity">
+            <mat-header-cell *matHeaderCellDef>Qty</mat-header-cell>
+            <mat-cell *matCellDef="let item">{{ item.quantity }}</mat-cell>
+          </ng-container>
+
+          <!-- Price Column -->
+          <ng-container matColumnDef="price">
+            <mat-header-cell *matHeaderCellDef>Price</mat-header-cell>
+            <mat-cell *matCellDef="let item">$ {{ item.product.price }}</mat-cell>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+            <mat-cell *matCellDef="let item">
+              <button class="form-products__controls-button form-products__controls-button_delete"
+                mat-raised-button (click)="deleteInvoiceItem(item.product_id)">-</button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </mat-table>
+      </div>
+
+      <div class="form-products__controls" [formGroup]="itemForm">
+
+        <div class="form-products__controls-product">
+          <mat-form-field>
+            <mat-select placeholder="Add product" formControlName="product_id">
+              <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
+                {{ product.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-products__controls-quantity">
+          <mat-form-field>
+            <input matInput placeholder="Qty" type="number" formControlName="quantity">
+          </mat-form-field>
+          <!--<div class="controls-button controls-button_more" (click)="changeQuantityHandler('++')"></div>-->
+          <!--<div class="controls-button controls-button_less" (click)="changeQuantityHandler('&#45;&#45;')"></div>-->
+        </div>
+
+        <div class="form-products__controls-price">
+          <mat-form-field>
+            <input matInput placeholder="Price" formControlName="price" [value]="newItemPrice$ | async">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+        <button class="form-products__controls-button form-products__controls-button_add"
+          mat-raised-button (click)="addInvoiceItem()">+</button>
+      </div>
+
+    </div>
+
+  <!--<div class="form-errors">-->
+    <!--<div class="form-errors__item" *ngIf="customer.errors?.valueLimitValidator">-->
+      <!--You need to choose customer-->
+    <!--</div>-->
+    <!--<div class="form-errors__item" *ngIf="product.errors?.valueLimitValidator">-->
+      <!--You need to choose product-->
+    <!--</div>-->
+    <!--<div class="form-errors__item" *ngIf="quantity.errors?.valueLimitValidator">-->
+      <!--Quantity must be more then 0-->
+    <!--</div>-->
+    <!--<div class="form-errors__item" *ngIf="discount.errors?.valueLimitValidator">-->
+      <!--Discount must be between 0 and 50%-->
+    <!--</div>-->
+  </div>
+  <div class="form-discount">
+    <div class="form-discount__control">
+      <mat-form-field>
+        <input matInput placeholder="Discount" type="number" formControlName="discount">
+      </mat-form-field>
+      <!--<div class="controls-button controls-button_more" (click)="changeDiscountHandler('++')"></div>-->
+      <!--<div class="controls-button controls-button_less" (click)="changeDiscountHandler('&#45;&#45;')"></div>-->
+    </div>
+  </div>
+</form>

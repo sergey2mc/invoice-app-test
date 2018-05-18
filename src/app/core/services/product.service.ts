@@ -1,21 +1,46 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { Product } from '../../shared/interfaces/products.interface';
-import 'rxjs/add/operator/shareReplay';
+import { Product } from '../interfaces/product.interface';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
+import "rxjs/add/operator/publish";
+
 
 @Injectable()
 export class ProductService {
 
-    allProducts$: Observable<Product[] | Product>;
+  allProducts$: ConnectableObservable<Product[]>;
+	allProducts: Product[];
 
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    getProducts(id: string | number = -1): Observable<Product[] | Product> {
-        if (id > -1) {
-            return this.http.get<Product[] | Product>(`/products/${id}`);
-        } else {
-            return this.allProducts$ = this.allProducts$ || this.http.get<Product[] | Product>(`/products`).shareReplay(1);
-        }
-    }
+	getProducts(): Observable<Product[]> {
+		if (this.allProducts) {
+			return Observable.of(this.allProducts);
+		} else if (this.allProducts$) {
+			return this.allProducts$;
+		} else {
+			this.allProducts$ = this.http
+				.get<Product[]>(`/products`, {observe: 'response'})
+				.map(response => {
+					this.allProducts$ = null;
+					if (response.status === 400) {
+						return [];
+					} else if (response.status === 200) {
+						this.allProducts = response.body;
+						return this.allProducts;
+					}
+				})
+				.publish();
+
+			this.allProducts$.connect();
+			return this.allProducts$;
+		}
+	}
+
+	getProduct(id: number): Observable<Product> {
+		return this.http.get<Product>(`/products/${id}`);
+	}
 }

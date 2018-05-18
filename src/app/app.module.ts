@@ -8,7 +8,7 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from './core/core.module';
-import { httpInterceptorProviders } from './core/http-interceptors';
+import { httpInterceptorProviders } from './core/interceptors';
 
 @NgModule({
   declarations: [ AppComponent ],

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Customer } from '../shared/interfaces/customers.interface';
 import { Observable } from 'rxjs/Observable';
+
+import { Customer } from '../core/interfaces/customer.interface';
+
 
 @Component({
   selector: 'app-customers',
@@ -10,7 +12,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class CustomersComponent {
 
-  customers$: Observable<Customer | Customer[]>;
+  customers$: Observable<Customer[]>;
   displayedColumns = ['name', 'address', 'phone'];
 
 	constructor(private route: ActivatedRoute) {
