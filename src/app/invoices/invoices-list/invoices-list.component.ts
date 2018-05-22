@@ -54,7 +54,8 @@ export class InvoicesListComponent implements OnInit {
     ngOnInit() {
         this.invoices$ = zip(
                 this.route.snapshot.data.invoices,
-                this.customerService.getCustomers()
+                this.route.snapshot.data.customers,
+                // this.customerService.allCustomers$
             ).map(this.addCustomerNames);
     }
 

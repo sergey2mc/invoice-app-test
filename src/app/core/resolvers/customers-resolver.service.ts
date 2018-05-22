@@ -11,22 +11,24 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
 
 @Injectable()
-export class CustomersResolver implements Resolve<Customer | Customer[]> {
-    constructor(private customerService: CustomerService, private router: Router) {}
+export class CustomersResolver implements Resolve<Observable<Customer[]>> {
+    constructor(private customerService: CustomerService, private router: Router) {
+      this.customerService.getCustomers();
+    }
 
-    resolve(): Observable<Customer | Customer[]> {
-        return this.customerService.getCustomers()
-            .take(1)
-            .map(customer => {
-                if (customer) {
-                    return Observable.of(customer);
-                } else {
-                    return Observable.empty<Customer[]>();
-                }
-            })
-            .catch(() => {
-                this.router.navigate(['/']);
-                return Observable.throw('Sever error');
-            });
+    resolve(): Observable<Observable<Customer[]>> {
+      return this.customerService.allCustomers$
+        .take(1)
+        .map(customer => {
+          if (customer) {
+            return Observable.of(customer);
+          } else {
+            return Observable.empty<Customer[]>();
+          }
+        })
+        .catch(() => {
+          this.router.navigate(['/']);
+          return Observable.throw('Sever error');
+        });
     }
 }

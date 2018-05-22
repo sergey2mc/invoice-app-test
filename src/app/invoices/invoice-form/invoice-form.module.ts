@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material';
 
 import { SharedModule } from '../../shared/shared.module';
 import { InvoiceFormComponent } from './invoice-form.component';
+import { InvoicesFormRoutingModule } from './invoice-form-routing.module';
+import { InvoiceItemModule } from '../invoice-item/invoice-item.module';
 
 
 @NgModule({
@@ -15,7 +17,9 @@ import { InvoiceFormComponent } from './invoice-form.component';
 		ReactiveFormsModule,
 		MatSelectModule,
 		MatInputModule,
-		MatTableModule
+		MatTableModule,
+		InvoiceItemModule,
+		InvoicesFormRoutingModule
   ],
   exports: [ InvoiceFormComponent ]
 })

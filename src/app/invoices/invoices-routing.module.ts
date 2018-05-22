@@ -3,15 +3,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { InvoicesComponent } from './invoices.component';
 import { InvoicesListComponent } from './invoices-list/invoices-list.component';
 import { InvoicesResolver } from '../core/resolvers/invoices-resolver.service';
+import { CustomersResolver } from '../core/resolvers/customers-resolver.service';
 
 const invoicesRoutes: Routes = [
   {
     path: '',
     component: InvoicesComponent,
     children: [
-      { path: '', component: InvoicesListComponent, pathMatch: 'full', resolve: {invoices: InvoicesResolver} },
-      { path: 'new', loadChildren: './invoice-new/invoice-new.module#InvoiceNewModule' },
-      { path: 'edit/:id', loadChildren: './invoice-edit/invoice-edit.module#InvoiceEditModule' },
+      { path: '', component: InvoicesListComponent, pathMatch: 'full', resolve: {invoices: InvoicesResolver, customers: CustomersResolver} },
+      { path: 'new', loadChildren: './invoice-form/invoice-form.module#InvoiceFormModule', data: {mode: 'new'} },
+      { path: 'edit/:id', loadChildren: './invoice-form/invoice-form.module#InvoiceFormModule', data: {mode: 'edit'} },
       { path: 'view/:id', loadChildren: './invoice-view/invoice-view.module#InvoiceViewModule' }
     ]
   }
@@ -20,6 +21,6 @@ const invoicesRoutes: Routes = [
 @NgModule({
   imports: [ RouterModule.forChild(invoicesRoutes) ],
   exports: [ RouterModule ],
-  providers: [ InvoicesResolver ]
+  providers: [ InvoicesResolver, CustomersResolver ]
 })
 export class InvoicesRoutingModule { }

@@ -1,0 +1,109 @@
+<form class="form" [formGroup]="invoiceForm">
+
+  <div class="form-container">
+    <div class="form-data">
+
+      <div class="form-title" *ngIf="mode === 'new'">New Invoice</div>
+      <div class="form-title" *ngIf="mode === 'edit'">Invoice #{{ invoice?.id }}</div>
+
+      <mat-form-field class="form-customer">
+        <mat-select placeholder="Select customer" formControlName="customer_id">
+          <mat-option *ngFor="let customer of customersList$ | async" [value]="customer.id">
+            {{ customer.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="form-products">
+        <div class="form-products__table">
+          <div formArrayName="items">
+            <div *ngFor="let item of items?.value; let i=index">
+
+              <app-invoice-item
+                [item]="item"
+                (deleteItem)="deleteInvoiceItem(i)">
+              </app-invoice-item>
+
+            </div>
+          </div>
+
+            <!--<div class="form-products__controls-product">-->
+              <!--<mat-form-field>-->
+                <!--<mat-select placeholder="Add product" formControlName="product_id">-->
+                  <!--<mat-option *ngFor="let product of productsList$ | async" [value]="item.product.id">-->
+                    <!--{{ product.name }}-->
+                  <!--</mat-option>-->
+                <!--</mat-select>-->
+              <!--</mat-form-field>-->
+            <!--</div>-->
+
+            <!--<div class="form-products__controls-quantity">-->
+              <!--<mat-form-field>-->
+                <!--<input matInput placeholder="Qty" type="number" formControlName="quantity" [value]="item.quantity">-->
+              <!--</mat-form-field>-->
+            <!--</div>-->
+
+            <!--<div class="form-products__controls-price">-->
+              <!--<mat-form-field>-->
+                <!--<input matInput placeholder="Price" formControlName="price" [value]="item.product.price">-->
+                <!--<span matPrefix>$&nbsp;</span>-->
+              <!--</mat-form-field>-->
+            <!--</div>-->
+
+            <!--<button class="form-products__controls-button form-products__controls-button_delete"-->
+              <!--mat-raised-button (click)="deleteInvoiceItem(item.product_id)">-</button>-->
+
+        </div>
+
+        <div class="form-products__controls" [formGroup]="controlsForm">
+
+          <div class="form-products__controls-product">
+            <mat-form-field>
+              <mat-select placeholder="Add product" formControlName="product_id">
+                <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
+                  {{ product.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-products__controls-quantity">
+            <mat-form-field>
+              <input matInput placeholder="Qty" type="number" formControlName="quantity">
+            </mat-form-field>
+          </div>
+
+          <div class="form-products__controls-price">
+            <mat-form-field>
+              <input matInput placeholder="Price" [value]="newItemPrice$ | async">
+              <span matPrefix>$&nbsp;</span>
+            </mat-form-field>
+          </div>
+
+          <button class="form-products__controls-button form-products__controls-button_add"
+            mat-raised-button (click)="addInvoiceItem()">+</button>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-discount">
+      <div class="form-discount__control">
+        <mat-form-field>
+          <input matInput placeholder="Discount" type="number" formControlName="discount">
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-footer">
+    <div class="form-footer__total">
+      <div class="form-footer__total-label">Total</div>
+      <input class="form-footer__total-value" matInput placeholder="0.00" formControlName="total">
+      <!--<div class="form-footer__total-value">$ {{ (invoice?.total | number:'1.1-2') || '0.00' }}</div>-->
+    </div>
+    <button class="form-footer__button" mat-raised-button (click)="saveInvoice()">Save Invoice</button>
+  </div>
+
+</form>

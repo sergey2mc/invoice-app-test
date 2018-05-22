@@ -11,22 +11,24 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
 
 @Injectable()
-export class InvoicesResolver implements Resolve<Invoice | Invoice[]> {
-    constructor(private invoiceService: InvoiceService, private router: Router) {}
+export class InvoicesResolver implements Resolve<Observable<Invoice[]>> {
+    constructor(private invoiceService: InvoiceService, private router: Router) {
+      this.invoiceService.getInvoices();
+    }
 
-    resolve(): Observable<Invoice | Invoice[]> {
-        return this.invoiceService.getInvoices()
-            .take(1)
-            .map(invoices => {
-                if (invoices) {
-                    return Observable.of(invoices);
-                } else {
-                    return Observable.empty<Invoice[]>();
-                }
-            })
-            .catch(() => {
-                this.router.navigate(['/']);
-                return Observable.throw('Sever error');
-            });
+    resolve(): Observable<Observable<Invoice[]>> {
+      return this.invoiceService.allInvoices$
+        .take(1)
+        .map(invoices => {
+          if (invoices) {
+            return Observable.of(invoices);
+          } else {
+            return Observable.empty<Invoice[]>();
+          }
+        })
+        .catch(() => {
+          this.router.navigate(['/']);
+          return Observable.throw('Sever error');
+        });
     }
 }

@@ -1,18 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/publishReplay';
+
 import { Invoice } from '../interfaces/invoice.interface';
-import 'rxjs/add/operator/shareReplay';
+
 
 @Injectable()
 export class InvoiceService {
 
-  allInvoices$: Observable<Invoice[]>;
+	allInvoices$: ConnectableObservable<Invoice[]>;
+	emitter$: Subject<Invoice[]> = new Subject();
 
-  constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient) {
+		this.allInvoices$ = this.emitter$
+			.switchMap(() => this.http.get<Invoice[]>(`/invoices`))
+			.publishReplay(1);
+		this.allInvoices$.connect();
+	}
 
-	getInvoices(): Observable<Invoice[]> {
-    return this.allInvoices$ = this.allInvoices$ || this.http.get<Invoice[]>(`/invoices`).shareReplay(1);
+	getInvoices() {
+		this.emitter$.next();
 	}
 
 	getInvoice(id: number): Observable<Invoice> {
@@ -29,9 +41,5 @@ export class InvoiceService {
 
 	deleteInvoice(id: string | number): Observable<Invoice> {
 		return this.http.delete<Invoice>(`/invoices/${id}`);
-	}
-
-	clearCache() {
-		this.allInvoices$ = null;
 	}
 }
