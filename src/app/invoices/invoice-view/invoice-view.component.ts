@@ -1,94 +1,59 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { Observable } from 'rxjs/Observable';
+import { combineLatest } from 'rxjs/observable/combineLatest';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
+
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
-import { Product } from '../../core/interfaces/product.interface';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import { zip } from 'rxjs/observable/zip';
-import 'rxjs/add/operator/mergeMap';
+
 
 @Component({
-    selector: 'app-invoice-view',
-    templateUrl: './invoice-view.component.html',
-    styleUrls: ['./invoice-view.component.scss'],
+	selector: 'app-invoice-view',
+	templateUrl: './invoice-view.component.html',
+	styleUrls: ['./invoice-view.component.scss'],
 })
 export class InvoiceViewComponent implements OnInit {
 
-    getInvoiceSubscription: Subscription;
-    getCustomersAndInvoiceItemsSubscription: Subscription;
-    getProductsSubscription: Subscription;
-    getProductsObservables: Observable<Product | Product[]>[] = [];
-    getHttpParamsSubscription: Subscription;
-    customer = '';
+	invoice$: Observable<Invoice>;
 
-    invoice: Invoice = {
-        id: 0,
-        customer_id: 0,
-        discount: 0,
-        total: 0,
-        items: []
-    };
+	constructor(
+		private customerService: CustomerService,
+		private productService: ProductService,
+		private invoiceService: InvoiceService,
+		private invoiceItemsService: InvoiceItemsService,
+		private router: Router,
+		private route: ActivatedRoute
+	) {}
 
-    constructor(
-        private customerService: CustomerService,
-        private productService: ProductService,
-        private invoiceService: InvoiceService,
-        private invoiceItemsService: InvoiceItemsService,
-        private router: Router,
-        private route: ActivatedRoute
-    ) {}
+	ngOnInit() {
 
-    private getHttpParamsHandler() {
-        return (params) => {
-            this.getInvoiceSubscription = this.invoiceService.getInvoice(params.get('id')).subscribe(this.getInvoiceHandler());
-        };
-    }
+		this.invoice$ = this.route.snapshot.data.invoice
+			.switchMap(invoice => combineLatest(
+				Observable.of(invoice),
+				this.customerService.getCustomer(invoice.customer_id),
+				this.invoiceItemsService.getInvoiceItems(invoice.id)
+			))
+			.map(([invoice, customer, items]) => ({...invoice, customer: customer, items: items}))
+			.switchMap(invoice => combineLatest(
+				Observable.of(invoice),
+				this.productService.allProducts$
+			))
+			.map(([invoice, products]) => ({
+				...invoice,
+				items: invoice.items.map(item => ({...item, product: products.find(prod => prod.id === item.product_id)}))
+			}))
+			.share();
 
-    private getInvoiceHandler() {
-        return (res) => {
-            this.invoice = res;
-            this.getCustomersAndInvoiceItemsSubscription = zip(
-                this.customerService.getCustomer(res.customer_id),
-                this.invoiceItemsService.getInvoiceItems(res.id)
-            ).subscribe(this.getCustomersAndInvoiceItemsHandler());
-        };
-    }
+	}
 
-    private getCustomersAndInvoiceItemsHandler() {
-        return (res) => { // [0] - customers array, [1] - invoice-items array
-            this.customer = res[0].name;
-
-            this.invoice.items = res[1];
-
-            this.invoice.items.forEach((item: InvoiceItem) => {
-                this.getProductsObservables.push(this.productService.getProduct(item.product_id));
-            });
-            const zip$ = (array$) => zip(...array$);
-            this.getProductsSubscription = zip$(this.getProductsObservables).subscribe(prod => {
-                if (prod && prod.length) {
-                    this.invoice.items.forEach((item: InvoiceItem, index: number) => {
-                        const currentProduct = prod.filter((product: Product) => item.product_id === product.id);
-                        this.invoice.items[index]['name'] = currentProduct[0]['name'];
-                        this.invoice.items[index]['price'] = currentProduct[0]['price'];
-                    });
-                }
-                this.getProductsSubscription.unsubscribe();
-            });
-
-            this.getCustomersAndInvoiceItemsSubscription.unsubscribe();
-        };
-    }
-
-    ngOnInit() {
-        this.getHttpParamsSubscription = this.route.paramMap.subscribe(this.getHttpParamsHandler());
-    }
-
-    customerClickHandler() {
-        this.router.navigate(['customers']);
-    }
+	customerClickHandler() {
+		this.router.navigate(['customers']);
+	}
 }

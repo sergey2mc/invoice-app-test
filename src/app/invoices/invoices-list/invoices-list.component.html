@@ -1,4 +1,4 @@
-<mat-table class="products-table mat-elevation-z8" [dataSource]="invoices$ | async">
+<mat-table class="products-table mat-elevation-z8" [dataSource]="invoicesList$ | async">
 
   <!-- ID Column -->
   <ng-container matColumnDef="id">
@@ -9,7 +9,7 @@
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-    <mat-cell *matCellDef="let invoice">{{ invoice.name }}</mat-cell>
+    <mat-cell *matCellDef="let invoice">{{ invoice.customer.name }}</mat-cell>
   </ng-container>
 
   <!-- Discount Column -->

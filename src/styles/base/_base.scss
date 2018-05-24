@@ -11,10 +11,10 @@ input, select, button, a {
   cursor: pointer;
 }
 
-::-webkit-scrollbar {
-  width: 0;  /* remove scrollbar space */
-  background: transparent;  /* optional: just make scrollbar invisible */
-}
+//::-webkit-scrollbar {
+//  width: 0;  /* remove scrollbar space */
+//  background: transparent;  /* optional: just make scrollbar invisible */
+//}
 
 .loader {
   position: fixed;

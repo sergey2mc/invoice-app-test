@@ -1,6 +1,5 @@
-<div class="form-products__controls">
-
-    <div class="form-products__controls-product">
+<div class="form-item">
+    <div class="form-item__product">
         <mat-form-field>
             <mat-select placeholder="Add product" [formControl]="product_id">
                 <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
@@ -9,21 +8,16 @@
             </mat-select>
         </mat-form-field>
     </div>
-
-    <div class="form-products__controls-quantity">
+    <div class="form-item__quantity">
         <mat-form-field>
-            <input matInput placeholder="Qty" type="number" [formControl]="quantity">
+            <input matInput placeholder="Qty" type="number" min="0" [formControl]="quantity">
         </mat-form-field>
     </div>
-
-    <div class="form-products__controls-price">
+    <div class="form-item__price">
         <mat-form-field>
             <input matInput placeholder="Price" [formControl]="price">
             <span matPrefix>$&nbsp;</span>
         </mat-form-field>
     </div>
-
-    <button class="form-products__controls-button form-products__controls-button_del"
-            mat-raised-button (click)="onDeleteItem()">-</button>
-
+    <button class="form-item__button" mat-raised-button (click)="onDeleteItem()">-</button>
 </div>

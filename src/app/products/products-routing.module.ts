@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProductsComponent } from './products.component';
 import { ProductsResolver } from '../core/resolvers/products-resolver.service';
 
+
 const productsRoutes: Routes = [
   {
     path: '',
@@ -13,7 +14,7 @@ const productsRoutes: Routes = [
       products: ProductsResolver
     }
   }
-  ];
+];
 
 @NgModule({
   imports: [ RouterModule.forChild(productsRoutes) ],

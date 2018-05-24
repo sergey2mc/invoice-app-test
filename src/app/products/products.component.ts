@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Product } from '../core/interfaces/product.interface';
+
 import { Observable } from 'rxjs/Observable';
+
+import { Product } from '../core/interfaces/product.interface';
+
 
 @Component({
   selector: 'app-products',
@@ -10,7 +13,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class ProductsComponent {
 
-  products$: Observable<Product | Product[]>;
+  products$: Observable<Product[]>;
   displayedColumns = ['name', 'price'];
 
   constructor(private route: ActivatedRoute) {

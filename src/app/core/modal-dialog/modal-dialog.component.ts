@@ -8,7 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 })
 export class ModalDialogComponent {
 
-  mode = ''
+  mode = '';
 
   constructor(
     public dialogRef: MatDialogRef<ModalDialogComponent>,

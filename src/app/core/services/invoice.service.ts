@@ -14,21 +14,21 @@ import { Invoice } from '../interfaces/invoice.interface';
 export class InvoiceService {
 
 	allInvoices$: ConnectableObservable<Invoice[]>;
-	emitter$: Subject<Invoice[]> = new Subject();
+	allInvoicesEmitter$: Subject<Invoice[]> = new Subject();
 
 	constructor(private http: HttpClient) {
-		this.allInvoices$ = this.emitter$
+		this.allInvoices$ = this.allInvoicesEmitter$
 			.switchMap(() => this.http.get<Invoice[]>(`/invoices`))
 			.publishReplay(1);
 		this.allInvoices$.connect();
 	}
 
 	getInvoices() {
-		this.emitter$.next();
+		this.allInvoicesEmitter$.next();
 	}
 
-	getInvoice(id: number): Observable<Invoice> {
-			return this.http.get<Invoice>(`/invoices/${id}`);
+	getInvoice(id: number) {
+		return this.http.get<Invoice>(`/invoices/${id}`);
 	}
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {

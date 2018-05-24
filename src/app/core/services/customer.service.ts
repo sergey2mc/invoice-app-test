@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Observable} from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/publishReplay';
@@ -28,7 +28,6 @@ export class CustomerService {
 	}
 
 	getCustomer(id: number): Observable<Customer> {
-    return this.http.get<Customer>(`/customers/${id}`);
+		return this.http.get<Customer>(`/customers/${id}`)
 	}
-
 }

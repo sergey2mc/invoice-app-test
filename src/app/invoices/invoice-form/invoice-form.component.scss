@@ -28,199 +28,76 @@
     margin-bottom: 10px;
   }
 
-  &-products {
+  &-items {
+    width: 100%;
+    overflow-y: auto;
+    max-height: 235px;
+    margin-bottom: 20px;
 
-    &__header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-      margin-bottom: 10px;
-      padding-right: 40px;
-
-      &-product {
-        width: 280px;
-        height: 100%;
-        border: 1px solid $gray;
-      }
-
-      &-quantity {
-        width: 80px;
-        height: 100%;
-        border: 1px solid $gray;
-      }
-
-      &-price {
-        width: 80px;
-        height: 100%;
-        border: 1px solid $gray;
-      }
-    }
-
-
-
-    &__table {
-      width: 100%;
-      overflow-y: auto;
-      max-height: 235px;
-      margin-bottom: 20px;
-
-      .mat-column-name {
-        min-width: 250px;
-      }
-
-      .mat-column-quantity {
-        min-width: 50px;
-        text-align: center;
-      }
-
-      .mat-column-price {
-        min-width: 80px;
-        text-align: center;
-      }
-
-      .mat-column-actions {
-        min-width: 25px;
-        text-align: center;
-      }
-
-      &-item {
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        height: 30px;
-        line-height: 30px;
-        text-align: center;
-        padding-right: 40px;
-        margin-bottom: 10px;
-      }
-
-      &-product {
-        width: 280px;
-        height: 100%;
-        border: 1px solid $dark-gray;
-        background-color: $gray;
-      }
-
-      &-quantity {
-        position: relative;
-        width: 80px;
-        height: 100%;
-        border: 1px solid $dark-gray;
-        background-color: $gray;
-      }
-
-      &-price {
-        width: 80px;
-        height: 100%;
-        border: 1px solid $dark-gray;
-        background-color: $gray;
-      }
-
-      &-button {
-        position: absolute;
-        top: 2px;
-        right: 0;
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        line-height: 28px;
-        font-size: 18px;
-        padding: 0;
-        border: 1px solid $dark-gray;
-        background-color: $red;
-      }
-    }
-
-    &__controls {
-      position: relative;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 10px;
-
-      &-product {
-        width: 265px;
-        height: 100%;
-        margin-right: 10px;
-
-        .mat-form-field {
-          width: 100%;
-        }
-      }
-
-      &-quantity {
-        position: relative;
-        width: 80px;
-        height: 100%;
-
-        .mat-form-field {
-          width: 100%;
-          padding: 0 10px;
-        }
-      }
-
-      &-price {
-        width: 100px;
-        height: 100%;
-
-        .mat-form-field {
-          width: 100%;
-          padding: 0 10px;
-        }
-      }
-
-      &-select {
-        width: 100%;
-        height: 100%;
-        background-color: $light-blue-2;
-        border: 1px solid $dark-gray;
-        font-size: 18px;
-        text-align: center;
-      }
-
-      &-input {
-        width: 100%;
-        height: 100%;
-        border: 1px solid $dark-gray;
-        background-color: $light-blue-2;
-        font-size: 18px;
-        text-align: center;
-      }
-
-      &-button {
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        line-height: 28px;
-        font-size: 18px;
-        padding: 0;
-        border: 1px solid $gray;
-        border-radius: 50%;
-
-        &_add {
-          position: absolute;
-          top: 50%;
-          right: 0;
-          transform: translateY(-50%);
-          background-color: $light-green;
-        }
-
-        &_delete {
-          background-color: $red;
-        }
-      }
+    .ng-star-inserted:nth-child(2n) {
+      background-color: $light-gray;
     }
   }
+
+  &-controls {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding-top: 5px;
+    border-top: 2px solid $gray;
+    margin-bottom: 10px;
+
+    &__product {
+      width: 265px;
+      height: 100%;
+      margin-right: 10px;
+
+      .mat-form-field {
+        width: 100%;
+      }
+    }
+
+    &__quantity {
+      position: relative;
+      width: 80px;
+      height: 100%;
+
+      .mat-form-field {
+        width: 100%;
+        padding: 0 10px;
+      }
+    }
+
+    &__price {
+      width: 100px;
+      height: 100%;
+
+      .mat-form-field {
+        width: 100%;
+        padding: 0 10px;
+      }
+    }
+
+    &__button {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      line-height: 28px;
+      font-size: 18px;
+      padding: 0;
+      border: 1px solid $gray;
+      border-radius: 50%;
+      background-color: $light-green;
+    }
+  }
+
 
   &-discount {
     display: flex;
@@ -239,21 +116,6 @@
         width: 100%;
         padding: 0 10px;
       }
-    }
-  }
-
-  &-errors {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 50%;
-
-    &__item {
-      width: 100%;
-      color: $red;
-      font-size: 14px;
-      line-height: 16px;
-      text-align: right;
     }
   }
 
@@ -296,26 +158,5 @@
       font-size: 18px;
       padding: 9px 15px;
     }
-  }
-}
-
-.controls-button {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  right: 5px;
-  cursor: pointer;
-
-  &_more {
-    border-width: 0 7.5px 10px 7.5px;
-    border-color: transparent transparent $dark-gray transparent;
-    top: 4px;
-  }
-
-  &_less {
-    border-width: 10px 7.5px 0 7.5px;
-    border-color: $dark-gray transparent transparent transparent;
-    bottom: 4px;
   }
 }

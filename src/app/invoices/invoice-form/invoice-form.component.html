@@ -1,10 +1,8 @@
 <form class="form" [formGroup]="invoiceForm">
-
   <div class="form-container">
     <div class="form-data">
-
-      <div class="form-title" *ngIf="mode === 'new'">New Invoice</div>
-      <div class="form-title" *ngIf="mode === 'edit'">Invoice #{{ invoice?.id }}</div>
+      <div class="form-title" *ngIf="!editMode">New Invoice</div>
+      <div class="form-title" *ngIf="editMode">Invoice #{{ (invoice$ | async)?.id }}</div>
 
       <mat-form-field class="form-customer">
         <mat-select placeholder="Select customer" formControlName="customer_id">
@@ -14,50 +12,19 @@
         </mat-select>
       </mat-form-field>
 
-      <div class="form-products">
-        <div class="form-products__table">
-          <div formArrayName="items">
-            <div *ngFor="let item of items?.value; let i=index">
-
-              <app-invoice-item
-                [item]="item"
-                (deleteItem)="deleteInvoiceItem(i)">
-              </app-invoice-item>
-
-            </div>
+      <div>
+        <div class="form-items" formArrayName="items">
+          <div *ngFor="let item of items?.controls; let i=index">
+            <app-invoice-item
+              [item]="item"
+              [editMode]="editMode"
+              (deleteItem)="deleteInvoiceItem(i, item.value)">
+            </app-invoice-item>
           </div>
-
-            <!--<div class="form-products__controls-product">-->
-              <!--<mat-form-field>-->
-                <!--<mat-select placeholder="Add product" formControlName="product_id">-->
-                  <!--<mat-option *ngFor="let product of productsList$ | async" [value]="item.product.id">-->
-                    <!--{{ product.name }}-->
-                  <!--</mat-option>-->
-                <!--</mat-select>-->
-              <!--</mat-form-field>-->
-            <!--</div>-->
-
-            <!--<div class="form-products__controls-quantity">-->
-              <!--<mat-form-field>-->
-                <!--<input matInput placeholder="Qty" type="number" formControlName="quantity" [value]="item.quantity">-->
-              <!--</mat-form-field>-->
-            <!--</div>-->
-
-            <!--<div class="form-products__controls-price">-->
-              <!--<mat-form-field>-->
-                <!--<input matInput placeholder="Price" formControlName="price" [value]="item.product.price">-->
-                <!--<span matPrefix>$&nbsp;</span>-->
-              <!--</mat-form-field>-->
-            <!--</div>-->
-
-            <!--<button class="form-products__controls-button form-products__controls-button_delete"-->
-              <!--mat-raised-button (click)="deleteInvoiceItem(item.product_id)">-</button>-->
-
+          <mat-error *ngIf="items.invalid && saveInvoice$ | async">You have to add at least one product</mat-error>
         </div>
-
-        <div class="form-products__controls" [formGroup]="controlsForm">
-
-          <div class="form-products__controls-product">
+        <div class="form-controls" [formGroup]="controlsForm">
+          <div class="form-controls__product">
             <mat-form-field>
               <mat-select placeholder="Add product" formControlName="product_id">
                 <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
@@ -66,44 +33,34 @@
               </mat-select>
             </mat-form-field>
           </div>
-
-          <div class="form-products__controls-quantity">
+          <div class="form-controls__quantity">
             <mat-form-field>
-              <input matInput placeholder="Qty" type="number" formControlName="quantity">
+              <input matInput placeholder="Qty" type="number" min="0" formControlName="quantity">
             </mat-form-field>
           </div>
-
-          <div class="form-products__controls-price">
+          <div class="form-controls__price">
             <mat-form-field>
               <input matInput placeholder="Price" [value]="newItemPrice$ | async">
               <span matPrefix>$&nbsp;</span>
             </mat-form-field>
           </div>
-
-          <button class="form-products__controls-button form-products__controls-button_add"
-            mat-raised-button (click)="addInvoiceItem()">+</button>
-
+          <button class="form-controls__button form-controls__button_add" mat-raised-button (click)="addInvoiceItem()">+</button>
         </div>
-
       </div>
     </div>
-
     <div class="form-discount">
       <div class="form-discount__control">
         <mat-form-field>
-          <input matInput placeholder="Discount" type="number" formControlName="discount">
+          <input matInput placeholder="Discount" type="number" min="0" max="50" formControlName="discount">
         </mat-form-field>
       </div>
     </div>
   </div>
-
   <div class="form-footer">
     <div class="form-footer__total">
       <div class="form-footer__total-label">Total</div>
-      <input class="form-footer__total-value" matInput placeholder="0.00" formControlName="total">
-      <!--<div class="form-footer__total-value">$ {{ (invoice?.total | number:'1.1-2') || '0.00' }}</div>-->
+      <div class="form-footer__total-value">$ {{ total.value || '0.00' }}</div>
     </div>
-    <button class="form-footer__button" mat-raised-button (click)="saveInvoice()">Save Invoice</button>
+    <button class="form-footer__button" mat-raised-button *ngIf="!editMode" (click)="saveInvoice()">Save Invoice</button>
   </div>
-
 </form>

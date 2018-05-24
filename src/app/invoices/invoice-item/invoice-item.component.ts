@@ -5,11 +5,17 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { combineLatest } from 'rxjs/observable/combineLatest';
+import { merge } from 'rxjs/observable/merge';
 import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/filter';
 
-import { Product } from '../../core/interfaces/product.interface';
 import { ProductService } from '../../core/services/product.service';
+import { InvoiceService } from '../../core/services/invoice.service';
+import { InvoiceItemsService } from '../../core/services/invoice-items.service';
+import { Product } from '../../core/interfaces/product.interface';
 
 
 @Component({
@@ -20,16 +26,20 @@ import { ProductService } from '../../core/services/product.service';
 export class InvoiceItemComponent implements OnInit, OnDestroy {
 
 	productsList$: Observable<Product[]>;
-
-	itemChangesSubscription: Subscription;
-
 	deleteItem$: Subject<number> = new Subject();
 	deleteItemSubscription: Subscription;
+	itemChangesSubscription: Subscription;
+	updateInvoiceItemSubscription: Subscription;
 
   @Input() item;
+	@Input() editMode;
   @Output() deleteItem = new EventEmitter();
 
-  constructor(private productService: ProductService) {}
+  constructor(
+  	private productService: ProductService,
+		private invoiceService: InvoiceService,
+		private invoiceItemsService: InvoiceItemsService
+	) {}
 
 	get product_id(): FormControl {
 		return this.item.get('product_id') as FormControl;
@@ -46,6 +56,18 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
   ngOnInit() {
 		this.productsList$ = this.productService.allProducts$;
 
+		if (this.editMode) {
+			this.updateInvoiceItemSubscription = merge(
+					this.product_id.valueChanges,
+					this.quantity.valueChanges
+				)
+				.debounceTime(100)
+				.distinctUntilChanged()
+				.filter(() => this.item.valid)
+				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
+				.subscribe();
+		}
+
 		this.itemChangesSubscription = combineLatest(
 				this.product_id.valueChanges,
 				this.productsList$
@@ -56,13 +78,13 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 			.subscribe();
 
 		this.deleteItemSubscription = this.deleteItem$
-			.map(item => console.log(item))
 			.subscribe(() => this.deleteItem.emit())
   }
 
   ngOnDestroy() {
 		this.itemChangesSubscription.unsubscribe();
 		this.deleteItemSubscription.unsubscribe();
+		if (this.editMode) this.updateInvoiceItemSubscription.unsubscribe();
 	}
 
 	onDeleteItem() {
