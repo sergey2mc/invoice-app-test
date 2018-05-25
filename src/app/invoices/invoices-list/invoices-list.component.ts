@@ -17,6 +17,7 @@ import { Customer } from '../../core/interfaces/customer.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { CustomerService } from '../../core/services/customer.service';
+import { LoaderService } from '../../core/services/loader.service';
 
 
 @Component({
@@ -25,6 +26,8 @@ import { CustomerService } from '../../core/services/customer.service';
 	styleUrls: ['./invoices-list.component.scss'],
 })
 export class InvoicesListComponent implements OnInit, OnDestroy {
+
+	loaderEnabled$: Observable<boolean>;
 
 	invoicesEmitter$: Subject<number> = new Subject();
 	invoicesList$: ConnectableObservable<Invoice[]>;
@@ -35,12 +38,15 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	modalDialogSubscription: Subscription;
 
 	constructor(
+		private loaderService: LoaderService,
 		private invoiceService: InvoiceService,
 		private customerService: CustomerService,
 		private router: Router,
 		private route: ActivatedRoute,
 		public dialog: MatDialog
-	) {}
+	) {
+		this.loaderEnabled$ = loaderService.loaderEnabled$;
+	}
 
 	private openDialog(data) {
 		return this.dialog.open(ModalDialogComponent, {

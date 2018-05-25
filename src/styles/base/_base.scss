@@ -16,9 +16,20 @@ input, select, button, a {
 //  background: transparent;  /* optional: just make scrollbar invisible */
 //}
 
-.loader {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-100%, -50%);
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(183,183,183,.6);
+
+  &__loader {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+  }
 }

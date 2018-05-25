@@ -12,6 +12,7 @@ import { CustomerService } from '../../core/services/customer.service';
 import { ProductService } from '../../core/services/product.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
+import 'rxjs/add/operator/do';
 
 
 @Component({
@@ -33,24 +34,8 @@ export class InvoiceViewComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-
 		this.invoice$ = this.route.snapshot.data.invoice
-			.switchMap(invoice => combineLatest(
-				Observable.of(invoice),
-				this.customerService.getCustomer(invoice.customer_id),
-				this.invoiceItemsService.getInvoiceItems(invoice.id)
-			))
-			.map(([invoice, customer, items]) => ({...invoice, customer: customer, items: items}))
-			.switchMap(invoice => combineLatest(
-				Observable.of(invoice),
-				this.productService.allProducts$
-			))
-			.map(([invoice, products]) => ({
-				...invoice,
-				items: invoice.items.map(item => ({...item, product: products.find(prod => prod.id === item.product_id)}))
-			}))
 			.share();
-
 	}
 
 	customerClickHandler() {
