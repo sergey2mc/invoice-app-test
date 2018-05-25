@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve } from '@angular/router';
+import { Router, Resolve, NavigationStart, NavigationEnd } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
@@ -11,13 +11,21 @@ import 'rxjs/add/observable/throw';
 
 import { Product } from '../interfaces/product.interface';
 import { ProductService } from '../services/product.service';
+import { LoaderService } from '../services/loader.service';
 
 
 @Injectable()
 export class ProductsResolver implements Resolve< Observable<Product[]>> {
 
-  constructor(private productService: ProductService, private router: Router) {
+  constructor(private productService: ProductService, private loader: LoaderService, private router: Router) {
     this.productService.getProducts();
+		router.events.subscribe(e => {
+			if (e instanceof NavigationStart) {
+				loader.show();
+			} else if (e instanceof NavigationEnd) {
+				loader.hide();
+			}
+		});
   }
 
   resolve(): Observable<Observable<Product[]>> {

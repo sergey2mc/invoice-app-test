@@ -156,25 +156,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 		if (this.editMode) {
 			this.invoice$ = this.route.snapshot.data.invoice
-				.switchMap(invoice => combineLatest(
-					Observable.of(invoice),
-					this.customerService.getCustomer(invoice.customer_id),
-					this.invoiceItemsService.getInvoiceItems(invoice.id)
-				))
-				.map(([invoice, customer, items]) => ({...invoice, customer: customer, items: items}))
-				.switchMap(invoice => combineLatest(
-					Observable.of(invoice),
-					this.productService.allProducts$
-				))
-				.map(([invoice, products]) => ({
-					...invoice,
-					items: invoice.items.map(item => ({...item, product: products.find(prod => prod.id === item.product_id)}))
-				}))
 				.map(invoice => {
 					invoice.items.forEach(item => this.items.push(this.createItemForm(item)));
-					return invoice;
-				})
-				.map(invoice => {
 					this.invoiceForm.patchValue(invoice);
 					return invoice;
 				})
@@ -256,11 +239,11 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			})
 			.mergeMap(invoice => this.invoiceService.addInvoice(invoice))
 			.subscribe((invoice) => {
+				this.invoiceService.getInvoices();
 				const dialogRef = this.openDialog({id: invoice.id, mode: 'invoiceCreated'});
 				this.modalDialogSubscription = dialogRef.afterClosed()
 					.subscribe(result => {
 						if (result) {
-							this.invoiceService.getInvoices();
 							this.router.navigate(['/invoices']);
 						}
 						this.modalDialogSubscription.unsubscribe();

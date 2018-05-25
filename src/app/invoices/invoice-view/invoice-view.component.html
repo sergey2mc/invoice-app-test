@@ -28,7 +28,7 @@
   <div class="view-footer">
     <div class="view-footer__total">
       <div class="view-footer__total-label">Total</div>
-      <div class="view-footer__total-value">${{ (invoice$ | async)?.total }}</div>
+      <div class="view-footer__total-value">${{ (invoice$ | async)?.total | number:'1.1-2' }}</div>
     </div>
   </div>
 </div>
