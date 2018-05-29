@@ -17,7 +17,11 @@ import { LoaderService } from '../services/loader.service';
 @Injectable()
 export class ProductsResolver implements Resolve< Observable<Product[]>> {
 
-  constructor(private productService: ProductService, private loader: LoaderService, private router: Router) {
+  constructor(
+  	private productService: ProductService,
+		private loader: LoaderService,
+		private router: Router
+	) {
     this.productService.getProducts();
 		router.events.subscribe(e => {
 			if (e instanceof NavigationStart) {

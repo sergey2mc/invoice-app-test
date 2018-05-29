@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import 'rxjs/add/operator/switchMap';
@@ -14,7 +13,7 @@ import { Product } from '../interfaces/product.interface';
 export class ProductService {
 
 	allProducts$: ConnectableObservable<Product[]>;
-	emitter$: Subject<Product[]> = new Subject();
+	emitter$: Subject<null> = new Subject();
 
   constructor(private http: HttpClient) {
   	this.allProducts$ = this.emitter$
@@ -25,9 +24,5 @@ export class ProductService {
 
 	getProducts() {
   	this.emitter$.next();
-	}
-
-	getProduct(id: number): Observable<Product> {
-		return this.http.get<Product>(`/products/${id}`);
 	}
 }

@@ -17,7 +17,11 @@ import { LoaderService } from '../services/loader.service';
 @Injectable()
 export class CustomersResolver implements Resolve<Observable<Customer[]>> {
 
-  constructor(private customerService: CustomerService, private loader: LoaderService, private router: Router) {
+  constructor(
+  	private customerService: CustomerService,
+		private loader: LoaderService,
+		private router: Router
+	) {
     this.customerService.getCustomers();
     router.events.subscribe(e => {
 			if (e instanceof NavigationStart) {

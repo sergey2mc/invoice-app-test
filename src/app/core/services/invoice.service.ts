@@ -14,7 +14,7 @@ import { Invoice } from '../interfaces/invoice.interface';
 export class InvoiceService {
 
 	allInvoices$: ConnectableObservable<Invoice[]>;
-	allInvoicesEmitter$: Subject<Invoice[]> = new Subject();
+	allInvoicesEmitter$: Subject<null> = new Subject();
 
 	constructor(private http: HttpClient) {
 		this.allInvoices$ = this.allInvoicesEmitter$

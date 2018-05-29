@@ -19,8 +19,7 @@ const invoicesRoutes: Routes = [
         component: InvoicesListComponent,
         pathMatch: 'full',
         resolve: {
-          invoices: InvoicesResolver,
-          customers: CustomersResolver
+          invoices: InvoicesResolver
         }
       },
       {
