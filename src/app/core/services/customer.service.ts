@@ -14,7 +14,7 @@ import { Customer } from '../interfaces/customer.interface';
 export class CustomerService {
 
 	allCustomers$: ConnectableObservable<Customer[]>;
-	emitter$: Subject<Customer[]> = new Subject();
+	emitter$: Subject<null> = new Subject();
 
 	constructor(private http: HttpClient) {
 		this.allCustomers$ = this.emitter$

@@ -57,17 +57,13 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 		this.invoicesList$ = this.invoicesEmitter$
-			.switchMap((id) => {
+			.switchMap((id: number) => {
 				return combineLatest(
 					this.route.snapshot.data.invoices,
-					this.route.snapshot.data.customers,
 					Observable.of(id)
 				)
 			})
-			.map(([invoices, customers, id]: [Invoice[], Customer[], number]) => {
-				const data = invoices.map(item => item = {...item, customer: customers.find(customer => customer.id === item.customer_id)});
-				return id ? data.filter((item: Invoice) => item.id !== id) : data;
-			})
+			.map(([invoices, id]: [Invoice[], number]) => id ? invoices.filter((item: Invoice) => item.id !== id) : invoices)
 			.publishReplay(1);
 		this.invoicesList$.connect();
 		this.invoicesEmitter$.next();
