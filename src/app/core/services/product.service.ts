@@ -18,7 +18,7 @@ export class ProductService {
   constructor(private http: HttpClient) {
   	this.allProducts$ = this.emitter$
 			.switchMap(() => this.http.get<Product[]>(`/products`))
-			.publishReplay(1);
+			.publishReplay(1) as ConnectableObservable<Product[]>;
 		this.allProducts$.connect();
 	}
 

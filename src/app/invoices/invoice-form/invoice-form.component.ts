@@ -27,7 +27,7 @@ import { Customer } from '../../core/interfaces/customer.interface';
 import { Product } from '../../core/interfaces/product.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 
 
 @Component({

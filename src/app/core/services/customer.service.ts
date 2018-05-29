@@ -19,7 +19,7 @@ export class CustomerService {
 	constructor(private http: HttpClient) {
 		this.allCustomers$ = this.emitter$
 			.switchMap(() => this.http.get<Customer[]>(`/customers`))
-			.publishReplay(1);
+			.publishReplay(1) as ConnectableObservable<Customer[]>;
 		this.allCustomers$.connect();
 	}
 

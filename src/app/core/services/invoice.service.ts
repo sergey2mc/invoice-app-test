@@ -19,7 +19,7 @@ export class InvoiceService {
 	constructor(private http: HttpClient) {
 		this.allInvoices$ = this.allInvoicesEmitter$
 			.switchMap(() => this.http.get<Invoice[]>(`/invoices`))
-			.publishReplay(1);
+			.publishReplay(1) as ConnectableObservable<Invoice[]>;
 		this.allInvoices$.connect();
 	}
 

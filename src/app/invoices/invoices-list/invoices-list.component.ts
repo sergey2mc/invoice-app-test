@@ -12,7 +12,7 @@ import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 import { Customer } from '../../core/interfaces/customer.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
