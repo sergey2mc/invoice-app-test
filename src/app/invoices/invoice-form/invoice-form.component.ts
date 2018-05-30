@@ -27,7 +27,7 @@ import { Customer } from '../../core/interfaces/customer.interface';
 import { Product } from '../../core/interfaces/product.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
-import { ModalDialogComponent } from '../../core/modal-dialog/modal-dialog.component';
+import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 
 
 @Component({
@@ -176,7 +176,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					return this.invoiceForm.valid;
 				})
 				.mergeMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value))
-				.subscribe(() => this.invoiceService.getInvoices());
+				.subscribe()
 		}
 
 		this.totalPriceSubscription = merge(
@@ -239,7 +239,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			})
 			.mergeMap(invoice => this.invoiceService.addInvoice(invoice))
 			.subscribe((invoice) => {
-				this.invoiceService.getInvoices();
 				const dialogRef = this.openDialog({id: invoice.id, mode: 'invoiceCreated'});
 				this.modalDialogSubscription = dialogRef.afterClosed()
 					.subscribe(result => {

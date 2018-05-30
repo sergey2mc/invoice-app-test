@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve, ActivatedRouteSnapshot, NavigationEnd, NavigationStart } from '@angular/router';
+import { Router, Resolve, ActivatedRouteSnapshot } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import { combineLatest } from 'rxjs/observable/combineLatest';
@@ -32,16 +32,7 @@ export class InvoiceResolver implements Resolve<Observable<Invoice>> {
 		private productService: ProductService,
 		private loader: LoaderService,
 		private router: Router
-	) {
-		this.productService.getProducts();
-		router.events.subscribe(e => {
-			if (e instanceof NavigationStart) {
-				loader.show();
-			} else if (e instanceof NavigationEnd) {
-				loader.hide();
-			}
-		});
-	}
+	) {	}
 
 	resolve(route: ActivatedRouteSnapshot): Observable<Observable<Invoice>> {
 		return combineLatest(

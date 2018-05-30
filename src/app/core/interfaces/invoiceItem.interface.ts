@@ -1,5 +1,6 @@
 import { Product } from './product.interface';
 
+
 export interface InvoiceItem {
     id?: number;
     invoice_id: number;
