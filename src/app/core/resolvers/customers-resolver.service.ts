@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve, NavigationEnd, NavigationStart } from '@angular/router';
+import { Router, Resolve } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
@@ -22,15 +22,7 @@ export class CustomersResolver implements Resolve<Observable<Customer[]>> {
   	private customerService: CustomerService,
 		private loader: LoaderService,
 		private router: Router
-	) {
-    router.events.subscribe(e => {
-			if (e instanceof NavigationStart) {
-				loader.show();
-			} else if (e instanceof NavigationEnd) {
-				loader.hide();
-			}
-    });
-  }
+	) { }
 
   resolve(): Observable<Observable<Customer[]>> {
     return this.customerService.allCustomers$

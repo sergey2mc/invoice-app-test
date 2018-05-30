@@ -88,6 +88,7 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		const dialogRef = this.openDialog({ id: invoice.id, mode: 'deleteInvoiceFromInvoicesList'});
 		this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
 			if (result) {
+				this.loaderService.show();
 				this.deleteInvoice$.next(invoice.id);
 			}
 			this.modalDialogSubscription.unsubscribe();

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve, NavigationStart, NavigationEnd } from '@angular/router';
+import { Router, Resolve } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
@@ -22,15 +22,7 @@ export class ProductsResolver implements Resolve< Observable<Product[]>> {
   	private productService: ProductService,
 		private loader: LoaderService,
 		private router: Router
-	) {
-		router.events.subscribe(e => {
-			if (e instanceof NavigationStart) {
-				loader.show();
-			} else if (e instanceof NavigationEnd) {
-				loader.hide();
-			}
-		});
-  }
+	) { }
 
   resolve(): Observable<Observable<Product[]>> {
     return this.productService.allProducts$
