@@ -3,12 +3,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
-import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { combineLatest } from 'rxjs/observable/combineLatest';
-import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
@@ -28,14 +28,13 @@ import { LoaderService } from '../../core/services/loader.service';
 export class InvoicesListComponent implements OnInit, OnDestroy {
 
 	loaderEnabled$: Observable<boolean>;
-
-	invoicesEmitter$: Subject<number> = new Subject();
-	invoicesList$: ConnectableObservable<Invoice[]>;
-	displayedColumns = ['id', 'name', 'discount', 'total', 'actions'];
-
+	invoicesList$: BehaviorSubject<Invoice[]> = new BehaviorSubject([]);
 	deleteInvoice$: Subject<number> = new Subject();
+	invoicesListSubscription: Subscription;
 	deleteInvoicesSubscription: Subscription;
 	modalDialogSubscription: Subscription;
+
+	displayedColumns = ['id', 'name', 'discount', 'total', 'actions'];
 
 	constructor(
 		private loaderService: LoaderService,
@@ -56,26 +55,24 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.invoicesList$ = this.invoicesEmitter$
-			.switchMap((id: number) => {
-				return combineLatest(
-					this.route.snapshot.data.invoices,
-					Observable.of(id)
-				)
+		this.invoicesListSubscription = combineLatest(
+				this.route.snapshot.data.invoices,
+				this.route.snapshot.data.customers
+			)
+			.map(([invoices, customers]: [Invoice[], Customer[]]) => {
+				return invoices.map((invoice: Invoice) => ({...invoice, customer: customers.find(customer => customer.id === invoice.customer_id)}));
 			})
-			.map(([invoices, id]: [Invoice[], number]) => id ? invoices.filter((item: Invoice) => item.id !== id) : invoices)
-			.publishReplay(1);
-		this.invoicesList$.connect();
-		this.invoicesEmitter$.next();
+			.subscribe((invoices: Invoice[]) => this.invoicesList$.next(invoices));
 
 		this.deleteInvoicesSubscription = this.deleteInvoice$
-      .switchMap(id => this.invoiceService.deleteInvoice(id))
-      .subscribe(() => {
-        this.invoiceService.getInvoices();
-			})
+			.switchMap(id => this.invoiceService.deleteInvoice(id))
+			.withLatestFrom(this.invoicesList$)
+			.map(([delInvoice, invoices]) => delInvoice ? invoices.filter(invoice => invoice.id !== delInvoice.id) : invoices)
+			.subscribe((invoices: Invoice[]) => this.invoicesList$.next(invoices))
 	}
 
 	ngOnDestroy() {
+		this.invoicesListSubscription.unsubscribe();
 		this.deleteInvoicesSubscription.unsubscribe();
   }
 
@@ -92,7 +89,6 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
 			if (result) {
 				this.deleteInvoice$.next(invoice.id);
-				this.invoicesEmitter$.next(invoice.id);
 			}
 			this.modalDialogSubscription.unsubscribe();
 		});

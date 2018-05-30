@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -12,6 +13,7 @@ import { InvoicesListComponent } from './invoices-list.component';
   declarations: [ InvoicesListComponent ],
   imports: [
     SharedModule,
+		MatButtonModule,
     MatTableModule,
     MatProgressSpinnerModule,
     MatDialogModule,

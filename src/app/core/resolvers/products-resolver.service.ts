@@ -3,6 +3,7 @@ import { Router, Resolve, NavigationStart, NavigationEnd } from '@angular/router
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
@@ -22,7 +23,6 @@ export class ProductsResolver implements Resolve< Observable<Product[]>> {
 		private loader: LoaderService,
 		private router: Router
 	) {
-    this.productService.getProducts();
 		router.events.subscribe(e => {
 			if (e instanceof NavigationStart) {
 				loader.show();
@@ -34,6 +34,7 @@ export class ProductsResolver implements Resolve< Observable<Product[]>> {
 
   resolve(): Observable<Observable<Product[]>> {
     return this.productService.allProducts$
+			.filter(products => products.length > 0)
       .take(1)
       .map(products => {
         if (products) {
