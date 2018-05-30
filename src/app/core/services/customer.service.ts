@@ -18,11 +18,11 @@ export class CustomerService {
 
 	getCustomers() {
 		this.http.get<Customer[]>(`/customers`)
-			.subscribe(customers => this.allCustomers$.next(customers))
+			.subscribe(customers => this.allCustomers$.next(customers));
 	}
 
 	getCustomer(id: number): Observable<Customer> {
-		return this.http.get<Customer>(`/customers/${id}`)
+		return this.http.get<Customer>(`/customers/${id}`);
 	}
 
 }

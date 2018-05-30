@@ -15,7 +15,7 @@ export class InvoiceService {
 
 	allInvoices$: BehaviorSubject<Invoice[]> = new BehaviorSubject([]);
 
-	constructor(private http: HttpClient, private loaderService: LoaderService,) {
+	constructor(private http: HttpClient, private loaderService: LoaderService) {
 		this.getInvoices();
 	}
 

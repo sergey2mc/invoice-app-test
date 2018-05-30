@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import { combineLatest } from 'rxjs/observable/combineLatest';
@@ -19,7 +19,6 @@ import { InvoiceService } from '../services/invoice.service';
 import { InvoiceItemsService } from '../services/invoice-items.service';
 import { CustomerService } from '../services/customer.service';
 import { ProductService } from '../services/product.service';
-import { LoaderService } from '../services/loader.service';
 
 
 @Injectable()
@@ -29,9 +28,7 @@ export class InvoiceResolver implements Resolve<Observable<Invoice>> {
 		private invoiceService: InvoiceService,
 		private invoiceItemsService: InvoiceItemsService,
 		private customerService: CustomerService,
-		private productService: ProductService,
-		private loader: LoaderService,
-		private router: Router
+		private productService: ProductService
 	) {	}
 
 	resolve(route: ActivatedRouteSnapshot): Observable<Observable<Invoice>> {
@@ -53,16 +50,7 @@ export class InvoiceResolver implements Resolve<Observable<Invoice>> {
 					items: items.map(item => ({...item, product: products.find(prod => prod.id === item.product_id)}))
 				}
 			))
-			.map((invoice: Invoice) => {
-				if (invoice) {
-					return Observable.of(invoice);
-				} else {
-					return Observable.empty<Invoice>();
-				}
-			})
-			.catch(() => {
-				this.router.navigate(['/']);
-				return Observable.throw('Sever error');
-			});
+			.map((invoice: Invoice) => invoice ? Observable.of(invoice) : Observable.empty<Invoice>())
+			.catch(() => Observable.throw('Invoice Resolver: sever error'));
 	}
 }
