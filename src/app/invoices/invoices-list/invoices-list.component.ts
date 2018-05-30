@@ -10,7 +10,6 @@ import { combineLatest } from 'rxjs/observable/combineLatest';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
 
 import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 import { Customer } from '../../core/interfaces/customer.interface';
