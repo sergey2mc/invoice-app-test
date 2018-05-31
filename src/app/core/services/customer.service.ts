@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/publishReplay';
+import 'rxjs/add/operator/map';
 
 import { Customer } from '../interfaces/customer.interface';
 
@@ -27,7 +27,12 @@ export class CustomerService {
 	}
 
 	getCustomer(id: number): Observable<Customer> {
-		return this.http.get<Customer>(`/customers/${id}`);
+		if(this.allCustomers$) {
+			return this.allCustomers$
+				.map((customers: Customer[]) => customers.find((customer: Customer) => customer.id === id))
+		} else {
+			return this.http.get<Customer>(`/customers/${id}`);
+		}
 	}
 
 }

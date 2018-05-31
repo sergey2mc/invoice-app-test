@@ -12,10 +12,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/filter';
 
-import { ProductService } from '../../core/services/product.service';
-import { InvoiceService } from '../../core/services/invoice.service';
-import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { Product } from '../../core/interfaces/product.interface';
+import { ProductService } from '../../../core/services/product.service';
+import { InvoiceService } from '../../../core/services/invoice.service';
+import { InvoiceItemsService } from '../../../core/services/invoice-items.service';
+import { Product } from '../../../core/interfaces/product.interface';
 
 
 @Component({
@@ -61,7 +61,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 					this.product_id.valueChanges,
 					this.quantity.valueChanges
 				)
-				.debounceTime(100)
+				.debounceTime(500)
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))

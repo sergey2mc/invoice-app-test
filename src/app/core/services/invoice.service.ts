@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 
 import { Invoice } from '../interfaces/invoice.interface';
@@ -31,7 +31,12 @@ export class InvoiceService {
 	}
 
 	getInvoice(id: number): Observable<Invoice> {
-		return this.http.get<Invoice>(`/invoices/${id}`);
+		if(this.allInvoices$) {
+			return this.allInvoices$
+				.map((invoices: Invoice[]) => invoices.find((invoice: Invoice) => invoice.id === id))
+		} else {
+			return this.http.get<Invoice>(`/invoices/${id}`);
+		}
 	}
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {

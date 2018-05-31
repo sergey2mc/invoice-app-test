@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -167,7 +168,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					this.discount.valueChanges,
 					this.total.valueChanges
 				)
-				.debounceTime(100)
+				.debounceTime(500)
 				.skip(1)
 				.distinctUntilChanged()
 				.filter(() => {
@@ -185,7 +186,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 				this.deleteInvoiceItem$
 			)
 			.delay(10)
-			.debounceTime(10)
 			.map(() => {
 				return this.items.length ?
 					this.items.value

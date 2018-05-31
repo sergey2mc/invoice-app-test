@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/publishReplay';
 
 import { Product } from '../interfaces/product.interface';
@@ -27,6 +26,11 @@ export class ProductService {
 	}
 
 	getProduct(id: number): Observable<Product> {
-		return this.http.get<Product>(`/products/${id}`);
+		if(this.allProducts$) {
+			return this.allProducts$
+				.map((products: Product[]) => products.find((product: Product) => product.id === id))
+		} else {
+			return this.http.get<Product>(`/products/${id}`);
+		}
 	}
 }
