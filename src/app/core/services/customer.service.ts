@@ -20,7 +20,7 @@ export class CustomerService {
 		if (this.allCustomers$) {
 			return this.allCustomers$;
 		} else {
-			const data$: ConnectableObservable<Customer[]> = this.http.get<Customer[]>(`/customers`).publishReplay();
+			const data$: ConnectableObservable<Customer[]> = this.http.get<Customer[]>(`/customers`).publishReplay() as ConnectableObservable<Customer[]>;
 			data$.connect();
 			return this.allCustomers$ = data$;
 		}

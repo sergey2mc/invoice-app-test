@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 
 import { Product } from '../core/interfaces/product.interface';
+import { ProductService } from '../core/services/product.service';
 import { LoaderService } from '../core/services/loader.service';
 
 
@@ -18,8 +18,8 @@ export class ProductsComponent {
   products$: Observable<Product[]>;
   displayedColumns = ['name', 'price'];
 
-  constructor(private loaderService: LoaderService, private route: ActivatedRoute) {
-    this.products$ = this.route.snapshot.data.products;
+  constructor(private loaderService: LoaderService, private productService: ProductService) {
+    this.products$ = this.productService.allProducts$;
 		this.loaderEnabled$ = loaderService.loaderEnabled$;
   }
 }

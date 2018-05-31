@@ -4,9 +4,6 @@ import { Resolve } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
 
 import { Customer } from '../interfaces/customer.interface';
@@ -14,16 +11,13 @@ import { CustomerService } from '../services/customer.service';
 
 
 @Injectable()
-export class CustomersResolver implements Resolve<Observable<Customer[]>> {
+export class CustomersResolver implements Resolve<Customer[]> {
 
-  constructor(private customerService: CustomerService) {
-  	this.customerService.getCustomers();
-	}
+  constructor(private customerService: CustomerService) {}
 
-  resolve(): Observable<Observable<Customer[]>> {
-    return this.customerService.allCustomers$
+  resolve(): Observable<Customer[]> {
+    return this.customerService.getCustomers()
       .take(1)
-			.map((customer: Customer[]) => customer ? Observable.of(customer) : Observable.empty<Customer[]>())
 			.catch(() => Observable.throw('Customer Resolver: sever error'));
   }
 }

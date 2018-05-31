@@ -38,9 +38,9 @@ const invoicesRoutes: Routes = [
         path: 'edit/:id',
         loadChildren: './invoice-form/invoice-form.module#InvoiceFormModule',
 				resolve: {
-					invoice: InvoiceResolver,
 					customers: CustomersResolver,
-					products: ProductsResolver
+					products: ProductsResolver,
+					invoice: InvoiceResolver
 				},
         data: {
           mode: 'edit'

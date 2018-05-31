@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_BASE_HREF } from '@angular/common';
 
 import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
@@ -20,7 +19,6 @@ import { APP_INTERCEPTOR_PROVIDERS } from './interceptors';
     HttpClientModule
   ],
   providers: [
-		{ provide: APP_BASE_HREF, useValue: '/'},
     APP_SERVICE_PROVIDERS,
 		APP_RESOLVER_PROVIDERS,
 		APP_INTERCEPTOR_PROVIDERS

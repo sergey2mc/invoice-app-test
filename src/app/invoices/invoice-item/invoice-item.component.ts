@@ -4,8 +4,8 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { merge } from 'rxjs/observable/merge';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
@@ -57,7 +57,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 		this.productsList$ = this.productService.allProducts$;
 
 		if (this.editMode) {
-			this.updateInvoiceItemSubscription = merge(
+			this.updateInvoiceItemSubscription = Observable.merge(
 					this.product_id.valueChanges,
 					this.quantity.valueChanges
 				)
@@ -68,7 +68,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 				.subscribe();
 		}
 
-		this.itemChangesSubscription = combineLatest(
+		this.itemChangesSubscription = Observable.combineLatest(
 				this.product_id.valueChanges,
 				this.productsList$
 			)

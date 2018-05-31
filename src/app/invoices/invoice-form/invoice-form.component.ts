@@ -7,8 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { merge } from 'rxjs/observable/merge';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/filter';
@@ -151,8 +150,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 
-		this.productsList$ = this.route.snapshot.data.products;
-		this.customersList$ = this.route.snapshot.data.customers;
+		this.productsList$ = this.productService.allProducts$;
+		this.customersList$ = this.customerService.allCustomers$;
 
 		if (this.editMode) {
 			this.invoice$ = this.route.snapshot.data.invoice
@@ -163,7 +162,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 				})
 				.share();
 
-			this.updateInvoiceSubscription = combineLatest(
+			this.updateInvoiceSubscription = Observable.combineLatest(
 					this.customer.valueChanges,
 					this.discount.valueChanges,
 					this.total.valueChanges
@@ -179,7 +178,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 				.subscribe()
 		}
 
-		this.totalPriceSubscription = merge(
+		this.totalPriceSubscription = Observable.merge(
 				this.items.valueChanges,
 				this.discount.valueChanges,
 				this.addInvoiceItem$,
@@ -198,7 +197,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			.map(total => +total.toFixed(2))
 			.subscribe((total: number) => this.total.patchValue(total));
 
-		this.addInvoiceItemSubscription = combineLatest(
+		this.addInvoiceItemSubscription = Observable.combineLatest(
 				this.addInvoiceItem$,
 				this.productsList$,
 			)
@@ -223,7 +222,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			.mergeMap(itemId => this.invoiceItemsService.deleteInvoiceItem(this.invoiceForm.value.id, itemId))
 			.subscribe();
 
-		this.newItemPriceSubscription = combineLatest(
+		this.newItemPriceSubscription = Observable.combineLatest(
 				this.product.valueChanges,
 				this.productsList$
 			)

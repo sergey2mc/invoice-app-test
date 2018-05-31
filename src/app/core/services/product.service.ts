@@ -20,9 +20,13 @@ export class ProductService {
 		if (this.allProducts$) {
 			return this.allProducts$;
 		} else {
-			const data$: ConnectableObservable<Product[]> = this.http.get<Product[]>(`/products`).publishReplay();
+			const data$: ConnectableObservable<Product[]> = this.http.get<Product[]>(`/products`).publishReplay() as ConnectableObservable<Product[]>;
 			data$.connect();
 			return this.allProducts$ = data$;
 		}
+	}
+
+	getProduct(id: number): Observable<Product> {
+		return this.http.get<Product>(`/products/${id}`);
 	}
 }

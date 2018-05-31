@@ -25,7 +25,7 @@ export class InvoiceService {
 
 	updateInvoicesList(invoices: Invoice[] = null): Observable<Invoice[]> {
 		const source$ : Observable<Invoice[]> = invoices ? Observable.of(invoices) : this.http.get<Invoice[]>(`/invoices`);
-		const data$: ConnectableObservable<Invoice[]> = source$.publishReplay();
+		const data$: ConnectableObservable<Invoice[]> = source$.publishReplay() as ConnectableObservable<Invoice[]>;
 		data$.connect();
 		return this.allInvoices$ = data$;
 	}
@@ -36,7 +36,7 @@ export class InvoiceService {
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
 		return this.http.post<Invoice>('/invoices', newInvoice)
-			.withLatestFrom(this.allInvoices$)
+			.withLatestFrom(this.getInvoices())
 			.map(([newInvoice, invoices]) => {
 				this.updateInvoicesList([...invoices, newInvoice]);
 				return newInvoice;
@@ -52,7 +52,7 @@ export class InvoiceService {
 
 	deleteInvoice(id: number): Observable<Invoice> {
 		return this.http.delete<Invoice>(`/invoices/${id}`)
-			.withLatestFrom(this.allInvoices$)
+			.withLatestFrom(this.getInvoices())
 			.map(([deletedInvoice, invoices]) => {
 				this.updateInvoicesList(invoices.filter(invoice => invoice.id !== deletedInvoice.id));
 				return deletedInvoice;
