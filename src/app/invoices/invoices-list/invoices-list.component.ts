@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { combineLatest } from 'rxjs/observable/combineLatest';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
@@ -54,9 +54,9 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.invoicesListSubscription = combineLatest(
-				this.route.snapshot.data.invoices,
-				this.route.snapshot.data.customers
+		this.invoicesListSubscription = Observable.combineLatest(
+				this.invoiceService.getInvoices(),
+				this.customerService.getCustomers()
 			)
 			.map(([invoices, customers]: [Invoice[], Customer[]]) => {
 				return invoices.map((invoice: Invoice) => ({...invoice, customer: customers.find(customer => customer.id === invoice.customer_id)}));

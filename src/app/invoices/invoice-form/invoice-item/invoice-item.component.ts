@@ -4,18 +4,18 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { merge } from 'rxjs/observable/merge';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/filter';
 
-import { ProductService } from '../../core/services/product.service';
-import { InvoiceService } from '../../core/services/invoice.service';
-import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { Product } from '../../core/interfaces/product.interface';
+import { ProductService } from '../../../core/services/product.service';
+import { InvoiceService } from '../../../core/services/invoice.service';
+import { InvoiceItemsService } from '../../../core/services/invoice-items.service';
+import { Product } from '../../../core/interfaces/product.interface';
 
 
 @Component({
@@ -57,18 +57,18 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 		this.productsList$ = this.productService.allProducts$;
 
 		if (this.editMode) {
-			this.updateInvoiceItemSubscription = merge(
+			this.updateInvoiceItemSubscription = Observable.merge(
 					this.product_id.valueChanges,
 					this.quantity.valueChanges
 				)
-				.debounceTime(100)
+				.debounceTime(500)
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
 				.subscribe();
 		}
 
-		this.itemChangesSubscription = combineLatest(
+		this.itemChangesSubscription = Observable.combineLatest(
 				this.product_id.valueChanges,
 				this.productsList$
 			)

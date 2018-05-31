@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { SharedModule } from '../../shared/shared.module';
 import { InvoiceFormComponent } from './invoice-form.component';
 import { InvoicesFormRoutingModule } from './invoice-form-routing.module';
-import { InvoiceItemModule } from '../invoice-item/invoice-item.module';
+import { InvoiceItemModule } from './invoice-item/invoice-item.module';
 
 
 @NgModule({

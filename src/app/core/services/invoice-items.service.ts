@@ -13,8 +13,8 @@ export class InvoiceItemsService {
 
 	constructor(private http: HttpClient) {}
 
-	getInvoiceItems(invoiceId: number) {
-		return this.http.get<InvoiceItem[]>(`/invoices/${invoiceId}/items`)
+	getInvoiceItems(invoiceId: number): Observable<InvoiceItem[]> {
+		return this.http.get<InvoiceItem[]>(`/invoices/${invoiceId}/items`);
 	}
 
 	addInvoiceItem(invoiceId: number, item: InvoiceItem): Observable<InvoiceItem> {

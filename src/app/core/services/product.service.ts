@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import 'rxjs/add/operator/publishReplay';
 
 import { Product } from '../interfaces/product.interface';
 
@@ -9,14 +11,26 @@ import { Product } from '../interfaces/product.interface';
 @Injectable()
 export class ProductService {
 
-	allProducts$: BehaviorSubject<Product[]> = new BehaviorSubject([]);
+	allProducts$: Observable<Product[]>;
 
-	constructor(private http: HttpClient) {
-		this.getProducts();
+	constructor(private http: HttpClient) {}
+
+	getProducts(): Observable<Product[]> {
+		if (this.allProducts$) {
+			return this.allProducts$;
+		} else {
+			const data$: ConnectableObservable<Product[]> = this.http.get<Product[]>(`/products`).publishReplay() as ConnectableObservable<Product[]>;
+			data$.connect();
+			return this.allProducts$ = data$;
+		}
 	}
 
-	getProducts() {
-		this.http.get<Product[]>(`/products`)
-			.subscribe(products => this.allProducts$.next(products));
+	getProduct(id: number): Observable<Product> {
+		if(this.allProducts$) {
+			return this.allProducts$
+				.map((products: Product[]) => products.find((product: Product) => product.id === id))
+		} else {
+			return this.http.get<Product>(`/products/${id}`);
+		}
 	}
 }
