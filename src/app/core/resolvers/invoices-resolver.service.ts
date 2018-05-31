@@ -3,7 +3,6 @@ import { Resolve } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
@@ -17,11 +16,12 @@ import { InvoiceService } from '../services/invoice.service';
 @Injectable()
 export class InvoicesResolver implements Resolve<Observable<Invoice[]>> {
 
-  constructor(private invoiceService: InvoiceService) {}
+  constructor(private invoiceService: InvoiceService) {
+  	this.invoiceService.getInvoices();
+	}
 
   resolve(): Observable<Observable<Invoice[]>> {
     return this.invoiceService.allInvoices$
-      .filter(invoices => invoices.length > 0)
       .take(1)
 			.map((invoices: Invoice[]) => invoices ? Observable.of(invoices) : Observable.empty<Invoice[]>())
 			.catch(() => Observable.throw('Invoices Resolver: sever error'));

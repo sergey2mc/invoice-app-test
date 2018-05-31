@@ -175,7 +175,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					this.validateForms(this.invoiceForm);
 					return this.invoiceForm.valid;
 				})
-				.mergeMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value))
+				.switchMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value))
 				.subscribe()
 		}
 
