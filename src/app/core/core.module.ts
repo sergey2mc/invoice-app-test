@@ -1,17 +1,29 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TransferHttpCacheModule } from '@nguniversal/common';
 import { HttpClientModule } from '@angular/common/http';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
+import { APP_RESOLVER_PROVIDERS } from './resolvers';
+import { APP_INTERCEPTOR_PROVIDERS } from './interceptors';
 
 
 @NgModule({
-  exports: [
-    CommonModule,
-    NavbarModule
+  exports: [ NavbarModule ],
+  imports: [
+		BrowserModule.withServerTransition({appId: 'my-app'}),
+		BrowserAnimationsModule,
+		TransferHttpCacheModule,
+    HttpClientModule
   ],
-  imports: [ HttpClientModule ],
-  providers: [ APP_SERVICE_PROVIDERS ]
+  providers: [
+		{ provide: APP_BASE_HREF, useValue: '/'},
+    APP_SERVICE_PROVIDERS,
+		APP_RESOLVER_PROVIDERS,
+		APP_INTERCEPTOR_PROVIDERS
+  ]
 })
 export class CoreModule { }
