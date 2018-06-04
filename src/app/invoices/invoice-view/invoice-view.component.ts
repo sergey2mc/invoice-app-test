@@ -22,7 +22,7 @@ export class InvoiceViewComponent implements OnInit {
 
 	constructor(
 		private customerService: CustomerService,
-		private productService: ProductService,
+		public productService: ProductService,
 		private invoiceService: InvoiceService,
 		private invoiceItemsService: InvoiceItemsService,
 		private router: Router,
@@ -30,8 +30,8 @@ export class InvoiceViewComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.invoice$ = this.route.snapshot.data.invoice
-			.share();
+		this.invoice$ = this.invoiceService.invoice$
+			// .do(i => console.log('RESULT INVOICE', i));
 	}
 
 	customerClickHandler() {

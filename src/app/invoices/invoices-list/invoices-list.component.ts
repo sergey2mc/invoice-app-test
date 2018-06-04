@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/switchMap';
@@ -27,7 +26,7 @@ import { LoaderService } from '../../core/services/loader.service';
 export class InvoicesListComponent implements OnInit, OnDestroy {
 
 	loaderEnabled$: Observable<boolean>;
-	invoicesList$: BehaviorSubject<Invoice[]> = new BehaviorSubject([]);
+	invoicesList$: Observable<Invoice[]>;
 	deleteInvoice$: Subject<number> = new Subject();
 	invoicesListSubscription: Subscription;
 	deleteInvoicesSubscription: Subscription;
@@ -54,24 +53,29 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.invoicesListSubscription = Observable.combineLatest(
-				this.invoiceService.getInvoices(),
-				this.customerService.getCustomers()
+
+		this.invoicesList$ = Observable.combineLatest(
+				this.invoiceService.allInvoices$,
+				this.customerService.allCustomers$
 			)
 			.map(([invoices, customers]: [Invoice[], Customer[]]) => {
 				return invoices.map((invoice: Invoice) => ({...invoice, customer: customers.find(customer => customer.id === invoice.customer_id)}));
-			})
-			.subscribe((invoices: Invoice[]) => this.invoicesList$.next(invoices));
+			});
 
 		this.deleteInvoicesSubscription = this.deleteInvoice$
 			.switchMap(id => this.invoiceService.deleteInvoice(id))
-			.withLatestFrom(this.invoicesList$)
-			.map(([delInvoice, invoices]) => delInvoice ? invoices.filter(invoice => invoice.id !== delInvoice.id) : invoices)
-			.subscribe((invoices: Invoice[]) => this.invoicesList$.next(invoices))
+			.subscribe((delInvoice: Invoice) => {
+				if (delInvoice['id']) {
+					const dialogRef = this.openDialog({ id: delInvoice.id, mode: 'deleteInvoiceInfo'});
+					this.modalDialogSubscription = dialogRef.afterClosed().subscribe(() => this.modalDialogSubscription.unsubscribe());
+				} else {
+					const dialogRef = this.openDialog({ id: delInvoice.id, mode: 'deleteInvoiceError'});
+					this.modalDialogSubscription = dialogRef.afterClosed().subscribe(() => this.modalDialogSubscription.unsubscribe());
+				}
+			});
 	}
 
 	ngOnDestroy() {
-		this.invoicesListSubscription.unsubscribe();
 		this.deleteInvoicesSubscription.unsubscribe();
   }
 
@@ -87,7 +91,6 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		const dialogRef = this.openDialog({ id: invoice.id, mode: 'deleteInvoiceFromInvoicesList'});
 		this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
 			if (result) {
-				this.loaderService.show();
 				this.deleteInvoice$.next(invoice.id);
 			}
 			this.modalDialogSubscription.unsubscribe();

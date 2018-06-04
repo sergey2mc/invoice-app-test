@@ -8,6 +8,7 @@ import 'rxjs/add/observable/throw';
 
 import { Product } from '../interfaces/product.interface';
 import { ProductService } from '../services/product.service';
+import 'rxjs/add/operator/switchMap';
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class ProductsResolver implements Resolve<Product[]> {
   constructor(private productService: ProductService) {}
 
   resolve(): Observable<Product[]> {
-    return this.productService.getProducts()
+  	return this.productService.dataLoaded$
+			.switchMap(status => status ? this.productService.allProducts$ : this.productService.getProducts())
 			.take(1)
 			.catch(() => Observable.throw('Products Resolver: sever error'));
   }

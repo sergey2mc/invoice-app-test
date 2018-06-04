@@ -16,7 +16,9 @@ export class InvoicesResolver implements Resolve<Invoice[]> {
   constructor(private invoiceService: InvoiceService) {}
 
   resolve(): Observable<Invoice[]> {
-    return this.invoiceService.getInvoices()
+		return this.invoiceService.dataLoaded$
+			.do(status => console.log('Resolver', status))
+			.switchMap(status => status ? this.invoiceService.allInvoices$ : this.invoiceService.getInvoices())
       .take(1)
 			.catch(() => Observable.throw('Invoices Resolver: sever error'));
     }

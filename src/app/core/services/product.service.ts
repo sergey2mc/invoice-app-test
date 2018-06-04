@@ -3,34 +3,57 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/publishReplay';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/publishBehavior';
+import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/scan';
 
 import { Product } from '../interfaces/product.interface';
+import { Actions, StateManagement } from '../../shared/state/state-management';
 
 
 @Injectable()
 export class ProductService {
 
+	dataLoaded$: ConnectableObservable<boolean>;
+	state: StateManagement<Product>;
 	allProducts$: Observable<Product[]>;
+	product$: Observable<Product>;
 
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient) {
+		this.state = new StateManagement<Product>();
 
-	getProducts(): Observable<Product[]> {
-		if (this.allProducts$) {
-			return this.allProducts$;
-		} else {
-			const data$: ConnectableObservable<Product[]> = this.http.get<Product[]>(`/products`).publishReplay() as ConnectableObservable<Product[]>;
-			data$.connect();
-			return this.allProducts$ = data$;
-		}
+		this.dataLoaded$ = this.state.request$
+			.scan((dataLoaded: boolean, {type}) => {
+				if (type === Actions.GetList) {
+					return true;
+				}
+			}, false)
+			.publishBehavior(false);
+		this.dataLoaded$.connect();
+
+		this.allProducts$ = Observable.combineLatest(
+				this.state.collectionIds$,
+				this.state.entities$
+			)
+			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
+			.shareReplay(1);
+
+		this.product$ = Observable.combineLatest(
+				this.state.entityId$,
+				this.state.entities$
+			)
+			.map(([id, entities]) => entities[id])
+			.shareReplay(1);
+	}
+
+	getProducts() {
+		this.state.getList$.next(this.http.get<Product[]>(`/products`));
+		return this.allProducts$;
 	}
 
 	getProduct(id: number): Observable<Product> {
-		if(this.allProducts$) {
-			return this.allProducts$
-				.map((products: Product[]) => products.find((product: Product) => product.id === id))
-		} else {
-			return this.http.get<Product>(`/products/${id}`);
-		}
+		this.state.get$.next(this.http.get<Product>(`/products/${id}`));
+		return this.product$;
 	}
 }

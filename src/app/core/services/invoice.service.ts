@@ -5,63 +5,98 @@ import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/publishBehavior';
+import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/scan';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 
 import { Invoice } from '../interfaces/invoice.interface';
 import { LoaderService } from './loader.service';
+import { InvoiceItemsService } from './invoice-items.service';
+import { ProductService } from './product.service';
+import { CustomerService } from './customer.service';
+import { Actions, StateManagement } from '../../shared/state/state-management';
 
 
 @Injectable()
 export class InvoiceService {
 
+	dataLoaded$: ConnectableObservable<boolean>;
+	state: StateManagement<Invoice>;
 	allInvoices$: Observable<Invoice[]>;
+	invoice$: Observable<Invoice>;
 
-	constructor(private http: HttpClient, private loaderService: LoaderService) {}
+	constructor(
+		private http: HttpClient,
+		private customerService: CustomerService,
+		private productService: ProductService,
+		private invoiceItemsService: InvoiceItemsService,
+		private loaderService: LoaderService
+	) {
+		this.state = new StateManagement<Invoice>();
 
-	getInvoices(): Observable<Invoice[]> {
-		return this.allInvoices$ ? this.allInvoices$ : this.updateInvoicesList();
+		this.dataLoaded$ = this.state.request$
+			.scan((dataLoaded: boolean, {type}) => {
+				if (type === Actions.GetList) {
+					return true;
+				}
+			}, false)
+			.do(status => console.log('Service', status))
+			.publishBehavior(false);
+		this.dataLoaded$.connect();
+
+		this.allInvoices$ = Observable.combineLatest(
+			this.state.collectionIds$,
+			this.state.entities$
+			)
+			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
+			.shareReplay(1);
+
+		this.invoice$ = Observable.combineLatest(
+				this.state.entityId$,
+				this.state.entities$
+			)
+			.map(([id, entities]) => entities[id])
+			.switchMap((invoice: Invoice) => Observable.combineLatest(
+				Observable.of(invoice),
+				this.invoiceItemsService.getInvoiceItems(invoice.id)
+					.combineLatest(this.productService.allProducts$)
+					.map(([items, products]) => items.map(item => ({...item, product: products.find(product => product.id === item.product_id)}))),
+				this.customerService.getCustomer(invoice.customer_id)
+			))
+			.map(([invoice, items, customer]) => ({
+				...invoice,
+				items: items,
+				customer: customer
+			}))
+			.shareReplay(1);
 	}
 
-	updateInvoicesList(invoices: Invoice[] = null): Observable<Invoice[]> {
-		const source$ : Observable<Invoice[]> = invoices ? Observable.of(invoices) : this.http.get<Invoice[]>(`/invoices`);
-		const data$: ConnectableObservable<Invoice[]> = source$.publishReplay() as ConnectableObservable<Invoice[]>;
-		data$.connect();
-		return this.allInvoices$ = data$;
+	getInvoices(): Observable<Invoice[]> {
+		this.state.getList$.next(this.http.get<Invoice[]>(`/invoices`));
+		return this.allInvoices$;
 	}
 
 	getInvoice(id: number): Observable<Invoice> {
-		if(this.allInvoices$) {
-			return this.allInvoices$
-				.map((invoices: Invoice[]) => invoices.find((invoice: Invoice) => invoice.id === id))
-		} else {
-			return this.http.get<Invoice>(`/invoices/${id}`);
-		}
+		this.state.get$.next(this.http.get<Invoice>(`/invoices/${id}`));
+		return this.invoice$;
 	}
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
-		return this.http.post<Invoice>('/invoices', newInvoice)
-			.withLatestFrom(this.getInvoices())
-			.map(([newInvoice, invoices]) => {
-				this.updateInvoicesList([...invoices, newInvoice]);
-				return newInvoice;
-			});
+		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice));
+		return this.invoice$;
 	}
 
-	updateInvoice(invoice: Invoice): Observable<Invoice[]> {
-		return this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice)
-			.withLatestFrom(this.getInvoices())
-			.map(([editedInvoice, invoices]) => invoices.map(invoice => invoice.id === editedInvoice.id ? editedInvoice : invoice))
-			.do((invoices: Invoice[]) => this.updateInvoicesList(invoices))
+	updateInvoice(invoice: Invoice): Observable<Invoice> {
+		this.state.update$.next(this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice));
+		return this.invoice$;
 	}
 
 	deleteInvoice(id: number): Observable<Invoice> {
-		return this.http.delete<Invoice>(`/invoices/${id}`)
-			.withLatestFrom(this.getInvoices())
-			.map(([deletedInvoice, invoices]) => {
-				this.updateInvoicesList(invoices.filter(invoice => invoice.id !== deletedInvoice.id));
-				return deletedInvoice;
-			})
-			.do(() => this.loaderService.hide());
+		this.state.delete$.next(this.http.delete<Invoice>(`/invoices/${id}`));
+		return this.state.deleteData$;
 	}
 }

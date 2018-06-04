@@ -50,6 +50,8 @@ const invoicesRoutes: Routes = [
         path: 'view/:id',
         loadChildren: './invoice-view/invoice-view.module#InvoiceViewModule',
 				resolve: {
+					customers: CustomersResolver,
+        	products: ProductsResolver,
 					invoice: InvoiceResolver
 				}
       }

@@ -31,3 +31,19 @@
     <button mat-button [mat-dialog-close]="true">Ok</button>
   </mat-dialog-actions>
 </div>
+
+<div *ngIf="mode === 'deleteInvoiceInfo'">
+  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
+  <mat-dialog-content>Successfully deleted</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="true">Ok</button>
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="mode === 'deleteInvoiceError'">
+  <h2 mat-dialog-title>Ooops...</h2>
+  <mat-dialog-content>Some thing went wrong...</mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="true">Ok</button>
+  </mat-dialog-actions>
+</div>
