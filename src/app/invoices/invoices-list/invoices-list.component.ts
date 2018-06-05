@@ -16,6 +16,7 @@ import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { CustomerService } from '../../core/services/customer.service';
 import { LoaderService } from '../../core/services/loader.service';
+import { ModalType } from '../../shared/modal-dialog/modal-type';
 
 
 @Component({
@@ -45,15 +46,7 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		this.loaderEnabled$ = loaderService.loaderEnabled$;
 	}
 
-	private openDialog(data) {
-		return this.dialog.open(ModalDialogComponent, {
-			width: '235px',
-			data: data
-		});
-	}
-
 	ngOnInit() {
-
 		this.invoicesList$ = Observable.combineLatest(
 				this.invoiceService.allInvoices$,
 				this.customerService.allCustomers$
@@ -64,15 +57,10 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 
 		this.deleteInvoicesSubscription = this.deleteInvoice$
 			.switchMap(id => this.invoiceService.deleteInvoice(id))
-			.subscribe((delInvoice: Invoice) => {
-				if (delInvoice['id']) {
-					const dialogRef = this.openDialog({ id: delInvoice.id, mode: 'deleteInvoiceInfo'});
-					this.modalDialogSubscription = dialogRef.afterClosed().subscribe(() => this.modalDialogSubscription.unsubscribe());
-				} else {
-					const dialogRef = this.openDialog({ id: delInvoice.id, mode: 'deleteInvoiceError'});
-					this.modalDialogSubscription = dialogRef.afterClosed().subscribe(() => this.modalDialogSubscription.unsubscribe());
-				}
-			});
+			.subscribe(
+				(delInvoice: Invoice) => this.openDialog({ id: delInvoice.id, mode: ModalType.INFO_INVOICE_DELETED }),
+				() => this.openDialog({ mode: ModalType.ERROR_INVOICE_DELETE })
+			);
 	}
 
 	ngOnDestroy() {
@@ -88,12 +76,19 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	deleteButtonHandler(invoice: Invoice) {
-		const dialogRef = this.openDialog({ id: invoice.id, mode: 'deleteInvoiceFromInvoicesList'});
+		const dialogRef = this.openDialog({ id: invoice.id, mode: ModalType.ASK_INVOICE_DELETE});
 		this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
 			if (result) {
 				this.deleteInvoice$.next(invoice.id);
 			}
 			this.modalDialogSubscription.unsubscribe();
+		});
+	}
+
+	private openDialog(data) {
+		return this.dialog.open(ModalDialogComponent, {
+			width: '235px',
+			data: data
 		});
 	}
 }

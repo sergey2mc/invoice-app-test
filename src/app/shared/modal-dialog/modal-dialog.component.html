@@ -1,5 +1,5 @@
-<div *ngIf="mode === 'removeItemFromInvoiceItems'">
-  <h2 mat-dialog-title>Delete from invoice</h2>
+<div *ngIf="data?.mode === ModalType.ASK_INVOICE_DELETE">
+  <h2 mat-dialog-title>Delete Invoice #{{ data?.id }}</h2>
   <mat-dialog-content>Are you sure?</mat-dialog-content>
   <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="false">No</button>
@@ -7,43 +7,31 @@
   </mat-dialog-actions>
 </div>
 
-<div *ngIf="mode === 'deleteInvoiceFromInvoicesList'">
-  <h2 mat-dialog-title>Delete Invoice #{{ data.id }}</h2>
-  <mat-dialog-content>Are you sure?</mat-dialog-content>
-  <mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="false">No</button>
-    <button mat-button [mat-dialog-close]="true">Yes</button>
-  </mat-dialog-actions>
-</div>
-
-<div *ngIf="mode === 'invoiceCreated'">
-  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
+<div *ngIf="data?.mode === ModalType.INFO_INVOICE_CREATED">
+  <h2 mat-dialog-title>Invoice #{{ data?.id }}</h2>
   <mat-dialog-content>Successfully created</mat-dialog-content>
   <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="true">Ok</button>
   </mat-dialog-actions>
 </div>
 
-<div *ngIf="mode === 'invoiceUpdated'">
-  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
-  <mat-dialog-content>Successfully saved</mat-dialog-content>
-  <mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="true">Ok</button>
-  </mat-dialog-actions>
-</div>
-
-<div *ngIf="mode === 'deleteInvoiceInfo'">
-  <h2 mat-dialog-title>Invoice #{{ data.id }}</h2>
+<div *ngIf="data?.mode === ModalType.INFO_INVOICE_DELETED">
+  <h2 mat-dialog-title>Invoice #{{ data?.id }}</h2>
   <mat-dialog-content>Successfully deleted</mat-dialog-content>
   <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="true">Ok</button>
   </mat-dialog-actions>
 </div>
 
-<div *ngIf="mode === 'deleteInvoiceError'">
+<div *ngIf="data?.mode === ModalType.ERROR_INVOICE_DELETE ||
+            data?.mode === ModalType.ERROR_INVOICE_UPDATE ||
+            data?.mode === ModalType.ERROR_INVOICE_SAVE ||
+            data?.mode === ModalType.ERROR_INVOICEITEM_ADD ||
+            data?.mode === ModalType.ERROR_INVOICEITEM_DELETE ||
+            data?.mode === ModalType.ERROR_INVOICEITEM_UPDATE">
   <h2 mat-dialog-title>Ooops...</h2>
   <mat-dialog-content>Some thing went wrong...</mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="true">Ok</button>
+    <button mat-button [mat-dialog-close]="false">Ok</button>
   </mat-dialog-actions>
 </div>

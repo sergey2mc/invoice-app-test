@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -16,6 +17,10 @@ import { ProductService } from '../../../core/services/product.service';
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../../core/services/invoice-items.service';
 import { Product } from '../../../core/interfaces/product.interface';
+import { ModalType } from '../../../shared/modal-dialog/modal-type';
+import { ModalDialogComponent } from '../../../shared/modal-dialog/modal-dialog.component';
+import 'rxjs/add/operator/withLatestFrom';
+
 
 
 @Component({
@@ -38,7 +43,8 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
   constructor(
   	private productService: ProductService,
 		private invoiceService: InvoiceService,
-		private invoiceItemsService: InvoiceItemsService
+		private invoiceItemsService: InvoiceItemsService,
+		public dialog: MatDialog
 	) {}
 
 	get product_id(): FormControl {
@@ -57,6 +63,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 		this.productsList$ = this.productService.allProducts$;
 
 		if (this.editMode) {
+			// EDIT MODE: update item
 			this.updateInvoiceItemSubscription = Observable.merge(
 					this.product_id.valueChanges,
 					this.quantity.valueChanges
@@ -65,18 +72,17 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
-				.subscribe();
+				.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_UPDATE }));
 		}
 
-		this.itemChangesSubscription = Observable.combineLatest(
-				this.product_id.valueChanges,
-				this.productsList$
-			)
+		// update item on changes
+		this.itemChangesSubscription = this.product_id.valueChanges
+			.withLatestFrom(this.productsList$)
 			.distinctUntilChanged()
-			.map(([product_id, products]) => products.find(product => product.id === product_id))
-			.map(product => this.item.controls.product.patchValue({...product}))
-			.subscribe();
+			.map(([product_id, products]) => this.item.controls.product.patchValue({...products.find(product => product.id === product_id)}))
+			.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_UPDATE }));
 
+		// delete item
 		this.deleteItemSubscription = this.deleteItem$
 			.subscribe(() => this.deleteItem.emit())
   }
@@ -90,5 +96,12 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 	onDeleteItem() {
     this.deleteItem$.next(this.item.value);
   }
+
+	private openDialog(data) {
+		return this.dialog.open(ModalDialogComponent, {
+			width: '235px',
+			data: data
+		});
+	}
 
 }

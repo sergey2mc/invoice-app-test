@@ -3,18 +3,17 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/publishReplay';
-import 'rxjs/add/operator/withLatestFrom';
-import 'rxjs/add/operator/publishBehavior';
 import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/publishReplay';
+import 'rxjs/add/operator/publishBehavior';
 import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
-import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 
 import { Invoice } from '../interfaces/invoice.interface';
-import { LoaderService } from './loader.service';
 import { InvoiceItemsService } from './invoice-items.service';
 import { ProductService } from './product.service';
 import { CustomerService } from './customer.service';
@@ -33,24 +32,20 @@ export class InvoiceService {
 		private http: HttpClient,
 		private customerService: CustomerService,
 		private productService: ProductService,
-		private invoiceItemsService: InvoiceItemsService,
-		private loaderService: LoaderService
+		private invoiceItemsService: InvoiceItemsService
 	) {
 		this.state = new StateManagement<Invoice>();
 
 		this.dataLoaded$ = this.state.request$
-			.scan((dataLoaded: boolean, {type}) => {
-				if (type === Actions.GetList) {
-					return true;
-				}
-			}, false)
-			.do(status => console.log('Service', status))
+			.filter(({type}) => type === Actions.GetList)
+			.scan(() => true, false)
+			// .do(status => console.log('Invoice Service <dataLoaded>', status))
 			.publishBehavior(false);
 		this.dataLoaded$.connect();
 
 		this.allInvoices$ = Observable.combineLatest(
-			this.state.collectionIds$,
-			this.state.entities$
+				this.state.collectionIds$,
+				this.state.entities$
 			)
 			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
 			.shareReplay(1);
@@ -60,10 +55,10 @@ export class InvoiceService {
 				this.state.entities$
 			)
 			.map(([id, entities]) => entities[id])
-			.switchMap((invoice: Invoice) => Observable.combineLatest(
+			.switchMap((invoice: Invoice) => Observable.combineLatest(  // combine invoice, (items + products) and customer
 				Observable.of(invoice),
 				this.invoiceItemsService.getInvoiceItems(invoice.id)
-					.combineLatest(this.productService.allProducts$)
+					.withLatestFrom(this.productService.allProducts$)
 					.map(([items, products]) => items.map(item => ({...item, product: products.find(product => product.id === item.product_id)}))),
 				this.customerService.getCustomer(invoice.customer_id)
 			))
@@ -72,7 +67,8 @@ export class InvoiceService {
 				items: items,
 				customer: customer
 			}))
-			.shareReplay(1);
+			// .do(res => console.log('Invoice Service <invoice>', res))
+			.share();
 	}
 
 	getInvoices(): Observable<Invoice[]> {
@@ -87,12 +83,12 @@ export class InvoiceService {
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
 		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice));
-		return this.invoice$;
+		return this.invoice$
 	}
 
 	updateInvoice(invoice: Invoice): Observable<Invoice> {
 		this.state.update$.next(this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice));
-		return this.invoice$;
+		return this.state.updateData$;
 	}
 
 	deleteInvoice(id: number): Observable<Invoice> {

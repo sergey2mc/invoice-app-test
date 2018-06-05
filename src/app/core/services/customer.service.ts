@@ -3,8 +3,11 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import 'rxjs/add/observable/zip';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 
@@ -24,11 +27,9 @@ export class CustomerService {
 		this.state = new StateManagement<Customer>();
 
 		this.dataLoaded$ = this.state.request$
-			.scan((dataLoaded: boolean, {type}) => {
-				if (type === Actions.GetList) {
-					return true;
-				}
-			}, false)
+			.filter(({type}) => type === Actions.GetList)
+			.scan(() => true, false)
+			// .do(status => console.log('Service', status))
 			.publishBehavior(false);
 		this.dataLoaded$.connect();
 

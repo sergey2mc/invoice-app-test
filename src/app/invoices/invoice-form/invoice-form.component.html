@@ -21,7 +21,7 @@
               (deleteItem)="deleteInvoiceItem(i, item.value)">
             </app-invoice-item>
           </div>
-          <mat-error *ngIf="items.invalid && saveInvoice$ | async">You have to add at least one product</mat-error>
+          <mat-error *ngIf="!!items.errors && saveInvoice$ | async">You have to add at least one product</mat-error>
         </div>
         <div class="form-controls" [formGroup]="controlsForm">
           <div class="form-controls__product">
