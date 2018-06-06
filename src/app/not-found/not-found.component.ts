@@ -3,7 +3,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { LoaderService } from '../core/services/loader.service';
 import { ErrorHandlerService } from '../core/services/error-handler.service';
 
 
@@ -14,14 +13,9 @@ import { ErrorHandlerService } from '../core/services/error-handler.service';
 })
 export class NotFoundComponent {
 
-	loaderEnabled$: Observable<boolean>;
 	error$: Observable<HttpErrorResponse>;
 
-	constructor(
-		private loaderService: LoaderService,
-		private errorService: ErrorHandlerService
-	) {
-		this.loaderEnabled$ = loaderService.loaderEnabled$;
+	constructor(private errorService: ErrorHandlerService) {
 		this.error$ = errorService.httpError$;
 	}
 }
