@@ -50,6 +50,7 @@ export class InvoiceService {
 			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
 			.shareReplay(1);
 
+
 		this.invoice$ = Observable.combineLatest(
 				this.state.entityId$,
 				this.state.entities$
