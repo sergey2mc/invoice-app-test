@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/withLatestFrom';
-import 'rxjs/add/operator/publishReplay';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/publishBehavior';
+import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/shareReplay';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
@@ -17,6 +17,7 @@ import { Invoice } from '../interfaces/invoice.interface';
 import { InvoiceItemsService } from './invoice-items.service';
 import { ProductService } from './product.service';
 import { CustomerService } from './customer.service';
+import { ErrorHandlerService } from './error-handler.service';
 import { Actions, StateManagement } from '../../shared/state/state-management';
 
 
@@ -32,7 +33,8 @@ export class InvoiceService {
 		private http: HttpClient,
 		private customerService: CustomerService,
 		private productService: ProductService,
-		private invoiceItemsService: InvoiceItemsService
+		private invoiceItemsService: InvoiceItemsService,
+		private errorService: ErrorHandlerService
 	) {
 		this.state = new StateManagement<Invoice>();
 
@@ -54,7 +56,7 @@ export class InvoiceService {
 				this.state.entityId$,
 				this.state.entities$
 			)
-			.map(([id, entities]) => entities[id])
+			.map(([id, entities]) => (!!id && !!entities[id]) ? entities[id] : this.errorService.handleError<Invoice>())
 			.switchMap((invoice: Invoice) => Observable.combineLatest(  // combine invoice, (items + products) and customer
 				Observable.of(invoice),
 				this.invoiceItemsService.getInvoiceItems(invoice.id)
@@ -72,27 +74,28 @@ export class InvoiceService {
 	}
 
 	getInvoices(): Observable<Invoice[]> {
-		this.state.getList$.next(this.http.get<Invoice[]>(`/invoices`));
+		this.state.getList$.next(this.http.get<Invoice[]>(`/invoices`).catch((error) => this.errorService.handleError<Invoice[]>(error)));
 		return this.allInvoices$;
 	}
 
 	getInvoice(id: number): Observable<Invoice> {
-		this.state.get$.next(this.http.get<Invoice>(`/invoices/${id}`));
+		this.state.get$.next(this.http.get<Invoice>(`/invoices/${id}`).catch((error) => this.errorService.handleError<Invoice>(error)));
 		return this.invoice$;
 	}
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
-		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice));
+		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice).catch((error) => this.errorService.handleError<Invoice>(error)));
 		return this.invoice$
 	}
 
 	updateInvoice(invoice: Invoice): Observable<Invoice> {
-		this.state.update$.next(this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice));
+		this.state.update$.next(this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice).catch((error) => this.errorService.handleError<Invoice>(error)));
 		return this.state.updateData$;
 	}
 
 	deleteInvoice(id: number): Observable<Invoice> {
-		this.state.delete$.next(this.http.delete<Invoice>(`/invoices/${id}`));
+		this.state.delete$.next(this.http.delete<Invoice>(`/invoices/${id}`).catch((error) => this.errorService.handleError<Invoice>(error)));
 		return this.state.deleteData$;
 	}
+
 }

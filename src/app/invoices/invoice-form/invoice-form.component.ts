@@ -3,31 +3,31 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import { MatDialog } from '@angular/material';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/map';
 
-import { ProductService } from '../../core/services/product.service';
-import { CustomerService } from '../../core/services/customer.service';
-import { InvoiceService } from '../../core/services/invoice.service';
-import { InvoiceItemsService } from '../../core/services/invoice-items.service';
 import { Customer } from '../../core/interfaces/customer.interface';
 import { Product } from '../../core/interfaces/product.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
+import { ProductService } from '../../core/services/product.service';
+import { CustomerService } from '../../core/services/customer.service';
+import { InvoiceService } from '../../core/services/invoice.service';
+import { InvoiceItemsService } from '../../core/services/invoice-items.service';
 import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 import { ModalType } from '../../shared/modal-dialog/modal-type';
 
@@ -196,7 +196,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 						});
 				});
 
-			// NEW MODE: add item to items form
+			// NEW MODE: add item to items form array
 			this.addInvoiceItemSubscription = this.addInvoiceItem$
 				.filter(() => this.validateForms(this.controlsForm))
 				.withLatestFrom(this.productsList$)

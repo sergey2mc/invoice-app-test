@@ -1,16 +1,17 @@
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/mergeAll';
-import 'rxjs/add/operator/do';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/publish';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/publish';
+import 'rxjs/add/operator/do';
 
 import { Entity } from '../../core/interfaces/entity.interface';
+import {catchError} from 'rxjs/operators';
 
 
 export enum Actions {
@@ -105,16 +106,16 @@ export class StateManagement<T> {
 		// Observable<{response: T[], type: Actions}> => Observable<number>
 		this.entityId$ = this.request$
 			.filter(({type}) => type !== Actions.GetList)
-			.map((data) => this.getCollectionIds(data.response))
+			.map((data) => (!!data.response && !!data.response[0]) ? this.getCollectionIds(data.response) : [null])
 			.map((id: number[]) => id[0]);
 			// .do(res => console.log('ID...', res));
 	}
 
 	getEntities(data: T[]): Entity<T> {
-		return data.reduce((acc: Entity<T>, item: T) => ({...acc, [item['id']]: item}), {});
+		return (!!data && !!data[0]) ? data.reduce((acc: Entity<T>, item: T) => ({...acc, [item['id']]: item}), {}) : {};
 	}
 
 	getCollectionIds(data: T[]): number[] {
-		return data.map(item => item['id']);
+		return (!!data && !!data[0]) ? data.map(item => item['id']) : [null];
 	}
 }

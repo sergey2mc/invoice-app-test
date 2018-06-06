@@ -3,7 +3,6 @@
     <div class="form-data">
       <div class="form-title" *ngIf="!editMode">New Invoice</div>
       <div class="form-title" *ngIf="editMode">Invoice #{{ (invoice$ | async)?.id }}</div>
-
       <mat-form-field class="form-customer">
         <mat-select placeholder="Select customer" formControlName="customer_id">
           <mat-option *ngFor="let customer of customersList$ | async" [value]="customer.id">
@@ -11,41 +10,38 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-
-      <div>
-        <div class="form-items" formArrayName="items">
-          <div *ngFor="let item of items?.controls; let i=index">
-            <app-invoice-item
-              [item]="item"
-              [editMode]="editMode"
-              (deleteItem)="deleteInvoiceItem(i, item.value)">
-            </app-invoice-item>
-          </div>
-          <mat-error *ngIf="!!items.errors && saveInvoice$ | async">You have to add at least one product</mat-error>
+      <div class="form-items" formArrayName="items">
+        <div *ngFor="let item of items?.controls; let i=index">
+          <app-invoice-item
+            [item]="item"
+            [editMode]="editMode"
+            (deleteItem)="deleteInvoiceItem(i, item.value)">
+          </app-invoice-item>
         </div>
-        <div class="form-controls" [formGroup]="controlsForm">
-          <div class="form-controls__product">
-            <mat-form-field>
-              <mat-select placeholder="Add product" formControlName="product_id">
-                <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
-                  {{ product.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          <div class="form-controls__quantity">
-            <mat-form-field>
-              <input matInput placeholder="Qty" type="number" min="0" formControlName="quantity">
-            </mat-form-field>
-          </div>
-          <div class="form-controls__price">
-            <mat-form-field>
-              <input matInput placeholder="Price" [value]="newItemPrice$ | async">
-              <span matPrefix>$&nbsp;</span>
-            </mat-form-field>
-          </div>
-          <button class="form-controls__button form-controls__button_add" mat-raised-button (click)="addInvoiceItem()">+</button>
+        <mat-error *ngIf="!!items.errors && saveInvoice$ | async">You have to add at least one product</mat-error>
+      </div>
+      <div class="form-controls" [formGroup]="controlsForm">
+        <div class="form-controls__product">
+          <mat-form-field>
+            <mat-select placeholder="Add product" formControlName="product_id">
+              <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
+                {{ product.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
+        <div class="form-controls__quantity">
+          <mat-form-field>
+            <input matInput placeholder="Qty" type="number" min="0" formControlName="quantity">
+          </mat-form-field>
+        </div>
+        <div class="form-controls__price">
+          <mat-form-field>
+            <input matInput placeholder="Price" [value]="newItemPrice$ | async">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+        <button class="form-controls__button form-controls__button_add" mat-raised-button (click)="addInvoiceItem()">+</button>
       </div>
     </div>
     <div class="form-discount">
@@ -61,6 +57,8 @@
       <div class="form-footer__total-label">Total</div>
       <div class="form-footer__total-value">$ {{ total.value || '0.00' }}</div>
     </div>
-    <button class="form-footer__button" mat-raised-button *ngIf="!editMode" (click)="saveInvoice()">Save Invoice</button>
+    <button class="form-footer__button" mat-raised-button *ngIf="!editMode" [disabled]="invoiceForm.invalid" (click)="saveInvoice()">
+      Save Invoice
+    </button>
   </div>
 </form>

@@ -1,3 +1,8 @@
 <div class="not-found">
-  <img src="assets/img/not-found.gif" alt="Page not found">
+  Ooops...<br />
+  Something went wrong...<br />
+  <div *ngIf="!!(error$ | async)?.message">
+    Status: {{ (error$ | async)?.status }}<br />
+    Message: {{ (error$ | async)?.message }}
+  </div>
 </div>

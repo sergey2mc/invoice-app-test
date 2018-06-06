@@ -4,7 +4,7 @@ import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/of';
 
 import { Invoice } from '../interfaces/invoice.interface';
@@ -20,6 +20,6 @@ export class InvoiceResolver implements Resolve<Observable<Invoice>> {
 		return this.invoiceService.getInvoice(+route.paramMap.get('id'))
 			.take(1)
 			.map(invoice => Observable.of(invoice))
-			.catch(() => Observable.throw('Invoice Resolver: sever error'));
+			.catch(() => Observable.empty<Observable<Invoice>>());
 	}
 }

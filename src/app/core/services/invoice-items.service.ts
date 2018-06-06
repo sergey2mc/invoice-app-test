@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import 'rxjs/add/observable/zip';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/publishBehavior';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 
