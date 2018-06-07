@@ -10,13 +10,13 @@ import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
 
-import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
 import { Customer } from '../../core/interfaces/customer.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { CustomerService } from '../../core/services/customer.service';
-import { LoaderService } from '../../core/services/loader.service';
-import { ModalType } from '../../shared/modal-dialog/modal-type';
+
+import { ModalComponent } from '../../shared/modal/modal.component';
+import { ModalMessages } from '../../shared/modal/modal-messages';
 
 
 @Component({
@@ -26,7 +26,6 @@ import { ModalType } from '../../shared/modal-dialog/modal-type';
 })
 export class InvoicesListComponent implements OnInit, OnDestroy {
 
-	loaderEnabled$: Observable<boolean>;
 	invoicesList$: Observable<Invoice[]>;
 	deleteInvoice$: Subject<number> = new Subject();
 	invoicesListSubscription: Subscription;
@@ -36,15 +35,12 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	displayedColumns = ['id', 'name', 'discount', 'total', 'actions'];
 
 	constructor(
-		private loaderService: LoaderService,
 		private invoiceService: InvoiceService,
 		private customerService: CustomerService,
 		private router: Router,
 		private route: ActivatedRoute,
 		public dialog: MatDialog
-	) {
-		this.loaderEnabled$ = loaderService.loaderEnabled$;
-	}
+	) {}
 
 	ngOnInit() {
 		this.invoicesList$ = Observable.combineLatest(
@@ -58,8 +54,8 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		this.deleteInvoicesSubscription = this.deleteInvoice$
 			.switchMap(id => this.invoiceService.deleteInvoice(id))
 			.subscribe(
-				(delInvoice: Invoice) => this.openDialog({ id: delInvoice.id, mode: ModalType.INFO_INVOICE_DELETED }),
-				() => this.openDialog({ mode: ModalType.ERROR_INVOICE_DELETE })
+				(delInvoice: Invoice) => this.openDialog({ id: delInvoice.id, message: ModalMessages.INFO_INVOICE_DELETED }),
+				() => this.openDialog({ mode: ModalMessages.ERROR_INVOICE_DELETE })
 			);
 	}
 
@@ -76,7 +72,7 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	deleteButtonHandler(invoice: Invoice) {
-		const dialogRef = this.openDialog({ id: invoice.id, mode: ModalType.ASK_INVOICE_DELETE});
+		const dialogRef = this.openDialog({ id: invoice.id, message: ModalMessages.ASK_INVOICE_DELETE});
 		this.modalDialogSubscription = dialogRef.afterClosed().subscribe(result => {
 			if (result) {
 				this.deleteInvoice$.next(invoice.id);
@@ -86,7 +82,7 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 	}
 
 	private openDialog(data) {
-		return this.dialog.open(ModalDialogComponent, {
+		return this.dialog.open(ModalComponent, {
 			width: '235px',
 			data: data
 		});

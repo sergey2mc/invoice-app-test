@@ -1,4 +1,4 @@
-import { InvoiceItem } from './invoiceItem.interface';
+import { InvoiceItem } from './invoice-item.interface';
 import { Customer } from './customer.interface';
 
 

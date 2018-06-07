@@ -1,11 +1,7 @@
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule } from '@angular/material/dialog';
 
 import { SharedModule } from '../../shared/shared.module';
-import { ModalDialogModule } from '../../shared/modal-dialog/modal-dialog.module';
+import { ModalModule } from '../../shared/modal/modal.module';
 import { InvoicesListComponent } from './invoices-list.component';
 
 
@@ -13,11 +9,7 @@ import { InvoicesListComponent } from './invoices-list.component';
   declarations: [ InvoicesListComponent ],
   imports: [
     SharedModule,
-		MatButtonModule,
-    MatTableModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
-    ModalDialogModule
+		ModalModule
   ],
   exports: [ InvoicesListComponent ]
 })

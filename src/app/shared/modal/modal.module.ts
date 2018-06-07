@@ -3,17 +3,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import { SharedModule } from '../shared.module';
-import { ModalDialogComponent } from './modal-dialog.component';
+import { ModalComponent } from './modal.component';
 
 
 @NgModule({
-  declarations: [ ModalDialogComponent ],
+  declarations: [ ModalComponent ],
   imports: [
     SharedModule,
     MatButtonModule,
     MatDialogModule
   ],
-  exports: [ ModalDialogComponent ],
-  entryComponents: [ ModalDialogComponent ]
+  exports: [ ModalComponent ],
+  entryComponents: [ ModalComponent ]
 })
-export class ModalDialogModule { }
+export class ModalModule { }

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material';
@@ -14,7 +13,6 @@ import { SharedModule } from '../../../shared/shared.module';
   imports: [
     SharedModule,
 		ReactiveFormsModule,
-    MatButtonModule,
 		MatSelectModule,
 		MatInputModule,
 		MatDividerModule

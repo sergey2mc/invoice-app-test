@@ -1,4 +1,4 @@
-<form class="form" [formGroup]="invoiceForm">
+<form class="form" #form="ngForm" [formGroup]="invoiceForm">
   <div class="form-container">
     <div class="form-data">
       <div class="form-title" *ngIf="!editMode">New Invoice</div>
@@ -41,7 +41,11 @@
             <span matPrefix>$&nbsp;</span>
           </mat-form-field>
         </div>
-        <button class="form-controls__button form-controls__button_add" mat-raised-button (click)="addInvoiceItem()">+</button>
+        <button
+          class="form-controls__button form-controls__button_add"
+          mat-raised-button
+          (click)="addInvoiceItem()"
+        >+</button>
       </div>
     </div>
     <div class="form-discount">

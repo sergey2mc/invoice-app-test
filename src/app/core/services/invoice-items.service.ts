@@ -10,7 +10,7 @@ import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 
-import { InvoiceItem } from '../interfaces/invoiceItem.interface';
+import { InvoiceItem } from '../interfaces/invoice-item.interface';
 import { Actions, StateManagement } from '../../shared/state/state-management';
 
 

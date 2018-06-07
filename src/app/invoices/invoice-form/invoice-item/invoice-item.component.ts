@@ -12,14 +12,15 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/withLatestFrom';
 
 import { ProductService } from '../../../core/services/product.service';
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../../core/services/invoice-items.service';
 import { Product } from '../../../core/interfaces/product.interface';
-import { ModalType } from '../../../shared/modal-dialog/modal-type';
-import { ModalDialogComponent } from '../../../shared/modal-dialog/modal-dialog.component';
-import 'rxjs/add/operator/withLatestFrom';
+
+import { ModalMessages } from '../../../shared/modal/modal-messages';
+import { ModalComponent } from '../../../shared/modal/modal.component';
 
 
 
@@ -31,7 +32,9 @@ import 'rxjs/add/operator/withLatestFrom';
 export class InvoiceItemComponent implements OnInit, OnDestroy {
 
 	productsList$: Observable<Product[]>;
+
 	deleteItem$: Subject<number> = new Subject();
+
 	deleteItemSubscription: Subscription;
 	itemChangesSubscription: Subscription;
 	updateInvoiceItemSubscription: Subscription;
@@ -72,7 +75,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
-				.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_UPDATE }));
+				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_UPDATE }));
 		}
 
 		// update item on changes
@@ -80,7 +83,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 			.withLatestFrom(this.productsList$)
 			.distinctUntilChanged()
 			.map(([product_id, products]) => this.item.controls.product.patchValue({...products.find(product => product.id === product_id)}))
-			.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_UPDATE }));
+			.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_UPDATE }));
 
 		// delete item
 		this.deleteItemSubscription = this.deleteItem$
@@ -98,7 +101,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
   }
 
 	private openDialog(data) {
-		return this.dialog.open(ModalDialogComponent, {
+		return this.dialog.open(ModalComponent, {
 			width: '235px',
 			data: data
 		});

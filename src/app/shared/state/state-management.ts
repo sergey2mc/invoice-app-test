@@ -70,8 +70,10 @@ export class StateManagement<T> {
 			.publish();
 		this.response$.connect();
 
-		// calc entities after every action has been happened
-		// Observable<{response: T[], type: Actions}> => Observable<Entity<T>>
+		/**
+		 * calc entities after every action has been happened
+		 * Observable<{response: T[], type: Actions}> => Observable<Entity<T>>
+		 */
 		this.entities$ = this.response$
 			.scan((acc: Entity<T>, data: {response: T[], type: Actions}) => {
 				switch (data.type) {

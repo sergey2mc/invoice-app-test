@@ -8,6 +8,7 @@ import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
 import { APP_RESOLVER_PROVIDERS } from './resolvers';
 import { APP_INTERCEPTOR_PROVIDERS } from './interceptors';
+import { ModalMessagesModule } from '../shared/modal/messages/modal-messages.module';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { APP_INTERCEPTOR_PROVIDERS } from './interceptors';
 		BrowserModule.withServerTransition({appId: 'my-app'}),
 		BrowserAnimationsModule,
 		TransferHttpCacheModule,
-    HttpClientModule
+    HttpClientModule,
+		ModalMessagesModule
   ],
   providers: [
     APP_SERVICE_PROVIDERS,

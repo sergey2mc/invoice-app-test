@@ -23,13 +23,13 @@ import 'rxjs/add/operator/map';
 import { Customer } from '../../core/interfaces/customer.interface';
 import { Product } from '../../core/interfaces/product.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
-import { InvoiceItem } from '../../core/interfaces/invoiceItem.interface';
+import { InvoiceItem } from '../../core/interfaces/invoice-item.interface';
 import { ProductService } from '../../core/services/product.service';
 import { CustomerService } from '../../core/services/customer.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { ModalDialogComponent } from '../../shared/modal-dialog/modal-dialog.component';
-import { ModalType } from '../../shared/modal-dialog/modal-type';
+import { ModalComponent } from '../../shared/modal/modal.component';
+import { ModalMessages } from '../../shared/modal/modal-messages';
 
 
 @Component({
@@ -156,7 +156,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 				.skip(1)
 				.filter(() => this.validateForms(this.invoiceForm))
 				.switchMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value).take(1))
-				.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICE_UPDATE }));
+				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICE_UPDATE }));
 
 			// EDIT MODE: add item to existing invoice
 			this.addInvoiceItemSubscription = this.addInvoiceItem$
@@ -172,13 +172,13 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 						this.controlsForm.reset({quantity: 0});
 						this.newItemPrice$.next(0)
 					},
-					() => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_ADD })
+					() => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_ADD })
 				);
 
 			// EDIT MODE: delete item from existing invoice
 			this.deleteInvoiceItemSubscription = this.deleteInvoiceItem$
 				.switchMap(itemId => this.invoiceItemsService.deleteInvoiceItem(this.invoiceForm.value.id, itemId).take(1))
-				.subscribe( null, () => this.openDialog({ mode: ModalType.ERROR_INVOICEITEM_DELETE }));
+				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_DELETE }));
 
 		} else {
 
@@ -188,7 +188,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 				.filter(() => this.validateForms(this.invoiceForm))
 				.switchMap(invoice => this.invoiceService.addInvoice(invoice).take(1))
 				.subscribe((invoice) => {
-					const dialogRef = this.openDialog({id: invoice.id, mode: ModalType.INFO_INVOICE_CREATED});
+					const dialogRef = this.openDialog({id: invoice.id, message: ModalMessages.INFO_INVOICE_CREATED});
 					this.modalDialogSubscription = dialogRef.afterClosed()
 						.subscribe(() => {
 							this.router.navigate(['/invoices']);
@@ -259,7 +259,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 	}
 
 	private openDialog(data) {
-		return this.dialog.open(ModalDialogComponent, {
+		return this.dialog.open(ModalComponent, {
 			width: '235px',
 			data: data
 		});

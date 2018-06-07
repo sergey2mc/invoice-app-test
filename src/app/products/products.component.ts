@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 
 import { Product } from '../core/interfaces/product.interface';
 import { ProductService } from '../core/services/product.service';
-import { LoaderService } from '../core/services/loader.service';
 
 
 @Component({
@@ -14,12 +13,10 @@ import { LoaderService } from '../core/services/loader.service';
 })
 export class ProductsComponent {
 
-	loaderEnabled$: Observable<boolean>;
   products$: Observable<Product[]>;
   displayedColumns = ['name', 'price'];
 
-  constructor(private loaderService: LoaderService, private productService: ProductService) {
+  constructor(private productService: ProductService) {
     this.products$ = this.productService.allProducts$;
-		this.loaderEnabled$ = loaderService.loaderEnabled$;
   }
 }
