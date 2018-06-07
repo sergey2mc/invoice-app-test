@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import { MatDialog } from '@angular/material';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -16,7 +15,6 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/skip';
-import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/map';
 
@@ -28,8 +26,10 @@ import { ProductService } from '../../core/services/product.service';
 import { CustomerService } from '../../core/services/customer.service';
 import { InvoiceService } from '../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../core/services/invoice-items.service';
-import { ModalComponent } from '../../shared/modal/modal.component';
-import { ModalMessages } from '../../shared/modal/modal-messages';
+import { LoaderService } from '../../core/services/loader.service';
+import { ModalMessageTypes } from '../../shared/modal/modal-message-types';
+import { unsubscribeAll } from '../../shared/unsubscribe';
+import { openDialog } from '../../shared/open-dialog';
 
 
 @Component({
@@ -40,9 +40,7 @@ import { ModalMessages } from '../../shared/modal/modal-messages';
 export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 	editMode: boolean;
-	controlsForm: FormGroup;
 	invoiceForm: FormGroup;
-	itemForm: FormGroup;
 
 	invoice$: Observable<Invoice>;
 	productsList$: Observable<Product[]>;
@@ -50,28 +48,22 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 	addInvoiceItem$: Subject<InvoiceItem> = new Subject();
 	deleteInvoiceItem$: Subject<number> = new Subject();
-	newItemPrice$: BehaviorSubject<number> = new BehaviorSubject(0);
 	saveInvoice$: Subject<Invoice> = new Subject();
 
-	addInvoiceItemSubscription: Subscription;
-	deleteInvoiceItemSubscription: Subscription;
-	newItemPriceSubscription: Subscription;
-	saveInvoiceSubscription: Subscription;
-	updateInvoiceSubscription: Subscription;
-	totalPriceSubscription: Subscription;
-	modalDialogSubscription: Subscription;
+	subscriptions: {[property: string]: Subscription} = {};
 
 	constructor(
 		private customerService: CustomerService,
 		private productService: ProductService,
 		private invoiceService: InvoiceService,
 		private invoiceItemsService: InvoiceItemsService,
+		private loader: LoaderService,
 		private router: Router,
 		private route: ActivatedRoute,
 		public dialog: MatDialog
 	) {
 		this.editMode = this.route.snapshot.data.mode === 'edit';
-		this.createControlsForm();
+
 		this.createInvoiceForm();
   }
 
@@ -85,10 +77,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 	get total(): FormControl {
 		return this.invoiceForm.get('total') as FormControl;
-	}
-
-	get product(): FormControl {
-		return this.controlsForm.get('product_id') as FormControl;
 	}
 
 	get items(): FormArray {
@@ -105,21 +93,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 		})
 	}
 
-	createControlsForm() {
-		return this.controlsForm = new FormGroup({
-			id: new FormControl(0),
-			invoice_id: new FormControl(0),
-			product_id: new FormControl( 0, [Validators.required, Validators.min(1)]),
-			quantity: new FormControl(0, [Validators.required, Validators.min(1)]),
-			product: new FormGroup({
-				name: new FormControl(null),
-				price: new FormControl({value: 0, disabled: true})
-			})
-		});
-	}
-
 	createItemForm(invoiceItem) {
-		return this.itemForm = new FormGroup({
+		return new FormGroup({
 			id: new FormControl(invoiceItem.id),
 			invoice_id: new FormControl(invoiceItem.invoice_id),
 			product_id: new FormControl(invoiceItem.product_id, [Validators.required, Validators.min(1)]),
@@ -137,148 +112,124 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
 		if (this.editMode) {
 
-			// EDIT MODE: invoice for editing
-			this.invoice$ = this.route.snapshot.data.invoice
-				.take(1)
-				.map(invoice => {
+			/**
+			 * EDIT MODE: invoice for editing
+			 */
+			this.invoice$ = this.route.snapshot.data.invoice.take(1);
+			this.subscriptions.invoice = this.invoice$
+				.subscribe(invoice => {
 					invoice.items.forEach(item => this.items.push(this.createItemForm(item)));
 					this.invoiceForm.patchValue(invoice);
-					return invoice;
 				});
 
-			// EDIT MODE: update invoice on change customer, discount or total price
-			this.updateInvoiceSubscription = Observable.combineLatest(
+			/**
+			 * EDIT MODE: update invoice on change customer, discount or total price
+			 * @type {Subscription}
+			 */
+			this.subscriptions.updateInvoice = Observable.merge(
 					this.customer.valueChanges,
 					this.discount.valueChanges,
 					this.total.valueChanges
 				)
-				.debounceTime(500)
-				.skip(1)
-				.filter(() => this.validateForms(this.invoiceForm))
+				.debounceTime(300)
+				// .distinctUntilChanged((prev, curr) => prev.sort().toString() === curr.sort().toString())
+				.filter(() => this.invoiceForm.valid)
 				.switchMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value).take(1))
-				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICE_UPDATE }));
-
-			// EDIT MODE: add item to existing invoice
-			this.addInvoiceItemSubscription = this.addInvoiceItem$
-				.filter(() => this.validateForms(this.controlsForm))
-				.withLatestFrom(this.productsList$)
-				.map(([item, products]) => {
-					this.items.push(this.createItemForm({...item, product: products.find(product => product.id === item.product_id)}));
-					return item;
-				})
-				.switchMap((item: InvoiceItem) => this.invoiceItemsService.addInvoiceItem(this.invoiceForm.value.id, item).take(1))
 				.subscribe(
-					() => {
-						this.controlsForm.reset({quantity: 0});
-						this.newItemPrice$.next(0)
-					},
-					() => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_ADD })
+					() => this.loader.hide(),
+					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICE_UPDATE})
 				);
 
-			// EDIT MODE: delete item from existing invoice
-			this.deleteInvoiceItemSubscription = this.deleteInvoiceItem$
+			/**
+			 * EDIT MODE: add item to existing invoice
+			 * @type {Subscription}
+			 */
+			this.subscriptions.addInvoiceItem = this.addInvoiceItem$
+				.switchMap((item: InvoiceItem) => this.invoiceItemsService.addInvoiceItem(this.invoiceForm.value.id, item).take(1))
+				.withLatestFrom(this.productsList$)
+				.map(([newItem, products]) => ({...newItem, product: products.find(product => product.id === newItem.product_id)}))
+				.subscribe(
+					(newItem: InvoiceItem) => this.items.push(this.createItemForm(newItem)),
+					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_ADD})
+				);
+
+			/**
+			 * EDIT MODE: delete item from existing invoice
+			 * @type {Subscription}
+			 */
+			this.subscriptions.deleteInvoiceItem = this.deleteInvoiceItem$
 				.switchMap(itemId => this.invoiceItemsService.deleteInvoiceItem(this.invoiceForm.value.id, itemId).take(1))
-				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_DELETE }));
+				.subscribe(
+					() => this.loader.hide(),
+					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_DELETE})
+				);
 
 		} else {
 
-			// NEW MODE: save new invoice
-			this.saveInvoiceSubscription = this.saveInvoice$
+			/**
+			 * NEW MODE: save new invoice
+			 * @type {Subscription}
+			 */
+			this.subscriptions.saveInvoice = this.saveInvoice$
 				.debounceTime(300)
-				.filter(() => this.validateForms(this.invoiceForm))
+				.filter(() => this.invoiceForm.valid)
 				.switchMap(invoice => this.invoiceService.addInvoice(invoice).take(1))
 				.subscribe((invoice) => {
-					const dialogRef = this.openDialog({id: invoice.id, message: ModalMessages.INFO_INVOICE_CREATED});
-					this.modalDialogSubscription = dialogRef.afterClosed()
+					const dialogRef = openDialog(this.dialog, {id: invoice.id, message: ModalMessageTypes.INFO_INVOICE_CREATED});
+					this.subscriptions.modalDialog = dialogRef.afterClosed()
 						.subscribe(() => {
 							this.router.navigate(['/invoices']);
-							this.modalDialogSubscription.unsubscribe();
+							this.subscriptions.modalDialog.unsubscribe();
 						});
 				});
 
-			// NEW MODE: add item to items form array
-			this.addInvoiceItemSubscription = this.addInvoiceItem$
-				.filter(() => this.validateForms(this.controlsForm))
+			/**
+			 * NEW MODE: add item to items form array
+			 * @type {Subscription}
+			 */
+			this.subscriptions.addInvoiceItem = this.addInvoiceItem$
 				.withLatestFrom(this.productsList$)
-				.map(([item, products]) => {
-					this.items.push(this.createItemForm({...item, product: products.find(product => product.id === item.product_id)}));
-					return item;
-				})
-				.subscribe(() => {
-						this.controlsForm.reset({quantity: 0});
-						this.newItemPrice$.next(0)
-					}
-				);
+				.map(([item, products]) => ({...item, product: products.find(product => product.id === item.product_id)}))
+				.subscribe((newItem: InvoiceItem) => this.items.push(this.createItemForm(newItem)));
 
 		}
 
-		// get choosed product's price
-		this.newItemPriceSubscription = this.product.valueChanges
-			.withLatestFrom(this.productsList$)
-			.map(([product_id, products]) => products.find((product: Product) => product.id === product_id))
-			.map(product => !!product ? product.price : 0)
-			.subscribe(price => this.newItemPrice$.next(price));
-
-		// calc total price
-		this.totalPriceSubscription = Observable.merge(
+		/**
+		 * Calc total price
+		 * @type {Subscription}
+		 */
+		this.subscriptions.totalPrice = Observable.merge(
 				this.items.valueChanges,
 				this.discount.valueChanges,
 				this.addInvoiceItem$,
 				this.deleteInvoiceItem$
 			)
 			.delay(10)
+			.filter(() => this.invoiceForm.valid)
 			.map(() => this.items.length ? this.items.value.map(item => item.product.price * item.quantity).reduce((acc, itemTotal) => acc + itemTotal) : 0)
 			.map(total => +(total - total * this.discount.value * 0.01).toFixed(2))
 			.subscribe((total: number) => this.total.patchValue(total));
 
+		this.subscriptions.loader = this.invoiceForm.valueChanges
+			.debounceTime(300)
+			.subscribe(() => this.loader.show());
 	}
 
 	ngOnDestroy() {
-		this.addInvoiceItemSubscription.unsubscribe();
-		this.totalPriceSubscription.unsubscribe();
-		this.newItemPriceSubscription.unsubscribe();
-		if (this.editMode) {
-			this.updateInvoiceSubscription.unsubscribe();
-			this.deleteInvoiceItemSubscription.unsubscribe();
-		} else {
-			this.saveInvoiceSubscription.unsubscribe();
-		}
+		unsubscribeAll(this.subscriptions);
 	}
 
 	saveInvoice() {
 		this.saveInvoice$.next(this.invoiceForm.value);
 	}
 
-	addInvoiceItem() {
-		this.addInvoiceItem$.next(this.controlsForm.value);
+	addInvoiceItem(form: FormGroup) {
+		this.addInvoiceItem$.next(<InvoiceItem>{...form.value, invoice_id: this.invoiceForm.value.id});
 	}
 
 	deleteInvoiceItem(index: number, item: InvoiceItem) {
 		this.items.removeAt(index);
 		this.deleteInvoiceItem$.next(item.id);
-	}
-
-	private openDialog(data) {
-		return this.dialog.open(ModalComponent, {
-			width: '235px',
-			data: data
-		});
-	}
-
-	private validateForms(formGroup: FormGroup): boolean {
-		let errors = 0;
-		for (let field in formGroup.controls) {
-			const control = formGroup.get(field);
-			if (control instanceof FormControl) {
-				control.markAsTouched({ onlySelf: true });
-			} else if (control instanceof FormGroup) {
-				this.validateForms(control);
-			} else if (control instanceof FormArray) {
-				control.controls.forEach((group: FormGroup) => this.validateForms(group));
-			}
-			if (control.invalid) errors++;
-		}
-		return errors === 0;
 	}
 
 }

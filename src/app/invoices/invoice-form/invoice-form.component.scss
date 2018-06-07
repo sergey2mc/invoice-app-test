@@ -39,66 +39,6 @@
     }
   }
 
-  &-controls {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    padding-top: 5px;
-    border-top: 2px solid $gray;
-    margin-bottom: 10px;
-
-    &__product {
-      width: 250px;
-      height: 100%;
-      margin-right: 10px;
-
-      .mat-form-field {
-        width: 100%;
-      }
-    }
-
-    &__quantity {
-      position: relative;
-      width: 80px;
-      height: 100%;
-
-      .mat-form-field {
-        width: 100%;
-        padding: 0 10px;
-      }
-    }
-
-    &__price {
-      width: 100px;
-      height: 100%;
-
-      .mat-form-field {
-        width: 100%;
-        padding: 0 10px;
-      }
-    }
-
-    &__button {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      width: 28px;
-      min-width: 28px;
-      height: 28px;
-      line-height: 28px;
-      font-size: 18px;
-      padding: 0;
-      border: 1px solid $gray;
-      border-radius: 50%;
-      background-color: $light-green;
-    }
-  }
-
-
   &-discount {
     display: flex;
     flex-direction: column;
@@ -115,7 +55,13 @@
       .mat-form-field {
         width: 100%;
         padding: 0 10px;
+        margin-bottom: -20px;
       }
+    }
+
+    &__error {
+      font-size: 14px;
+      padding-left: 10px;
     }
   }
 

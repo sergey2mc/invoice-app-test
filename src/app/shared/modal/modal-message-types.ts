@@ -1,4 +1,4 @@
-export enum ModalMessages {
+export enum ModalMessageTypes {
 	ASK_INVOICE_DELETE = 'Delete Invoice #',
 	INFO_INVOICE_CREATED = 'Successfully created!',
 	INFO_INVOICE_DELETED = 'Successfully deleted!',

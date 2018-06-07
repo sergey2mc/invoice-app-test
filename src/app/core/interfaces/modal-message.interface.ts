@@ -1,6 +1,6 @@
+import { ModalMessageTypes } from '../../shared/modal/modal-message-types';
+
 export interface ModalMessage {
-	data: {
-		id?: number,
-		message: string
-	}
+	id?: number,
+	message: ModalMessageTypes
 }

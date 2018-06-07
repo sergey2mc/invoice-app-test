@@ -1,7 +1,7 @@
 import { Component, ComponentFactoryResolver, Inject, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-import { ModalMessages } from './modal-messages';
+import { ModalMessageTypes } from './modal-message-types';
 import { QuestionMessageComponent } from './messages/question/question-message.component';
 import { InfoMessageComponent } from './messages/info/info-message.component';
 import { ErrorMessageComponent } from './messages/error/error-message.component';
@@ -42,15 +42,15 @@ export class ModalComponent {
 
 	private getComponent(message) {
 		switch (message) {
-      case ModalMessages.ASK_INVOICE_DELETE: return QuestionMessageComponent;
-			case ModalMessages.INFO_INVOICE_CREATED:
-			case ModalMessages.INFO_INVOICE_DELETED: return InfoMessageComponent;
-			case ModalMessages.ERROR_INVOICE_SAVE:
-			case ModalMessages.ERROR_INVOICE_UPDATE:
-			case ModalMessages.ERROR_INVOICE_DELETE:
-			case ModalMessages.ERROR_INVOICEITEM_ADD:
-			case ModalMessages.ERROR_INVOICEITEM_UPDATE:
-			case ModalMessages.ERROR_INVOICEITEM_DELETE: return ErrorMessageComponent;
+      case ModalMessageTypes.ASK_INVOICE_DELETE: return QuestionMessageComponent;
+			case ModalMessageTypes.INFO_INVOICE_CREATED:
+			case ModalMessageTypes.INFO_INVOICE_DELETED: return InfoMessageComponent;
+			case ModalMessageTypes.ERROR_INVOICE_SAVE:
+			case ModalMessageTypes.ERROR_INVOICE_UPDATE:
+			case ModalMessageTypes.ERROR_INVOICE_DELETE:
+			case ModalMessageTypes.ERROR_INVOICEITEM_ADD:
+			case ModalMessageTypes.ERROR_INVOICEITEM_UPDATE:
+			case ModalMessageTypes.ERROR_INVOICEITEM_DELETE: return ErrorMessageComponent;
       default: return InfoMessageComponent;
 		}
   }

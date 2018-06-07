@@ -8,7 +8,7 @@ import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
 import { APP_RESOLVER_PROVIDERS } from './resolvers';
 import { APP_INTERCEPTOR_PROVIDERS } from './interceptors';
-import { ModalMessagesModule } from '../shared/modal/messages/modal-messages.module';
+import { ModalMessageTypesModule } from '../shared/modal/messages/modal-messages.module';
 
 
 @NgModule({
@@ -18,7 +18,7 @@ import { ModalMessagesModule } from '../shared/modal/messages/modal-messages.mod
 		BrowserAnimationsModule,
 		TransferHttpCacheModule,
     HttpClientModule,
-		ModalMessagesModule
+		ModalMessageTypesModule
   ],
   providers: [
     APP_SERVICE_PROVIDERS,

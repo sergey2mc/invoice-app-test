@@ -15,44 +15,27 @@
           <app-invoice-item
             [item]="item"
             [editMode]="editMode"
+            [itemMode]="true"
             (deleteItem)="deleteInvoiceItem(i, item.value)">
           </app-invoice-item>
+          <mat-divider></mat-divider>
         </div>
-        <mat-error *ngIf="!!items.errors && saveInvoice$ | async">You have to add at least one product</mat-error>
+        <mat-error *ngIf="!items.valid && form.submitted">You have to add at least one product</mat-error>
       </div>
-      <div class="form-controls" [formGroup]="controlsForm">
-        <div class="form-controls__product">
-          <mat-form-field>
-            <mat-select placeholder="Add product" formControlName="product_id">
-              <mat-option *ngFor="let product of productsList$ | async" [value]="product.id">
-                {{ product.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div class="form-controls__quantity">
-          <mat-form-field>
-            <input matInput placeholder="Qty" type="number" min="0" formControlName="quantity">
-          </mat-form-field>
-        </div>
-        <div class="form-controls__price">
-          <mat-form-field>
-            <input matInput placeholder="Price" [value]="newItemPrice$ | async">
-            <span matPrefix>$&nbsp;</span>
-          </mat-form-field>
-        </div>
-        <button
-          class="form-controls__button form-controls__button_add"
-          mat-raised-button
-          (click)="addInvoiceItem()"
-        >+</button>
-      </div>
+
+      <app-invoice-item
+        [editMode]="editMode"
+        [itemMode]="false"
+        (addItem)="addInvoiceItem($event)">
+      </app-invoice-item>
+
     </div>
     <div class="form-discount">
       <div class="form-discount__control">
         <mat-form-field>
           <input matInput placeholder="Discount" type="number" min="0" max="50" formControlName="discount">
         </mat-form-field>
+        <mat-error class="form-discount__error" *ngIf="!invoiceForm.controls.discount.valid">0...50%</mat-error>
       </div>
     </div>
   </div>
@@ -61,8 +44,9 @@
       <div class="form-footer__total-label">Total</div>
       <div class="form-footer__total-value">$ {{ total.value || '0.00' }}</div>
     </div>
-    <button class="form-footer__button" mat-raised-button *ngIf="!editMode" [disabled]="invoiceForm.invalid" (click)="saveInvoice()">
+    <button class="form-footer__button" mat-raised-button *ngIf="!editMode" (click)="saveInvoice()">
       Save Invoice
     </button>
   </div>
 </form>
+<app-loader></app-loader>

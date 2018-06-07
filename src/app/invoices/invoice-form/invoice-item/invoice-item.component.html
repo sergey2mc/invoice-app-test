@@ -1,4 +1,4 @@
-<div class="form-item">
+<form class="form-item" [formGroup]="item" #form="ngForm" (ngSubmit)="itemMode ? onDeleteItem() : onAddItem(controlsForm)">
     <div class="form-item__product">
         <mat-form-field>
             <mat-select placeholder="Add product" [formControl]="product_id">
@@ -15,10 +15,10 @@
     </div>
     <div class="form-item__price">
         <mat-form-field>
-            <input matInput placeholder="Price" [formControl]="price">
+            <input matInput readonly placeholder="Price" [formControl]="price">
             <span matPrefix>$&nbsp;</span>
         </mat-form-field>
     </div>
-    <button class="form-item__button" mat-raised-button (click)="onDeleteItem()">-</button>
-</div>
-<mat-divider></mat-divider>
+    <button class="form-item__button" type="submit" mat-raised-button *ngIf="itemMode">-</button>
+    <button class="form-item__button form-item__button--green" type="submit" mat-raised-button *ngIf="!itemMode">+</button>
+</form>

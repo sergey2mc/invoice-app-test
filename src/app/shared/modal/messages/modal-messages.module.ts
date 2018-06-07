@@ -11,4 +11,4 @@ import { ErrorMessageModule } from './error/error-message.module';
     ErrorMessageModule
   ]
 })
-export class ModalMessagesModule { }
+export class ModalMessageTypesModule { }

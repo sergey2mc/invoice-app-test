@@ -1,5 +1,5 @@
-import { Component, Input, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, Input, Output, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
@@ -17,11 +17,12 @@ import 'rxjs/add/operator/withLatestFrom';
 import { ProductService } from '../../../core/services/product.service';
 import { InvoiceService } from '../../../core/services/invoice.service';
 import { InvoiceItemsService } from '../../../core/services/invoice-items.service';
+import { LoaderService } from '../../../core/services/loader.service';
 import { Product } from '../../../core/interfaces/product.interface';
 
-import { ModalMessages } from '../../../shared/modal/modal-messages';
-import { ModalComponent } from '../../../shared/modal/modal.component';
-
+import { ModalMessageTypes } from '../../../shared/modal/modal-message-types';
+import { unsubscribeAll } from '../../../shared/unsubscribe';
+import { openDialog } from '../../../shared/open-dialog';
 
 
 @Component({
@@ -33,22 +34,33 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 
 	productsList$: Observable<Product[]>;
 
+	addItem$: Subject<number> = new Subject();
 	deleteItem$: Subject<number> = new Subject();
 
-	deleteItemSubscription: Subscription;
-	itemChangesSubscription: Subscription;
-	updateInvoiceItemSubscription: Subscription;
+	subscriptions: {[property: string]: Subscription} = {};
+
+	controlsForm: FormGroup;
 
   @Input() item;
 	@Input() editMode;
+	@Input() itemMode;
   @Output() deleteItem = new EventEmitter();
+	@Output() addItem = new EventEmitter();
+
+	@ViewChild(FormGroupDirective) form;
 
   constructor(
   	private productService: ProductService,
 		private invoiceService: InvoiceService,
 		private invoiceItemsService: InvoiceItemsService,
+		private loader: LoaderService,
 		public dialog: MatDialog
-	) {}
+	) {
+		this.createControlsForm();
+		if (!this.item) {
+  		this.item = this.controlsForm;
+		}
+	}
 
 	get product_id(): FormControl {
 		return this.item.get('product_id') as FormControl;
@@ -63,11 +75,15 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 	}
 
   ngOnInit() {
+
 		this.productsList$ = this.productService.allProducts$;
 
-		if (this.editMode) {
-			// EDIT MODE: update item
-			this.updateInvoiceItemSubscription = Observable.merge(
+		if (this.editMode && this.itemMode) {
+			/**
+			 * EDIT MODE: Update existing item
+			 * @type {Subscription}
+			 */
+			this.subscriptions.updateInvoiceItem = Observable.merge(
 					this.product_id.valueChanges,
 					this.quantity.valueChanges
 				)
@@ -75,35 +91,59 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
-				.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_UPDATE }));
+				.subscribe( null, () => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_UPDATE}));
 		}
 
-		// update item on changes
-		this.itemChangesSubscription = this.product_id.valueChanges
+		/**
+		 * Update item
+		 * @type {Subscription}
+		 */
+		this.subscriptions.itemChanges = this.product_id.valueChanges
 			.withLatestFrom(this.productsList$)
 			.distinctUntilChanged()
-			.map(([product_id, products]) => this.item.controls.product.patchValue({...products.find(product => product.id === product_id)}))
-			.subscribe( null, () => this.openDialog({ message: ModalMessages.ERROR_INVOICEITEM_UPDATE }));
+			.subscribe(([product_id, products]) => this.item.controls.product.patchValue({...products.find(product => product.id === product_id)}));
 
-		// delete item
-		this.deleteItemSubscription = this.deleteItem$
-			.subscribe(() => this.deleteItem.emit())
+		/**
+		 * Delete item
+		 * @type {Subscription}
+		 */
+		this.subscriptions.deleteItem = this.deleteItem$
+			.subscribe(() => this.deleteItem.emit());
+
+		/**
+		 * Add item
+		 * @type {Subscription}
+		 */
+		this.subscriptions.addItem = this.addItem$
+			.subscribe(() => this.addItem.emit(this.item));
   }
 
-  ngOnDestroy() {
-		this.itemChangesSubscription.unsubscribe();
-		this.deleteItemSubscription.unsubscribe();
-		if (this.editMode) this.updateInvoiceItemSubscription.unsubscribe();
+	ngOnDestroy() {
+		unsubscribeAll(this.subscriptions);
 	}
 
 	onDeleteItem() {
     this.deleteItem$.next(this.item.value);
   }
 
-	private openDialog(data) {
-		return this.dialog.open(ModalComponent, {
-			width: '235px',
-			data: data
+	onAddItem(form) {
+  	if (this.controlsForm.valid) {
+			this.addItem$.next(form.value);
+			this.controlsForm.reset();
+			this.form.resetForm();
+		}
+	}
+
+	private createControlsForm() {
+		return this.controlsForm = new FormGroup({
+			id: new FormControl(0),
+			invoice_id: new FormControl(0),
+			product_id: new FormControl( 0, [Validators.required, Validators.min(1)]),
+			quantity: new FormControl(0, [Validators.required, Validators.min(1)]),
+			product: new FormGroup({
+				name: new FormControl(null),
+				price: new FormControl({value: 0, disabled: true})
+			})
 		});
 	}
 

@@ -11,6 +11,7 @@ import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 
 import { InvoiceItem } from '../interfaces/invoice-item.interface';
+import { LoaderService } from './loader.service';
 import { Actions, StateManagement } from '../../shared/state/state-management';
 
 
@@ -21,7 +22,7 @@ export class InvoiceItemsService {
 	state: StateManagement<InvoiceItem>;
 	invoiceItems$: Observable<any>;
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private loader: LoaderService) {
 		this.state = new StateManagement<InvoiceItem>();
 
 		this.dataLoaded$ = this.state.request$
@@ -57,6 +58,7 @@ export class InvoiceItemsService {
 
 
 	deleteInvoiceItem(invoiceId: number, itemId: number): Observable<InvoiceItem> {
+		this.loader.show();
 		this.state.delete$.next(this.http.delete<InvoiceItem>(`/invoices/${invoiceId}/items/${itemId}`));
 		return this.state.deleteData$;
 	}

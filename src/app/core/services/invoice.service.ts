@@ -17,6 +17,7 @@ import { Invoice } from '../interfaces/invoice.interface';
 import { InvoiceItemsService } from './invoice-items.service';
 import { ProductService } from './product.service';
 import { CustomerService } from './customer.service';
+import { LoaderService } from './loader.service';
 import { ErrorHandlerService } from './error-handler.service';
 import { Actions, StateManagement } from '../../shared/state/state-management';
 
@@ -34,6 +35,7 @@ export class InvoiceService {
 		private customerService: CustomerService,
 		private productService: ProductService,
 		private invoiceItemsService: InvoiceItemsService,
+		private loader: LoaderService,
 		private errorService: ErrorHandlerService
 	) {
 		this.state = new StateManagement<Invoice>();
