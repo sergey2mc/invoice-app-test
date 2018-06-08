@@ -9,17 +9,18 @@ import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/let';
 
-import { Entity } from '../../core/interfaces/entity.interface';
-import {catchError} from 'rxjs/operators';
-
+interface Entity<T> {
+	[index: number]: T;
+}
 
 export enum Actions {
-	Get,
-	Add,
-	Update,
-	Delete,
-	GetList
+	Get = 'GET',
+	Add = 'ADD',
+	Update = 'UPDATE',
+	Delete = 'DELETE',
+	GetList = 'GET_ALL'
 }
 
 export class StateManagement<T> {
@@ -27,7 +28,9 @@ export class StateManagement<T> {
 	entities$: Observable<Entity<T>>;
 	collectionIds$: Observable<number[]>;
 
-	entityId$: Observable<number>;
+	entityIdGet$: Observable<number>;
+	entityIdAdd$: Observable<number>;
+	entityIdUpdate$: Observable<number>;
 
 	get$: Subject<Observable<T>> = new Subject();
 	add$: Subject<Observable<T>> = new Subject();
@@ -46,16 +49,20 @@ export class StateManagement<T> {
 
 	constructor() {
 
-		// merging observable data and making subjects WARM
-		// Observable<Observable<T>> => Observable<T>
+		/**
+		 * Merging observable data and making subjects WARM
+		 * @type Observable<Observable<T>> => Observable<T>
+		 */
 		this.getData$ = this.get$.mergeAll().share();
 		this.addData$ = this.add$.mergeAll().share();
 		this.updateData$ = this.update$.mergeAll().share();
 		this.deleteData$ = this.delete$.mergeAll().share();
 		this.getListData$ = this.getList$.mergeAll().share();
 
-		// merging observables, that are emited by subjects and refactoring emited data's format
-		// <Observable<T>> => Observable<{response: T[], type: Actions}>
+		/**
+		 * Merging observables, that are emited by subjects and refactoring emited data's format
+		 * @type <Observable<T>> => Observable<{response: T[], type: Actions}>
+		 */
 		this.request$ = Observable.merge(
 				this.getData$.map(res => ({response: [res], type: Actions.Get})),
 				this.addData$.map(res => ({response: [res], type: Actions.Add})),
@@ -65,7 +72,9 @@ export class StateManagement<T> {
 			)
 			.share();
 
-		// making merged observable HOT
+		/**
+		 * Making merged observable HOT
+		 */
 		this.response$ = this.request$
 			.publish();
 		this.response$.connect();
@@ -91,8 +100,10 @@ export class StateManagement<T> {
 			}, {});
 			// .do(data => console.log('Entities...', data));
 
-		// calc collection IDs after every action has been happened
-		// Observable<{response: T[], type: Actions}> => Observable<number[]>
+		/**
+		 * Calc collection IDs after every action has been happened
+		 * @type Observable<{response: T[], type: Actions}> => Observable<number[]>
+		 */
 		this.collectionIds$ = this.response$
 			.scan((acc: number[], data: {response: T[], type: Actions}) => {
 				switch (data.type) {
@@ -104,20 +115,62 @@ export class StateManagement<T> {
 			}, []);
 			// .do(data => console.log('Collection IDs...', data))
 
-		// calc id of target entity after Get/Add/Update/Delete action has been happened
-		// Observable<{response: T[], type: Actions}> => Observable<number>
-		this.entityId$ = this.request$
-			.filter(({type}) => type !== Actions.GetList)
-			.map((data) => (!!data.response && !!data.response[0]) ? this.getCollectionIds(data.response) : [null])
-			.map((id: number[]) => id[0]);
-			// .do(res => console.log('ID...', res));
+		/**
+		 * Getting id of target entity after Get/Add/Update/Delete action has been happened
+		 * @type Observable<{response: T[], type: Actions}> => Observable<number>
+		 */
+		this.entityIdGet$ = this.request$.let(this.getEntityId(Actions.Get)); //.do(res => console.log('ID Get...', res));
+		this.entityIdAdd$ = this.request$.let(this.getEntityId(Actions.Add)); //.do(res => console.log('ID Add...', res));
+		this.entityIdUpdate$ = this.request$.let(this.getEntityId(Actions.Update)); //.do(res => console.log('ID Update...', res));
 	}
 
-	getEntities(data: T[]): Entity<T> {
+	/**
+	 * Return instance from response after Add/Update actions
+	 * @param {Actions} action
+	 * @returns {Observable<T>}
+	 */
+	getResponseElement(action: Actions): Observable<T> {
+		let elementId$;
+		switch (action) {
+			case Actions.Add: elementId$ = this.entityIdAdd$; break;
+			case Actions.Update: elementId$ = this.entityIdUpdate$; break;
+		}
+		return Observable.combineLatest(
+				this.entities$,
+				elementId$
+			)
+			.map(([entities, id]) => entities[id]);
+	}
+
+	/**
+	 * Calc id of target entity after "action" has been happened
+	 * @param {Actions} action
+	 * @returns {(observable: Observable<{response: T[]; type: Actions}>) => Observable<number>}
+	 */
+	private getEntityId(action: Actions) {
+		return (observable: Observable<{response: T[], type: Actions}>): Observable<number> => {
+			return observable
+				.filter(({type}) => type === action)
+				.map((data) => (!!data.response && !!data.response[0]) ? this.getCollectionIds(data.response) : [null])
+				.map((id: number[]) => id[0]);
+		}
+	}
+
+	/**
+	 * Getting Entities from array of <T>odjects
+	 * @param {T[]} data
+	 * @returns {Entity<T>}
+	 */
+	private getEntities(data: T[]): Entity<T> {
 		return (!!data && !!data[0]) ? data.reduce((acc: Entity<T>, item: T) => ({...acc, [item['id']]: item}), {}) : {};
 	}
 
-	getCollectionIds(data: T[]): number[] {
+	/**
+	 * Getting Collection IDs from array of <T>odjects
+	 * @param {T[]} data
+	 * @returns {number[]}
+	 */
+	private getCollectionIds(data: T[]): number[] {
 		return (!!data && !!data[0]) ? data.map(item => item['id']) : [null];
 	}
 }

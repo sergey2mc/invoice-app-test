@@ -28,7 +28,6 @@ export class ProductService {
 		this.dataLoaded$ = this.state.request$
 			.filter(({type}) => type === Actions.GetList)
 			.scan(() => true, false)
-			// .do(status => console.log('Service', status))
 			.publishBehavior(false);
 		this.dataLoaded$.connect();
 
@@ -40,7 +39,7 @@ export class ProductService {
 			.shareReplay(1);
 
 		this.product$ = Observable.combineLatest(
-				this.state.entityId$,
+				this.state.entityIdGet$,
 				this.state.entities$
 			)
 			.map(([id, entities]) => entities[id])

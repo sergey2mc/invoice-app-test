@@ -63,7 +63,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 		public dialog: MatDialog
 	) {
 		this.editMode = this.route.snapshot.data.mode === 'edit';
-
 		this.createInvoiceForm();
   }
 
@@ -90,7 +89,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			discount: new FormControl(invoice['discount'] || 0, [Validators.required, Validators.min(0), Validators.max(50)]),
 			items: new FormArray([], Validators.required),
 			total: new FormControl(invoice['total'] || 0),
-		})
+		});
 	}
 
 	createItemForm(invoiceItem) {
@@ -164,6 +163,14 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_DELETE})
 				);
 
+			/**
+			 * Enabling loader on form changes
+			 * @type {Subscription}
+			 */
+			this.subscriptions.loader = this.invoiceForm.valueChanges
+				.debounceTime(300)
+				.subscribe(() => this.loader.show());
+
 		} else {
 
 			/**
@@ -210,9 +217,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			.map(total => +(total - total * this.discount.value * 0.01).toFixed(2))
 			.subscribe((total: number) => this.total.patchValue(total));
 
-		this.subscriptions.loader = this.invoiceForm.valueChanges
-			.debounceTime(300)
-			.subscribe(() => this.loader.show());
 	}
 
 	ngOnDestroy() {

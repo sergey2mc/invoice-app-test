@@ -29,6 +29,8 @@ export class InvoiceService {
 	state: StateManagement<Invoice>;
 	allInvoices$: Observable<Invoice[]>;
 	invoice$: Observable<Invoice>;
+	invoiceAdded$: Observable<Invoice>;
+	invoiceUpdated$: Observable<Invoice>;
 
 	constructor(
 		private http: HttpClient,
@@ -43,7 +45,6 @@ export class InvoiceService {
 		this.dataLoaded$ = this.state.request$
 			.filter(({type}) => type === Actions.GetList)
 			.scan(() => true, false)
-			// .do(status => console.log('Invoice Service <dataLoaded>', status))
 			.publishBehavior(false);
 		this.dataLoaded$.connect();
 
@@ -55,7 +56,7 @@ export class InvoiceService {
 			.shareReplay(1);
 
 		this.invoice$ = Observable.combineLatest(
-				this.state.entityId$,
+				this.state.entityIdGet$,
 				this.state.entities$
 			)
 			.map(([id, entities]) => (!!id && !!entities[id]) ? entities[id] : this.errorService.handleError<Invoice>())
@@ -73,6 +74,9 @@ export class InvoiceService {
 			}))
 			// .do(res => console.log('Invoice Service <invoice>', res))
 			.share();
+
+		this.invoiceAdded$ = this.state.getResponseElement(Actions.Add);
+		this.invoiceUpdated$ = this.state.getResponseElement(Actions.Update);
 	}
 
 	getInvoices(): Observable<Invoice[]> {
@@ -87,12 +91,12 @@ export class InvoiceService {
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
 		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice).catch((error) => this.errorService.handleError<Invoice>(error)));
-		return this.invoice$
+		return this.invoiceAdded$
 	}
 
 	updateInvoice(invoice: Invoice): Observable<Invoice> {
 		this.state.update$.next(this.http.put<Invoice>(`/invoices/${invoice.id}`, invoice).catch((error) => this.errorService.handleError<Invoice>(error)));
-		return this.state.updateData$;
+		return this.invoiceUpdated$;
 	}
 
 	deleteInvoice(id: number): Observable<Invoice> {

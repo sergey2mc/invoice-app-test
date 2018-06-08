@@ -20,7 +20,8 @@ export class InvoiceItemsService {
 
 	dataLoaded$: ConnectableObservable<boolean>;
 	state: StateManagement<InvoiceItem>;
-	invoiceItems$: Observable<any>;
+	invoiceItemAdded$: Observable<InvoiceItem>;
+	invoiceItemUpdated$: Observable<InvoiceItem>;
 
 	constructor(private http: HttpClient, private loader: LoaderService) {
 		this.state = new StateManagement<InvoiceItem>();
@@ -28,16 +29,11 @@ export class InvoiceItemsService {
 		this.dataLoaded$ = this.state.request$
 			.filter(({type}) => type === Actions.GetList)
 			.scan(() => true, false)
-			// .do(status => console.log('Service', status))
 			.publishBehavior(false);
 		this.dataLoaded$.connect();
 
-		this.invoiceItems$ = Observable.combineLatest(
-				this.state.collectionIds$,
-				this.state.entities$
-			)
-			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
-			.shareReplay(1);
+		this.invoiceItemAdded$ = this.state.getResponseElement(Actions.Add);
+		this.invoiceItemUpdated$ = this.state.getResponseElement(Actions.Update);
 	}
 
 
@@ -48,12 +44,12 @@ export class InvoiceItemsService {
 
 	updateInvoiceItem(invoiceId: number, invoiceItem: InvoiceItem): Observable<InvoiceItem> {
 		this.state.update$.next(this.http.put<InvoiceItem>(`/invoices/${invoiceId}/items/${invoiceItem.id}`, invoiceItem));
-		return this.state.updateData$;
+		return this.invoiceItemUpdated$;
 	}
 
 	addInvoiceItem(invoiceId: number, item: InvoiceItem): Observable<InvoiceItem> {
 		this.state.add$.next(this.http.post<InvoiceItem>(`/invoices/${invoiceId}/items`, item));
-		return this.state.addData$;
+		return this.invoiceItemAdded$;
 	}
 
 
