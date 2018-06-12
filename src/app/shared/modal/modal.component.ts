@@ -27,7 +27,7 @@ export class ModalComponent {
 	@ViewChild('dynamic', {read: ViewContainerRef}) viewContainerRef: ViewContainerRef;
 
 	ngOnInit() {
-    this.loadComponent(this.getComponent(this.data.message), this.data)
+    this.loadComponent(this.getComponent(this.data.message), this.data);
 	}
 
 	onNoClick(): void {

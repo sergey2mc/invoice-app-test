@@ -119,9 +119,9 @@ export class StateManagement<T> {
 		 * Getting id of target entity after Get/Add/Update/Delete action has been happened
 		 * @type Observable<{response: T[], type: Actions}> => Observable<number>
 		 */
-		this.entityIdGet$ = this.request$.let(this.getEntityId(Actions.Get)); //.do(res => console.log('ID Get...', res));
-		this.entityIdAdd$ = this.request$.let(this.getEntityId(Actions.Add)); //.do(res => console.log('ID Add...', res));
-		this.entityIdUpdate$ = this.request$.let(this.getEntityId(Actions.Update)); //.do(res => console.log('ID Update...', res));
+		this.entityIdGet$ = this.request$.let(this.getEntityId(Actions.Get)); // .do(res => console.log('ID Get...', res));
+		this.entityIdAdd$ = this.request$.let(this.getEntityId(Actions.Add)); // .do(res => console.log('ID Add...', res));
+		this.entityIdUpdate$ = this.request$.let(this.getEntityId(Actions.Update)); // .do(res => console.log('ID Update...', res));
 	}
 
 	/**
@@ -153,7 +153,7 @@ export class StateManagement<T> {
 				.filter(({type}) => type === action)
 				.map((data) => (!!data.response && !!data.response[0]) ? this.getCollectionIds(data.response) : [null])
 				.map((id: number[]) => id[0]);
-		}
+		};
 	}
 
 	/**

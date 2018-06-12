@@ -17,7 +17,7 @@ export class ErrorHandlerService {
 	handleError<T>(error = null) {
 		this.httpError$.next(error);
 		this.router.navigate(['/not-found']);
-		return Observable.empty<T>()
+		return Observable.empty<T>();
 	}
 
 }

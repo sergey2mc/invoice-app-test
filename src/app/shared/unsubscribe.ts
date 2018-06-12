@@ -5,7 +5,7 @@ import {Subscription} from 'rxjs/Subscription';
  * @param {{[p: string]: Subscription}} subscriptions
  */
 export function unsubscribeAll(subscriptions: {[property: string]: Subscription}): void {
-	for (let key in subscriptions) {
+	for (const key in subscriptions) {
 		if (typeof subscriptions[key].unsubscribe !== undefined) {
 			subscriptions[key].unsubscribe();
 		}

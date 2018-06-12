@@ -91,7 +91,7 @@ export class InvoiceService {
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
 		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice).catch((error) => this.errorService.handleError<Invoice>(error)));
-		return this.invoiceAdded$
+		return this.invoiceAdded$;
 	}
 
 	updateInvoice(invoice: Invoice): Observable<Invoice> {

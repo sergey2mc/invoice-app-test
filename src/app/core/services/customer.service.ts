@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/publishReplay';
@@ -11,50 +10,55 @@ import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 
+import { Store } from '@ngrx/store';
 import { Customer } from '../interfaces/customer.interface';
-import { Actions, StateManagement } from '../../shared/state/state-management';
+import { AppState } from '../../ngrx/app-state';
+
+import * as customers from './../../ngrx/customers/actions';
+import * as customersGetterState from '../../ngrx/customers/states/customer-getter.state';
+import * as customersRequestsGetterState from '../../ngrx/requests/nested-states/customers/nested-states/customers-get/states/customers-get-getter.state';
+import * as customerRequestsGetterState from '../../ngrx/requests/nested-states/customers/nested-states/customer-get/states/customer-get-getter.state';
 
 
 @Injectable()
 export class CustomerService {
 
-	dataLoaded$: ConnectableObservable<boolean>;
-	state: StateManagement<Customer>;
+	dataLoaded$: Observable<boolean>;
 	allCustomers$: Observable<Customer[]>;
 	customer$: Observable<Customer>;
 
-	constructor(private http: HttpClient) {
-		this.state = new StateManagement<Customer>();
+	constructor(
+		private http: HttpClient,
+		private store: Store<AppState>
+	) {
+		this.dataLoaded$ = this.store.select(customersRequestsGetterState.getIsLoadedCustomersGetRequest);
 
-		this.dataLoaded$ = this.state.request$
-			.filter(({type}) => type === Actions.GetList)
-			.scan(() => true, false)
-			.publishBehavior(false);
-		this.dataLoaded$.connect();
+		this.allCustomers$ = this.store.select(customersGetterState.getCustomers)
+			.withLatestFrom(this.dataLoaded$)
+			.filter(([customers, loaded]) => loaded)
+			.map(([customers, loaded]) => customers);
 
-		this.allCustomers$ = Observable.combineLatest(
-				this.state.collectionIds$,
-				this.state.entities$
-			)
-			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
-			.shareReplay(1);
-
-		this.customer$ = Observable.combineLatest(
-				this.state.entityIdGet$,
-				this.state.entities$
-			)
-			.map(([id, entities]) => entities[id])
-			.shareReplay(1);
+		this.customer$ = this.store.select(customersGetterState.getCustomer)
+			.withLatestFrom(this.store.select(customerRequestsGetterState.getIsLoadedCustomerGetRequest))
+			.filter(([customer, loaded]) => loaded)
+			.map(([customer, loaded]) => customer);
 	}
 
 	getCustomers() {
-		this.state.getList$.next(this.http.get<Customer[]>(`/customers`));
+		this.store.dispatch(new customers.GetCustomersAction);
 		return this.allCustomers$;
 	}
 
-	getCustomer(id: number): Observable<Customer> {
-		this.state.get$.next(this.http.get<Customer>(`/customers/${id}`));
+	getCustomersRequest(): Observable<Customer[]> {
+		return this.http.get<Customer[]>(`/customers`);
+	}
+
+	getCustomer(id) {
+		this.store.dispatch(new customers.GetCustomerAction(id));
 		return this.customer$;
 	}
 
+	getCustomerRequest(id): Observable<Customer> {
+		return this.http.get<Customer>(`/customers/${id}`);
+	}
 }

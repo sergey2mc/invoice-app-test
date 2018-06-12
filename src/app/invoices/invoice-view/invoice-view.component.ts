@@ -21,7 +21,7 @@ export class InvoiceViewComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.invoice$ = this.route.snapshot.data.invoice
+		this.invoice$ = this.route.snapshot.data.invoice;
 			// .do(i => console.log('RESULT INVOICE', i))
 	}
 
