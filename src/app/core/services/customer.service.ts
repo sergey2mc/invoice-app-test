@@ -14,8 +14,8 @@ import { Store } from '@ngrx/store';
 import { Customer } from '../interfaces/customer.interface';
 import { AppState } from '../../ngrx/app-state';
 
-import * as customers from './../../ngrx/customers/actions';
-import * as customersGetterState from '../../ngrx/customers/states/customer-getter.state';
+import * as customers from '../../ngrx/customers/actions';
+import * as customersGetterState from '../../ngrx/customers/states/customers-getter.state';
 import * as customersRequestsGetterState from '../../ngrx/requests/nested-states/customers/nested-states/customers-get/states/customers-get-getter.state';
 import * as customerRequestsGetterState from '../../ngrx/requests/nested-states/customers/nested-states/customer-get/states/customer-get-getter.state';
 
@@ -53,12 +53,12 @@ export class CustomerService {
 		return this.http.get<Customer[]>(`/customers`);
 	}
 
-	getCustomer(id) {
+	getCustomer(id: number) {
 		this.store.dispatch(new customers.GetCustomerAction(id));
 		return this.customer$;
 	}
 
-	getCustomerRequest(id): Observable<Customer> {
+	getCustomerRequest(id: number): Observable<Customer> {
 		return this.http.get<Customer>(`/customers/${id}`);
 	}
 }

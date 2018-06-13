@@ -12,6 +12,12 @@ import { reducers } from '../ngrx';
 import { CustomersEffects } from '../ngrx/customers/effects';
 import { CustomersRequestsEffects } from '../ngrx/requests/nested-states/customers/effects';
 import { CustomerRequestsEffects } from '../ngrx/requests/nested-states/customers/nested-states/customer-get/effects';
+import { ProductsEffects } from '../ngrx/products/effects';
+import { ProductsRequestsEffects } from '../ngrx/requests/nested-states/products/nested-states/products-get/effects';
+import { ProductRequestsEffects } from '../ngrx/requests/nested-states/products/nested-states/product-get/effects';
+import { InvoicesEffects } from '../ngrx/invoices/effects';
+import { InvoicesRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoices-get/effects';
+import { InvoiceRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-get/effects';
 
 import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
@@ -32,7 +38,13 @@ import { ModalMessageTypesModule } from '../shared/modal/messages/modal-messages
 		EffectsModule.forRoot([
 			CustomersEffects,
 			CustomersRequestsEffects,
-			CustomerRequestsEffects
+			CustomerRequestsEffects,
+			ProductsEffects,
+			ProductsRequestsEffects,
+			ProductRequestsEffects,
+			InvoicesEffects,
+			InvoicesRequestsEffects,
+			InvoiceRequestsEffects
 		]),
 		StoreDevtoolsModule.instrument({
 			maxAge: 25,

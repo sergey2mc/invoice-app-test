@@ -1,1 +1,1 @@
-export * from './customer-get.effects';
+export * from './customers-get.effects';

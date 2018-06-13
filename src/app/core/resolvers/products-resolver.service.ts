@@ -5,10 +5,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/switchMap';
 
 import { Product } from '../interfaces/product.interface';
 import { ProductService } from '../services/product.service';
-import 'rxjs/add/operator/switchMap';
 
 
 @Injectable()

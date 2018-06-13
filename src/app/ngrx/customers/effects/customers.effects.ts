@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
+
 import { Observable } from 'rxjs/Observable';
 
+import { Actions, Effect } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
 import * as customersActions from '../actions';
 import * as requestsActions from '../../requests/nested-states/customers/actions';
-import {Action} from '@ngrx/store';
 
 
 @Injectable()

@@ -19,13 +19,21 @@ import { ProductService } from './product.service';
 import { CustomerService } from './customer.service';
 import { LoaderService } from './loader.service';
 import { ErrorHandlerService } from './error-handler.service';
-import { Actions, StateManagement } from '../../shared/state/state-management';
+import {Actions, StateManagement} from '../../shared/state/state-management';
+
+import { Store } from '@ngrx/store';
+import { AppState } from '../../ngrx/app-state';
+
+import * as invoices from '../../ngrx/invoices/actions';
+import * as invoicesGetterState from '../../ngrx/invoices/states/invoices-getter.state';
+import * as invoicesRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoices-get/states/invoices-get-getter.state';
+import * as invoiceRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoice-get/states/invoice-get-getter.state';
 
 
 @Injectable()
 export class InvoiceService {
 
-	dataLoaded$: ConnectableObservable<boolean>;
+	dataLoaded$: Observable<boolean>;
 	state: StateManagement<Invoice>;
 	allInvoices$: Observable<Invoice[]>;
 	invoice$: Observable<Invoice>;
@@ -34,6 +42,7 @@ export class InvoiceService {
 
 	constructor(
 		private http: HttpClient,
+		private store: Store<AppState>,
 		private customerService: CustomerService,
 		private productService: ProductService,
 		private invoiceItemsService: InvoiceItemsService,
@@ -42,52 +51,49 @@ export class InvoiceService {
 	) {
 		this.state = new StateManagement<Invoice>();
 
-		this.dataLoaded$ = this.state.request$
-			.filter(({type}) => type === Actions.GetList)
-			.scan(() => true, false)
-			.publishBehavior(false);
-		this.dataLoaded$.connect();
+		this.dataLoaded$ = this.store.select(invoicesRequestsGetterState.getIsLoadedInvoicesGetRequest);
 
-		this.allInvoices$ = Observable.combineLatest(
-				this.state.collectionIds$,
-				this.state.entities$
-			)
-			.map(([ids, entities]) => ids.filter(id => entities[id]).map(id => entities[id]))
-			.shareReplay(1);
+		this.allInvoices$ = this.store.select(invoicesGetterState.getInvoices)
+			.withLatestFrom(this.dataLoaded$)
+			.filter(([invoices, loaded]) => loaded)
+			.map(([invoices, loaded]) => invoices);
 
-		this.invoice$ = Observable.combineLatest(
-				this.state.entityIdGet$,
-				this.state.entities$
-			)
-			.map(([id, entities]) => (!!id && !!entities[id]) ? entities[id] : this.errorService.handleError<Invoice>())
-			.switchMap((invoice: Invoice) => Observable.combineLatest(  // combine invoice, (items + products) and customer
+		this.invoice$ = this.store.select(invoicesGetterState.getInvoice)
+			.withLatestFrom(this.store.select(invoiceRequestsGetterState.getIsLoadedInvoiceGetRequest))
+			.filter(([invoice, loaded]) => loaded)
+			.map(([invoice, loaded]) => invoice)
+			.switchMap((invoice) => Observable.combineLatest(
 				Observable.of(invoice),
+				this.customerService.getCustomer(invoice.customer_id),
 				this.invoiceItemsService.getInvoiceItems(invoice.id)
-					.withLatestFrom(this.productService.allProducts$)
-					.map(([items, products]) => items.map(item => ({...item, product: products.find(product => product.id === item.product_id)}))),
-				this.customerService.getCustomer(invoice.customer_id)
 			))
-			.map(([invoice, items, customer]) => ({
-				...invoice,
-				items: items,
-				customer: customer
-			}))
-			// .do(res => console.log('Invoice Service <invoice>', res))
-			.share();
+			.map(([invoice, customer, items]) => ({...invoice, customer, items}))
+			// .do(res => console.log('Invoice Service <invoice>', res));
 
 		this.invoiceAdded$ = this.state.getResponseElement(Actions.Add);
 		this.invoiceUpdated$ = this.state.getResponseElement(Actions.Update);
 	}
 
-	getInvoices(): Observable<Invoice[]> {
-		this.state.getList$.next(this.http.get<Invoice[]>(`/invoices`).catch((error) => this.errorService.handleError<Invoice[]>(error)));
+	getInvoices() {
+		this.store.dispatch(new invoices.GetInvoicesAction);
 		return this.allInvoices$;
 	}
 
-	getInvoice(id: number): Observable<Invoice> {
-		this.state.get$.next(this.http.get<Invoice>(`/invoices/${id}`).catch((error) => this.errorService.handleError<Invoice>(error)));
+	getInvoicesRequest(): Observable<Invoice[]> {
+		return this.http.get<Invoice[]>(`/invoices`);
+	}
+
+	getInvoice(id: number) {
+		this.store.dispatch(new invoices.GetInvoiceAction(id));
 		return this.invoice$;
 	}
+
+	getInvoiceRequest(id: number): Observable<Invoice> {
+		return this.http.get<Invoice>(`/invoices/${id}`);
+	}
+
+
+
 
 	addInvoice(newInvoice: Invoice): Observable<Invoice> {
 		this.state.add$.next(this.http.post<Invoice>('/invoices', newInvoice).catch((error) => this.errorService.handleError<Invoice>(error)));
