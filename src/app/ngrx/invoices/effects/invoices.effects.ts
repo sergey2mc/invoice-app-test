@@ -17,7 +17,7 @@ export class InvoicesEffects {
 		.map(() => new requestsActions.GetInvoicesAction);
 
 	@Effect()
-	invoices$: Observable<Action> = this.action$
+	getInvoices$: Observable<Action> = this.action$
 		.ofType(requestsActions.InvoicesGetActionTypes.GET_LIST_SUCCESS)
 		.map((action) => new invoicesActions.GetInvoicesSuccessAction(action['payload']));
 
@@ -27,9 +27,19 @@ export class InvoicesEffects {
 		.map((action) => new requestsActions.GetInvoiceAction(action['payload']));
 
 	@Effect()
-	invoice$: Observable<Action> = this.action$
+	getInvoice$: Observable<Action> = this.action$
 		.ofType(requestsActions.InvoiceGetActionTypes.GET_SUCCESS)
 		.map((action) => new invoicesActions.GetInvoiceSuccessAction(action['payload']));
+
+	@Effect()
+	invoiceDeleteRequest: Observable<Action> = this.action$
+		.ofType(invoicesActions.ActionTypes.DELETE)
+		.map((action) => new requestsActions.DeleteInvoiceAction(action['payload']));
+
+	@Effect()
+	deleteInvoice$: Observable<Action> = this.action$
+		.ofType(requestsActions.InvoiceDeleteActionTypes.DELETE_SUCCESS)
+		.map((action) => new invoicesActions.DeleteInvoiceSuccessAction(action['payload']));
 
 	constructor(private action$: Actions) {}
 }

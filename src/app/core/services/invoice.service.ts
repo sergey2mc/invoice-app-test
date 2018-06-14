@@ -26,11 +26,12 @@ import { AppState } from '../../ngrx/app-state';
 
 import * as invoices from '../../ngrx/invoices/actions';
 import * as invoicesGetterState from '../../ngrx/invoices/states/invoices-getter.state';
-import * as invoicesRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoices-get/states/invoices-get-getter.state';
-import * as invoiceRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoice-get/states/invoice-get-getter.state';
 import * as customersGetterState from '../../ngrx/customers/states/customers-getter.state';
 import * as invoiceItemsGetterState from '../../ngrx/invoice-items/states/invoice-items-getter.state';
 import * as productsGetterState from '../../ngrx/products/states/products-getter.state';
+import * as invoicesGetRequestGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoices-get/states/invoices-get-getter.state';
+import * as invoiceGetRequestGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoice-get/states/invoice-get-getter.state';
+import * as invoiceDeleteRequestGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoice-delete/states/invoice-delete-getter.state';
 
 
 @Injectable()
@@ -40,6 +41,7 @@ export class InvoiceService {
 	state: StateManagement<Invoice>;
 	allInvoices$: Observable<Invoice[]>;
 	invoice$: Observable<Invoice>;
+	deletedInvoice$: Observable<Invoice>;
 	invoiceAdded$: Observable<Invoice>;
 	invoiceUpdated$: Observable<Invoice>;
 
@@ -54,7 +56,7 @@ export class InvoiceService {
 	) {
 		this.state = new StateManagement<Invoice>();
 
-		this.dataLoaded$ = this.store.select(invoicesRequestsGetterState.getIsLoadedInvoicesGetRequest);
+		this.dataLoaded$ = this.store.select(invoicesGetRequestGetterState.getIsLoadedInvoicesGetRequest);
 
 		this.allInvoices$ = this.store.select(invoicesGetterState.getInvoices)
 			.withLatestFrom(this.dataLoaded$)
@@ -68,7 +70,7 @@ export class InvoiceService {
 			})));
 
 		this.invoice$ = this.store.select(invoicesGetterState.getInvoice)
-			.withLatestFrom(this.store.select(invoiceRequestsGetterState.getIsLoadedInvoiceGetRequest))
+			.withLatestFrom(this.store.select(invoiceGetRequestGetterState.getIsLoadedInvoiceGetRequest))
 			.filter(([invoice, loaded]) => loaded)
 			.map(([invoice]) => invoice)
 			// customer
@@ -87,6 +89,11 @@ export class InvoiceService {
 				items: invoice.items.map(item => ({...item, product: productEntities[item.product_id]}))
 			}));
 			// .do(res => console.log('Invoice Service', res));
+
+		this.deletedInvoice$ = this.store.select(invoicesGetterState.getInvoice)
+			.withLatestFrom(this.store.select(invoiceDeleteRequestGetterState.getIsLoadedInvoiceDeleteRequest))
+			.filter(([invoice, loaded]) => loaded)
+			.map(([invoice]) => invoice);
 
 		this.invoiceAdded$ = this.state.getResponseElement(Actions.Add);
 		this.invoiceUpdated$ = this.state.getResponseElement(Actions.Update);
@@ -110,6 +117,17 @@ export class InvoiceService {
 		return this.http.get<Invoice>(`/invoices/${id}`);
 	}
 
+	deleteInvoiceRequest(id: number): Observable<Invoice> {
+		return this.http.delete<Invoice>(`/invoices/${id}`);
+	}
+
+	deleteInvoice(id: number) {
+		this.store.dispatch(new invoices.DeleteInvoiceAction(id));
+		return this.deletedInvoice$;
+	}
+
+
+
 
 
 
@@ -123,9 +141,9 @@ export class InvoiceService {
 		return this.invoiceUpdated$;
 	}
 
-	deleteInvoice(id: number): Observable<Invoice> {
-		this.state.delete$.next(this.http.delete<Invoice>(`/invoices/${id}`).catch((error) => this.errorService.handleError<Invoice>(error)));
-		return this.state.deleteData$;
-	}
+	// deleteInvoice(id: number): Observable<Invoice> {
+	// 	this.state.delete$.next(this.http.delete<Invoice>(`/invoices/${id}`).catch((error) => this.errorService.handleError<Invoice>(error)));
+	// 	return this.state.deleteData$;
+	// }
 
 }

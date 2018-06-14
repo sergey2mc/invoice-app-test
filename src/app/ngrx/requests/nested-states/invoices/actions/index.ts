@@ -13,3 +13,11 @@ export {
 	GetInvoiceSuccessAction,
 	GetInvoiceFailAction
 } from '../nested-states/invoice-get/actions/invoice-get.actions';
+
+export {
+	Actions as InvoiceDeleteActions,
+	ActionTypes as InvoiceDeleteActionTypes,
+	DeleteInvoiceAction,
+	DeleteInvoiceSuccessAction,
+	DeleteInvoiceFailAction
+} from '../nested-states/invoice-delete/actions/invoice-delete.actions';

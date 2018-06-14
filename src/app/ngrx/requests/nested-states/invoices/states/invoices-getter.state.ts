@@ -19,3 +19,8 @@ export const getInvoiceGetRequestState = createSelector(
 	getInvoicesRequestState,
 	(state: IInvoicesState) => state.invoiceGetState
 );
+
+export const getInvoiceDeleteRequestState = createSelector(
+	getInvoicesRequestState,
+	(state: IInvoicesState) => state.invoiceDeleteState
+);

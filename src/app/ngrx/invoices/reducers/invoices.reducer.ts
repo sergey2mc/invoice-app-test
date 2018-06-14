@@ -15,6 +15,12 @@ export function invoicesReducer (state: IInvoiceState = initialState, {type, pay
 		case ActionTypes.GET_SUCCESS: {
 			return {...state, invoice: payload};
 		}
+		case ActionTypes.DELETE_SUCCESS: {
+			const entities = {...state.entities};
+			delete entities[(payload as Invoice).id];
+			const collectionIds = state.collectionIds.filter(id => id !== (payload as Invoice).id);
+			return {...state, entities, collectionIds, invoice: payload};
+		}
 		default: {
 			return state;
 		}

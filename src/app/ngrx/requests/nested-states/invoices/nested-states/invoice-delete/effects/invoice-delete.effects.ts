@@ -10,18 +10,18 @@ import 'rxjs/add/operator/map';
 
 import { Invoice } from '../../../../../../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../../../../../../core/services/invoice.service';
-import { ActionTypes, GetInvoiceFailAction, GetInvoiceSuccessAction } from '../actions';
+import { ActionTypes, DeleteInvoiceFailAction, DeleteInvoiceSuccessAction } from '../actions';
 
 
 @Injectable()
-export class InvoiceGetRequestsEffects {
+export class InvoiceDeleteRequestsEffects {
 
 	@Effect()
-	invoiceGetRequest: Observable<Action> = this.actions$
-		.ofType(ActionTypes.GET)
-		.switchMap((action: Action) => this.invoiceService.getInvoiceRequest(action['payload']))
-		.map((invoice: Invoice) => new GetInvoiceSuccessAction(invoice))
-		.catch((error) => Observable.of(new GetInvoiceFailAction(error)));
+	invoiceDeleteRequest: Observable<Action> = this.actions$
+		.ofType(ActionTypes.DELETE)
+		.switchMap((action: Action) => this.invoiceService.deleteInvoiceRequest(action['payload']))
+		.map((invoice: Invoice) => new DeleteInvoiceSuccessAction(invoice))
+		.catch((error) => Observable.of(new DeleteInvoiceFailAction(error)));
 
 	constructor(
 		private actions$: Actions,

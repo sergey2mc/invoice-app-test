@@ -11,7 +11,10 @@ export const ActionTypes = {
 	GET_LIST_SUCCESS: type(`[${ALIAS}] GET_LIST_SUCCESS`),
 
 	GET: type(`[${ALIAS}] GET`),
-	GET_SUCCESS: type(`[${ALIAS}] GET_SUCCESS`)
+	GET_SUCCESS: type(`[${ALIAS}] GET_SUCCESS`),
+
+	DELETE: type(`[${ALIAS}] DELETE`),
+	DELETE_SUCCESS: type(`[${ALIAS}] DELETE_SUCCESS`)
 };
 
 export class GetInvoicesAction implements Action {
@@ -38,8 +41,22 @@ export class GetInvoiceSuccessAction implements Action {
 	constructor(public payload: Invoice) {}
 }
 
+export class DeleteInvoiceAction implements Action {
+	readonly type = ActionTypes.DELETE;
+
+	constructor(public payload: number) {}
+}
+
+export class DeleteInvoiceSuccessAction implements Action {
+	readonly type = ActionTypes.DELETE_SUCCESS;
+
+	constructor(public payload: Invoice) {}
+}
+
 export type Actions =
 	GetInvoicesAction |
 	GetInvoicesSuccessAction |
 	GetInvoiceAction |
-	GetInvoiceSuccessAction;
+	GetInvoiceSuccessAction |
+	DeleteInvoiceAction |
+	DeleteInvoiceSuccessAction;

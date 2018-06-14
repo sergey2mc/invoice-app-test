@@ -15,7 +15,8 @@ import { ProductsEffects } from '../ngrx/products/effects';
 import { ProductsRequestsEffects } from '../ngrx/requests/nested-states/products/nested-states/products-get/effects';
 import { InvoicesEffects } from '../ngrx/invoices/effects';
 import { InvoicesRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoices-get/effects';
-import { InvoiceRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-get/effects';
+import { InvoiceGetRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-get/effects';
+import { InvoiceDeleteRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-delete/effects';
 import { InvoiceItemsEffects } from '../ngrx/invoice-items/effects';
 import { InvoiceItemsRequestsEffects } from '../ngrx/requests/nested-states/invoice-items/nested-states/invoice-items-get/effects';
 
@@ -42,7 +43,8 @@ import { ModalMessageTypesModule } from '../shared/modal/messages/modal-messages
 			ProductsRequestsEffects,
 			InvoicesEffects,
 			InvoicesRequestsEffects,
-			InvoiceRequestsEffects,
+			InvoiceGetRequestsEffects,
+			InvoiceDeleteRequestsEffects,
 			InvoiceItemsEffects,
 			InvoiceItemsRequestsEffects,
 		]),
