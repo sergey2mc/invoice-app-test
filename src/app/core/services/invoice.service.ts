@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/publishBehavior';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
@@ -28,6 +28,9 @@ import * as invoices from '../../ngrx/invoices/actions';
 import * as invoicesGetterState from '../../ngrx/invoices/states/invoices-getter.state';
 import * as invoicesRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoices-get/states/invoices-get-getter.state';
 import * as invoiceRequestsGetterState from '../../ngrx/requests/nested-states/invoices/nested-states/invoice-get/states/invoice-get-getter.state';
+import * as customersGetterState from '../../ngrx/customers/states/customers-getter.state';
+import * as invoiceItemsGetterState from '../../ngrx/invoice-items/states/invoice-items-getter.state';
+import * as productsGetterState from '../../ngrx/products/states/products-getter.state';
 
 
 @Injectable()
@@ -56,19 +59,34 @@ export class InvoiceService {
 		this.allInvoices$ = this.store.select(invoicesGetterState.getInvoices)
 			.withLatestFrom(this.dataLoaded$)
 			.filter(([invoices, loaded]) => loaded)
-			.map(([invoices, loaded]) => invoices);
+			.map(([invoices]) => invoices)
+			// customer
+			.combineLatest(this.store.select(customersGetterState.getCustomersEntities))
+			.map(([invoices, customersEntities]) => invoices.map(invoice => ({
+				...invoice,
+				customer: customersEntities[invoice.customer_id]
+			})));
 
 		this.invoice$ = this.store.select(invoicesGetterState.getInvoice)
 			.withLatestFrom(this.store.select(invoiceRequestsGetterState.getIsLoadedInvoiceGetRequest))
 			.filter(([invoice, loaded]) => loaded)
-			.map(([invoice, loaded]) => invoice)
-			.switchMap((invoice) => Observable.combineLatest(
-				Observable.of(invoice),
-				this.customerService.getCustomer(invoice.customer_id),
-				this.invoiceItemsService.getInvoiceItems(invoice.id)
-			))
-			.map(([invoice, customer, items]) => ({...invoice, customer, items}))
-			// .do(res => console.log('Invoice Service <invoice>', res));
+			.map(([invoice]) => invoice)
+			// customer
+			.combineLatest(this.store.select(customersGetterState.getCustomersEntities))
+			.map(([invoice, customersEntities]) => ({
+				...invoice,
+				customer: customersEntities[invoice.customer_id]
+			}))
+			// invoice items
+			.combineLatest(this.store.select(invoiceItemsGetterState.getInvoiceItems))
+			.map(([invoice, invoiceItems]) => ({...invoice, items: invoiceItems.filter(item => item.invoice_id === invoice.id)}))
+			// invoice items products
+			.combineLatest(this.store.select(productsGetterState.getProductsEntities))
+			.map(([invoice, productEntities]) => ({
+				...invoice,
+				items: invoice.items.map(item => ({...item, product: productEntities[item.product_id]}))
+			}));
+			// .do(res => console.log('Invoice Service', res));
 
 		this.invoiceAdded$ = this.state.getResponseElement(Actions.Add);
 		this.invoiceUpdated$ = this.state.getResponseElement(Actions.Update);

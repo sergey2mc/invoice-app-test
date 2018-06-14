@@ -12,9 +12,6 @@ export function productsReducer (state: IProductState = initialState, {type, pay
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
 		}
-		case ActionTypes.GET_SUCCESS: {
-			return {...state, product: payload};
-		}
 		default: {
 			return state;
 		}

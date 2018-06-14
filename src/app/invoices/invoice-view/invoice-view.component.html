@@ -11,9 +11,9 @@
         </div>
         <div class="view-invoice__products">
           <div class="view-invoice__products-item" *ngFor="let item of (invoice$ | async)?.items">
-            <div class="view-invoice__products-product">{{ item.product.name }}</div>
+            <div class="view-invoice__products-product">{{ item.product?.name }}</div>
             <div class="view-invoice__products-quantity">{{ item.quantity }}</div>
-            <div class="view-invoice__products-price">{{ item.product.price }}</div>
+            <div class="view-invoice__products-price">{{ item.product?.price }}</div>
           </div>
         </div>
       </div>

@@ -14,8 +14,3 @@ export const getProductsGetRequestState = createSelector(
 	getProductsRequestState,
 	(state: IProductsState) => state.productsGetState
 );
-
-export const getProductGetRequestState = createSelector(
-	getProductsRequestState,
-	(state: IProductsState) => state.productGetState
-);

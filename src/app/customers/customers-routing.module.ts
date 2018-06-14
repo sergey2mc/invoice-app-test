@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { CustomersComponent } from './customers.component';
-import { CustomersResolver } from '../core/resolvers/customers-resolver.service';
+import { CustomersResolverService } from '../core/resolvers/customers-resolver.service';
 
 
 const customersRoutes: Routes = [
@@ -11,7 +11,7 @@ const customersRoutes: Routes = [
     component: CustomersComponent,
     pathMatch: 'full',
     resolve: {
-      customers: CustomersResolver
+      customers: CustomersResolverService
     }
   }
 ];
@@ -19,6 +19,6 @@ const customersRoutes: Routes = [
 @NgModule({
   imports: [ RouterModule.forChild(customersRoutes) ],
   exports: [ RouterModule ],
-	providers: [ CustomersResolver ]
+	providers: [ CustomersResolverService ]
 })
 export class CustomersRoutingModule { }

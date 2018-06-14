@@ -12,9 +12,6 @@ export function customersReducer (state: ICustomerState = initialState, {type, p
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
 		}
-		case ActionTypes.GET_SUCCESS: {
-			return {...state, customer: payload};
-		}
 		default: {
 			return state;
 		}

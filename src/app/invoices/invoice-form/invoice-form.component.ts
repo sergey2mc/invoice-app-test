@@ -114,7 +114,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			/**
 			 * EDIT MODE: invoice for editing
 			 */
-			this.invoice$ = this.route.snapshot.data.invoice.take(1);
+			this.invoice$ = this.invoiceService.invoice$;
+
 			this.subscriptions.invoice = this.invoice$
 				.subscribe(invoice => {
 					invoice.items.forEach(item => this.items.push(this.createItemForm(item)));

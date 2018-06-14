@@ -8,10 +8,7 @@ const ALIAS = 'CUSTOMERS';
 
 export const ActionTypes = {
 	GET_LIST: type(`[${ALIAS}] GET_LIST`),
-	GET_LIST_SUCCESS: type(`[${ALIAS}] GET_LIST_SUCCESS`),
-
-	GET: type(`[${ALIAS}] GET`),
-	GET_SUCCESS: type(`[${ALIAS}] GET_SUCCESS`)
+	GET_LIST_SUCCESS: type(`[${ALIAS}] GET_LIST_SUCCESS`)
 };
 
 export class GetCustomersAction implements Action {
@@ -26,20 +23,6 @@ export class GetCustomersSuccessAction implements Action {
 	constructor(public payload: Customer[]) {}
 }
 
-export class GetCustomerAction implements Action {
-	readonly type = ActionTypes.GET;
-
-	constructor(public payload: number) {}
-}
-
-export class GetCustomerSuccessAction implements Action {
-	readonly type = ActionTypes.GET_SUCCESS;
-
-	constructor(public payload: Customer) {}
-}
-
 export type Actions =
-	GetCustomersAction |
-	GetCustomersSuccessAction |
 	GetCustomersAction |
 	GetCustomersSuccessAction;

@@ -12,7 +12,7 @@ import 'rxjs/add/operator/switchMap';
 
 
 @Injectable()
-export class CustomersResolver implements Resolve<Customer[]> {
+export class CustomersResolverService implements Resolve<Customer[]> {
 
   constructor(private customerService: CustomerService) {}
 
@@ -20,6 +20,6 @@ export class CustomersResolver implements Resolve<Customer[]> {
     return this.customerService.dataLoaded$
 			.switchMap(status => status ? this.customerService.allCustomers$ : this.customerService.getCustomers())
       .take(1)
-			.catch(() => Observable.throw('Customer Resolver: sever error'));
+			.catch(() => Observable.throw('Customer ResolverService: sever error'));
   }
 }

@@ -10,10 +10,8 @@ import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
 
-import { Customer } from '../../core/interfaces/customer.interface';
 import { Invoice } from '../../core/interfaces/invoice.interface';
 import { InvoiceService } from '../../core/services/invoice.service';
-import { CustomerService } from '../../core/services/customer.service';
 import { LoaderService } from '../../core/services/loader.service';
 
 import { ModalMessageTypes } from '../../shared/modal/modal-message-types';
@@ -36,20 +34,14 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private invoiceService: InvoiceService,
-		private customerService: CustomerService,
 		private loader: LoaderService,
 		private router: Router,
 		public dialog: MatDialog
 	) {}
 
 	ngOnInit() {
-		this.invoicesList$ = Observable.combineLatest(
-				this.invoiceService.allInvoices$,
-				this.customerService.allCustomers$
-			)
-			.map(([invoices, customers]: [Invoice[], Customer[]]) => {
-				return invoices.map((invoice: Invoice) => ({...invoice, customer: customers.find(customer => customer.id === invoice.customer_id)}));
-			});
+
+		this.invoicesList$ = this.invoiceService.allInvoices$;
 
 		this.deleteInvoicesSubscription = this.deleteInvoice$
 			.switchMap(id => this.invoiceService.deleteInvoice(id))

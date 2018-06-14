@@ -21,15 +21,5 @@ export class CustomersEffects {
 		.ofType(requestsActions.CustomersActionTypes.GET_LIST_SUCCESS)
 		.map((action) => new customersActions.GetCustomersSuccessAction(action['payload']));
 
-	@Effect()
-	customerGetRequest: Observable<Action> = this.action$
-		.ofType(customersActions.ActionTypes.GET)
-		.map((action) => new requestsActions.GetCustomerAction(action['payload']));
-
-	@Effect()
-	customer$: Observable<Action> = this.action$
-		.ofType(requestsActions.CustomerActionTypes.GET_SUCCESS)
-		.map((action) => new customersActions.GetCustomerSuccessAction(action['payload']));
-
 	constructor(private action$: Actions) {}
 }

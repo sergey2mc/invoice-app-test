@@ -12,7 +12,7 @@ import { ProductService } from '../services/product.service';
 
 
 @Injectable()
-export class ProductsResolver implements Resolve<Product[]> {
+export class ProductsResolverService implements Resolve<Product[]> {
 
   constructor(private productService: ProductService) {}
 
@@ -20,6 +20,6 @@ export class ProductsResolver implements Resolve<Product[]> {
   	return this.productService.dataLoaded$
 			.switchMap(status => status ? this.productService.allProducts$ : this.productService.getProducts())
 			.take(1)
-			.catch(() => Observable.throw('Products Resolver: sever error'));
+			.catch(() => Observable.throw('Products ResolverService: sever error'));
   }
 }

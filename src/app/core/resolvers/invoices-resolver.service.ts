@@ -11,7 +11,7 @@ import { InvoiceService } from '../services/invoice.service';
 
 
 @Injectable()
-export class InvoicesResolver implements Resolve<Invoice[]> {
+export class InvoicesResolverService implements Resolve<Invoice[]> {
 
   constructor(private invoiceService: InvoiceService) {}
 
@@ -19,6 +19,6 @@ export class InvoicesResolver implements Resolve<Invoice[]> {
 		return this.invoiceService.dataLoaded$
 			.switchMap(status => status ? this.invoiceService.allInvoices$ : this.invoiceService.getInvoices())
       .take(1)
-			.catch(() => Observable.throw('Invoices Resolver: sever error'));
+			.catch(() => Observable.throw('Invoices ResolverService: sever error'));
     }
 }

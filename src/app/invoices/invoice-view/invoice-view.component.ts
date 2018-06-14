@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
 import { Invoice } from '../../core/interfaces/invoice.interface';
+import { InvoiceService } from '../../core/services/invoice.service';
 
 
 @Component({
@@ -16,12 +17,13 @@ export class InvoiceViewComponent implements OnInit {
 	invoice$: Observable<Invoice>;
 
 	constructor(
+		private invoiceService: InvoiceService,
 		private router: Router,
 		private route: ActivatedRoute
 	) {}
 
 	ngOnInit() {
-		this.invoice$ = this.route.snapshot.data.invoice;
+		this.invoice$ = this.invoiceService.invoice$;
 			// .do(i => console.log('RESULT INVOICE', i))
 	}
 

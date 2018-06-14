@@ -14,8 +14,3 @@ export const getCustomersGetRequestState = createSelector(
 	getCustomersRequestState,
 	(state: ICustomersState) => state.customersGetState
 );
-
-export const getCustomerGetRequestState = createSelector(
-	getCustomersRequestState,
-	(state: ICustomersState) => state.customerGetState
-);

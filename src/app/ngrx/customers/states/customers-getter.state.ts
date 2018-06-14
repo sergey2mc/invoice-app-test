@@ -15,11 +15,6 @@ export const getCustomersCollectionIds = createSelector(
 	(state: ICustomerState) => state.collectionIds
 );
 
-export const getCustomer = createSelector(
-	getCustomersState,
-	(state: ICustomerState) => state.customer
-);
-
 export const getCustomers = createSelector(
 	getCustomersEntities,
 	getCustomersCollectionIds,

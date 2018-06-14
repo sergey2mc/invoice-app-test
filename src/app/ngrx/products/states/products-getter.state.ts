@@ -15,11 +15,6 @@ export const getProductsCollectionIds = createSelector(
 	(state: IProductState) => state.collectionIds
 );
 
-export const getProduct = createSelector(
-	getProductsState,
-	(state: IProductState) => state.product
-);
-
 export const getProducts = createSelector(
 	getProductsEntities,
 	getProductsCollectionIds,

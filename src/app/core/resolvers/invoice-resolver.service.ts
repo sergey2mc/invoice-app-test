@@ -12,7 +12,7 @@ import { InvoiceService } from '../services/invoice.service';
 
 
 @Injectable()
-export class InvoiceResolver implements Resolve<Observable<Invoice>> {
+export class InvoiceResolverService implements Resolve<Observable<Invoice>> {
 
 	constructor(private invoiceService: InvoiceService) {	}
 

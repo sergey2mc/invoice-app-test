@@ -19,9 +19,9 @@ export class ModalComponent {
   constructor(
     public dialogRef: MatDialogRef<ModalComponent>,
     @Inject(MAT_DIALOG_DATA) private data: any,
-		@Inject(ComponentFactoryResolver) factoryResolver
+		@Inject(ComponentFactoryResolver) factoryResolverService
   ) {
-		this.factoryResolver = factoryResolver;
+		this.factoryResolver = factoryResolverService;
   }
 
 	@ViewChild('dynamic', {read: ViewContainerRef}) viewContainerRef: ViewContainerRef;
