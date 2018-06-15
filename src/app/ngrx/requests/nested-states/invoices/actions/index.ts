@@ -15,14 +15,6 @@ export {
 } from '../nested-states/invoice-get/actions/invoice-get.actions';
 
 export {
-	Actions as InvoiceDeleteActions,
-	ActionTypes as InvoiceDeleteActionTypes,
-	DeleteInvoiceAction,
-	DeleteInvoiceSuccessAction,
-	DeleteInvoiceFailAction
-} from '../nested-states/invoice-delete/actions/invoice-delete.actions';
-
-export {
 	Actions as InvoiceAddActions,
 	ActionTypes as InvoiceAddActionTypes,
 	AddInvoiceAction,
@@ -37,3 +29,11 @@ export {
 	UpdateInvoiceSuccessAction,
 	UpdateInvoiceFailAction
 } from '../nested-states/invoice-update/actions/invoice-update.actions';
+
+export {
+	Actions as InvoiceDeleteActions,
+	ActionTypes as InvoiceDeleteActionTypes,
+	DeleteInvoiceAction,
+	DeleteInvoiceSuccessAction,
+	DeleteInvoiceFailAction
+} from '../nested-states/invoice-delete/actions/invoice-delete.actions';

@@ -81,7 +81,7 @@ export class InvoiceItemsService {
 	}
 
 	deleteInvoiceItemRequest({invoiceId, itemId}) {
-		return this.http.delete<InvoiceItem>(`/invoices/${invoiceId}/items/${itemId}`)
+		return this.http.delete<InvoiceItem>(`/invoices/${invoiceId}/items/${itemId}`);
 	}
 
 	addInvoiceItem(invoiceId: number, invoiceItem: InvoiceItem): Observable<InvoiceItem> {
@@ -99,7 +99,7 @@ export class InvoiceItemsService {
 	}
 
 	updateInvoiceItemRequest({invoiceId, invoiceItem}) {
-		return this.http.put<InvoiceItem>(`/invoices/${invoiceId}/items/${invoiceItem.id}`, invoiceItem)
+		return this.http.put<InvoiceItem>(`/invoices/${invoiceId}/items/${invoiceItem.id}`, invoiceItem);
 	}
 
 }

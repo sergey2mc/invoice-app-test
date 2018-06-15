@@ -14,19 +14,16 @@ export const ActionTypes = {
 
 export class AddInvoiceItemAction implements Action {
 	readonly type = ActionTypes.ADD;
-
 	constructor(public payload: number) {}
 }
 
 export class AddInvoiceItemSuccessAction implements Action {
 	readonly type = ActionTypes.ADD_SUCCESS;
-
 	constructor(public payload: InvoiceItem) {}
 }
 
 export class AddInvoiceItemFailAction implements Action {
 	readonly type = ActionTypes.ADD_FAIL;
-
 	constructor(public payload: any) {}
 }
 

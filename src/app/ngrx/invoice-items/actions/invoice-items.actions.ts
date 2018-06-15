@@ -10,14 +10,14 @@ export const ActionTypes = {
 	GET_LIST: type(`[${ALIAS}] GET_LIST`),
 	GET_LIST_SUCCESS: type(`[${ALIAS}] GET_LIST_SUCCESS`),
 
-	DELETE: type(`[${ALIAS}] DELETE`),
-	DELETE_SUCCESS: type(`[${ALIAS}] DELETE_SUCCESS`),
-
 	ADD: type(`[${ALIAS}] ADD`),
 	ADD_SUCCESS: type(`[${ALIAS}] ADD_SUCCESS`),
 
 	UPDATE: type(`[${ALIAS}] UPDATE`),
-	UPDATE_SUCCESS: type(`[${ALIAS}] UPDATE_SUCCESS`)
+	UPDATE_SUCCESS: type(`[${ALIAS}] UPDATE_SUCCESS`),
+
+	DELETE: type(`[${ALIAS}] DELETE`),
+	DELETE_SUCCESS: type(`[${ALIAS}] DELETE_SUCCESS`)
 };
 
 export class GetInvoiceItemsAction implements Action {
@@ -28,16 +28,6 @@ export class GetInvoiceItemsAction implements Action {
 export class GetInvoiceItemsSuccessAction implements Action {
 	readonly type = ActionTypes.GET_LIST_SUCCESS;
 	constructor(public payload: InvoiceItem[]) {}
-}
-
-export class DeleteInvoiceItemAction implements Action {
-	readonly type = ActionTypes.DELETE;
-	constructor(public payload: {invoiceId: number, itemId: number}) {}
-}
-
-export class DeleteInvoiceItemSuccessAction implements Action {
-	readonly type = ActionTypes.DELETE_SUCCESS;
-	constructor(public payload: InvoiceItem) {}
 }
 
 export class AddInvoiceItemAction implements Action {
@@ -60,12 +50,22 @@ export class UpdateInvoiceItemSuccessAction implements Action {
 	constructor(public payload: InvoiceItem) {}
 }
 
+export class DeleteInvoiceItemAction implements Action {
+	readonly type = ActionTypes.DELETE;
+	constructor(public payload: {invoiceId: number, itemId: number}) {}
+}
+
+export class DeleteInvoiceItemSuccessAction implements Action {
+	readonly type = ActionTypes.DELETE_SUCCESS;
+	constructor(public payload: InvoiceItem) {}
+}
+
 export type Actions =
 	GetInvoiceItemsAction |
 	GetInvoiceItemsSuccessAction |
-	DeleteInvoiceItemAction |
-	DeleteInvoiceItemSuccessAction |
 	AddInvoiceItemAction |
 	AddInvoiceItemSuccessAction |
 	UpdateInvoiceItemAction |
-	UpdateInvoiceItemSuccessAction;
+	UpdateInvoiceItemSuccessAction |
+	DeleteInvoiceItemAction |
+	DeleteInvoiceItemSuccessAction;

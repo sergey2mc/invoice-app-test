@@ -1,8 +1,8 @@
 import * as requestActions from '../actions';
-import { invoiceInitialState, IInvoiceAddState } from '../states';
+import { invoiceAddInitialState, IInvoiceAddState } from '../states';
 
 export function invoiceAddReducer(
-		state: IInvoiceAddState = invoiceInitialState,
+		state: IInvoiceAddState = invoiceAddInitialState,
 		{type, payload}: requestActions.Actions
 ) {
 	switch (type) {

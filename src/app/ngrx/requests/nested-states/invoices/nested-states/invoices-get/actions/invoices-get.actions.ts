@@ -14,19 +14,16 @@ export const ActionTypes = {
 
 export class GetInvoicesAction implements Action {
 	readonly type = ActionTypes.GET_LIST;
-
 	constructor(public payload?: undefined) {}
 }
 
 export class GetInvoicesSuccessAction implements Action {
 	readonly type = ActionTypes.GET_LIST_SUCCESS;
-
 	constructor(public payload: Invoice[]) {}
 }
 
 export class GetInvoicesFailAction implements Action {
 	readonly type = ActionTypes.GET_LIST_FAIL;
-
 	constructor(public payload: any) {}
 }
 

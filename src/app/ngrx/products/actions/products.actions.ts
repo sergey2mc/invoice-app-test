@@ -13,13 +13,11 @@ export const ActionTypes = {
 
 export class GetProductsAction implements Action {
 	readonly type = ActionTypes.GET_LIST;
-
 	constructor(public payload?: undefined) {}
 }
 
 export class GetProductsSuccessAction implements Action {
 	readonly type = ActionTypes.GET_LIST_SUCCESS;
-
 	constructor(public payload: Product[]) {}
 }
 

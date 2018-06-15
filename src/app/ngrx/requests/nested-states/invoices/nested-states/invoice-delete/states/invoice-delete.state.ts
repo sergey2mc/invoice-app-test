@@ -8,7 +8,7 @@ export interface IInvoiceDeleteState {
 	data: Invoice;
 }
 
-export const invoiceInitialState: IInvoiceDeleteState = {
+export const invoiceDeleteInitialState: IInvoiceDeleteState = {
 	loading: false,
 	loaded: false,
 	status: '',

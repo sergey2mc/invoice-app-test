@@ -22,16 +22,6 @@ export class InvoiceItemsEffects {
 		.map((action) => new invoiceItemsActions.GetInvoiceItemsSuccessAction(action['payload']));
 
 	@Effect()
-	invoiceItemDeleteRequest: Observable<Action> = this.action$
-		.ofType(invoiceItemsActions.ActionTypes.DELETE)
-		.map((action) => new requestsActions.DeleteInvoiceItemAction(action['payload']));
-
-	@Effect()
-	deleteInvoiceItem$: Observable<Action> = this.action$
-		.ofType(requestsActions.InvoiceItemDeleteActionTypes.DELETE_SUCCESS)
-		.map((action) => new invoiceItemsActions.DeleteInvoiceItemSuccessAction(action['payload']));
-
-	@Effect()
 	invoiceItemAddRequest: Observable<Action> = this.action$
 		.ofType(invoiceItemsActions.ActionTypes.ADD)
 		.map((action) => new requestsActions.AddInvoiceItemAction(action['payload']));
@@ -50,6 +40,16 @@ export class InvoiceItemsEffects {
 	updateInvoiceItem$: Observable<Action> = this.action$
 		.ofType(requestsActions.InvoiceItemUpdateActionTypes.UPDATE_SUCCESS)
 		.map((action) => new invoiceItemsActions.UpdateInvoiceItemSuccessAction(action['payload']));
+
+	@Effect()
+	invoiceItemDeleteRequest: Observable<Action> = this.action$
+		.ofType(invoiceItemsActions.ActionTypes.DELETE)
+		.map((action) => new requestsActions.DeleteInvoiceItemAction(action['payload']));
+
+	@Effect()
+	deleteInvoiceItem$: Observable<Action> = this.action$
+		.ofType(requestsActions.InvoiceItemDeleteActionTypes.DELETE_SUCCESS)
+		.map((action) => new invoiceItemsActions.DeleteInvoiceItemSuccessAction(action['payload']));
 
 	constructor(private action$: Actions) {}
 }

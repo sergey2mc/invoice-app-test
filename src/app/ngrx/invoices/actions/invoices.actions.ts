@@ -13,14 +13,14 @@ export const ActionTypes = {
 	GET: type(`[${ALIAS}] GET`),
 	GET_SUCCESS: type(`[${ALIAS}] GET_SUCCESS`),
 
-	DELETE: type(`[${ALIAS}] DELETE`),
-	DELETE_SUCCESS: type(`[${ALIAS}] DELETE_SUCCESS`),
-
 	ADD: type(`[${ALIAS}] ADD`),
 	ADD_SUCCESS: type(`[${ALIAS}] ADD_SUCCESS`),
 
 	UPDATE: type(`[${ALIAS}] UPDATE`),
-	UPDATE_SUCCESS: type(`[${ALIAS}] UPDATE_SUCCESS`)
+	UPDATE_SUCCESS: type(`[${ALIAS}] UPDATE_SUCCESS`),
+
+	DELETE: type(`[${ALIAS}] DELETE`),
+	DELETE_SUCCESS: type(`[${ALIAS}] DELETE_SUCCESS`)
 };
 
 export class GetInvoicesAction implements Action {
@@ -40,16 +40,6 @@ export class GetInvoiceAction implements Action {
 
 export class GetInvoiceSuccessAction implements Action {
 	readonly type = ActionTypes.GET_SUCCESS;
-	constructor(public payload: Invoice) {}
-}
-
-export class DeleteInvoiceAction implements Action {
-	readonly type = ActionTypes.DELETE;
-	constructor(public payload: number) {}
-}
-
-export class DeleteInvoiceSuccessAction implements Action {
-	readonly type = ActionTypes.DELETE_SUCCESS;
 	constructor(public payload: Invoice) {}
 }
 
@@ -73,14 +63,24 @@ export class UpdateInvoiceSuccessAction implements Action {
 	constructor(public payload: Invoice) {}
 }
 
+export class DeleteInvoiceAction implements Action {
+	readonly type = ActionTypes.DELETE;
+	constructor(public payload: number) {}
+}
+
+export class DeleteInvoiceSuccessAction implements Action {
+	readonly type = ActionTypes.DELETE_SUCCESS;
+	constructor(public payload: Invoice) {}
+}
+
 export type Actions =
 	GetInvoicesAction |
 	GetInvoicesSuccessAction |
 	GetInvoiceAction |
 	GetInvoiceSuccessAction |
-	DeleteInvoiceAction |
-	DeleteInvoiceSuccessAction |
 	AddInvoiceAction |
 	AddInvoiceSuccessAction |
 	UpdateInvoiceAction |
-	UpdateInvoiceSuccessAction;
+	UpdateInvoiceSuccessAction |
+	DeleteInvoiceAction |
+	DeleteInvoiceSuccessAction;

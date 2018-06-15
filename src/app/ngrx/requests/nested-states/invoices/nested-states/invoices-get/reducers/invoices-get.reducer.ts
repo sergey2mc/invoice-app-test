@@ -1,8 +1,8 @@
 import * as requestActions from '../actions';
-import { invoicesInitialState, IInvoicesGetState } from '../states';
+import { invoicesGetInitialState, IInvoicesGetState } from '../states';
 
 export function invoicesGetReducer(
-		state: IInvoicesGetState = invoicesInitialState,
+		state: IInvoicesGetState = invoicesGetInitialState,
 		{type, payload}: requestActions.Actions) {
 	switch (type) {
 		case requestActions.ActionTypes.GET_LIST: {

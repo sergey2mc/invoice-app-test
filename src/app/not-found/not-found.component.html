@@ -1,8 +1,4 @@
 <div class="not-found">
   Ooops...<br />
   Something went wrong...<br />
-  <div *ngIf="!!(error$ | async)?.message">
-    Status: {{ (error$ | async)?.status }}<br />
-    Message: {{ (error$ | async)?.message }}
-  </div>
 </div>

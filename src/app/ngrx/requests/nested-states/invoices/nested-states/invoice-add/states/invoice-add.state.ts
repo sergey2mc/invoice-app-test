@@ -8,7 +8,7 @@ export interface IInvoiceAddState {
 	data: Invoice;
 }
 
-export const invoiceInitialState: IInvoiceAddState = {
+export const invoiceAddInitialState: IInvoiceAddState = {
 	loading: false,
 	loaded: false,
 	status: '',

@@ -5,4 +5,4 @@ export interface IProductsState {
 	productsGetState?: IProductsGetState;
 }
 
-export const initialState: IProductsState = {};
+export const productsInitialState: IProductsState = {};

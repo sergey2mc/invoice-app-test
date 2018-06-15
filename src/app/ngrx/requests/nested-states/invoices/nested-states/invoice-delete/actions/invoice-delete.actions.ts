@@ -14,19 +14,16 @@ export const ActionTypes = {
 
 export class DeleteInvoiceAction implements Action {
 	readonly type = ActionTypes.DELETE;
-
 	constructor(public payload: number) {}
 }
 
 export class DeleteInvoiceSuccessAction implements Action {
 	readonly type = ActionTypes.DELETE_SUCCESS;
-
 	constructor(public payload: Invoice) {}
 }
 
 export class DeleteInvoiceFailAction implements Action {
 	readonly type = ActionTypes.DELETE_FAIL;
-
 	constructor(public payload: any) {}
 }
 
