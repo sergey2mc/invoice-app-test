@@ -8,7 +8,7 @@ export function invoicesReducer (state: IInvoiceState = initialState, {type, pay
 	switch (type) {
 		case ActionTypes.GET_LIST_SUCCESS: {
 			let entities = {...state.entities};
-			(payload as Invoice[]).forEach((invoice: Invoice) => entities = {...setEntities(entities, invoice)});
+			entities = (payload as Invoice[]).reduce((acc, product) => ({...acc, ...setEntities(entities, product)}), {});
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
 		}
@@ -19,7 +19,14 @@ export function invoicesReducer (state: IInvoiceState = initialState, {type, pay
 			const entities = {...state.entities};
 			delete entities[(payload as Invoice).id];
 			const collectionIds = state.collectionIds.filter(id => id !== (payload as Invoice).id);
-			return {...state, entities, collectionIds, invoice: payload};
+			return {...state, entities, collectionIds, invoice: payload as Invoice};
+		}
+		case ActionTypes.ADD_SUCCESS:
+		case ActionTypes.UPDATE_SUCCESS: {
+			let entities = {...state.entities};
+			entities = {...entities, ...setEntities(entities, payload)};
+			const collectionIds = getIdsArrEntities(entities);
+			return {...state, entities, collectionIds, invoice: payload as Invoice};
 		}
 		default: {
 			return state;

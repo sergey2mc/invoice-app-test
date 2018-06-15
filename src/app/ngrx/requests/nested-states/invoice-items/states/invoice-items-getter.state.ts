@@ -14,3 +14,18 @@ export const getInvoiceItemsGetRequestState = createSelector(
 	getInvoiceItemsRequestState,
 	(state: IInvoiceItemsState) => state.invoiceItemsGetState
 );
+
+export const getInvoiceItemDeleteRequestState = createSelector(
+	getInvoiceItemsRequestState,
+	(state: IInvoiceItemsState) => state.invoiceItemDeleteState
+);
+
+export const getInvoiceItemAddRequestState = createSelector(
+	getInvoiceItemsRequestState,
+	(state: IInvoiceItemsState) => state.invoiceItemAddState
+);
+
+export const getInvoiceItemUpdateRequestState = createSelector(
+	getInvoiceItemsRequestState,
+	(state: IInvoiceItemsState) => state.invoiceItemUpdateState
+);

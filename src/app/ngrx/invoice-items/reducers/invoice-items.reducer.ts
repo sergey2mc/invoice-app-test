@@ -8,9 +8,22 @@ export function invoiceItemsReducer (state: IInvoiceItemState = initialState, {t
 	switch (type) {
 		case ActionTypes.GET_LIST_SUCCESS: {
 			let entities = {...state.entities};
-			(payload as InvoiceItem[]).forEach((invoiceItem: InvoiceItem) => entities = {...setEntities(entities, invoiceItem)});
+			entities = (payload as InvoiceItem[]).reduce((acc, product) => ({...acc, ...setEntities(entities, product)}), {});
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
+		}
+		case ActionTypes.DELETE_SUCCESS: {
+			const entities = {...state.entities};
+			delete entities[(payload as InvoiceItem).id];
+			const collectionIds = state.collectionIds.filter(id => id !== (payload as InvoiceItem).id);
+			return {...state, entities, collectionIds, invoiceItem: payload as InvoiceItem};
+		}
+		case ActionTypes.ADD_SUCCESS:
+		case ActionTypes.UPDATE_SUCCESS: {
+			let entities = {...state.entities};
+			entities = {...setEntities(entities, payload)};
+			const collectionIds = getIdsArrEntities(entities);
+			return {...state, entities, collectionIds, invoiceItem: payload as InvoiceItem};
 		}
 		default: {
 			return state;

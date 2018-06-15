@@ -32,6 +32,7 @@ import { unsubscribeAll } from '../../shared/unsubscribe';
 import { openDialog } from '../../shared/open-dialog';
 
 
+
 @Component({
   selector: 'app-invoice-form',
   templateUrl: './invoice-form.component.html',
@@ -57,9 +58,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 		private productService: ProductService,
 		private invoiceService: InvoiceService,
 		private invoiceItemsService: InvoiceItemsService,
-		private loader: LoaderService,
 		private router: Router,
 		private route: ActivatedRoute,
+		private loader: LoaderService,
 		public dialog: MatDialog
 	) {
 		this.editMode = this.route.snapshot.data.mode === 'edit';
@@ -117,6 +118,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			this.invoice$ = this.invoiceService.invoice$;
 
 			this.subscriptions.invoice = this.invoice$
+				.distinctUntilChanged((prev, curr) => prev.toString() === curr.toString())
 				.subscribe(invoice => {
 					invoice.items.forEach(item => this.items.push(this.createItemForm(item)));
 					this.invoiceForm.patchValue(invoice);
@@ -132,9 +134,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					this.total.valueChanges
 				)
 				.debounceTime(300)
-				// .distinctUntilChanged((prev, curr) => prev.sort().toString() === curr.sort().toString())
+				.distinctUntilChanged((prev, curr) => prev.toString() === curr.toString())
 				.filter(() => this.invoiceForm.valid)
-				.switchMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value).take(1))
+				.switchMap(() => this.invoiceService.updateInvoice(this.invoiceForm.value))
 				.subscribe(
 					() => this.loader.hide(),
 					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICE_UPDATE})
@@ -160,17 +162,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 			this.subscriptions.deleteInvoiceItem = this.deleteInvoiceItem$
 				.switchMap(itemId => this.invoiceItemsService.deleteInvoiceItem(this.invoiceForm.value.id, itemId).take(1))
 				.subscribe(
-					() => this.loader.hide(),
+					null,
 					() => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_DELETE})
 				);
-
-			/**
-			 * Enabling loader on form changes
-			 * @type {Subscription}
-			 */
-			this.subscriptions.loader = this.invoiceForm.valueChanges
-				.debounceTime(300)
-				.subscribe(() => this.loader.show());
 
 		} else {
 
@@ -186,6 +180,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 					const dialogRef = openDialog(this.dialog, {id: invoice.id, message: ModalMessageTypes.INFO_INVOICE_CREATED});
 					this.subscriptions.modalDialog = dialogRef.afterClosed()
 						.subscribe(() => {
+							this.loader.hide();
 							this.router.navigate(['/invoices']);
 							this.subscriptions.modalDialog.unsubscribe();
 						});
@@ -225,14 +220,21 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 	}
 
 	saveInvoice() {
+		this.loader.show();
 		this.saveInvoice$.next(this.invoiceForm.value);
 	}
 
 	addInvoiceItem(form: FormGroup) {
+		if (this.editMode) {
+			this.loader.show();
+		}
 		this.addInvoiceItem$.next(<InvoiceItem>{...form.value, invoice_id: this.invoiceForm.value.id});
 	}
 
 	deleteInvoiceItem(index: number, item: InvoiceItem) {
+		if (this.editMode) {
+			this.loader.show();
+		}
 		this.items.removeAt(index);
 		this.deleteInvoiceItem$.next(item.id);
 	}

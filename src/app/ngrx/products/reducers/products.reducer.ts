@@ -8,7 +8,7 @@ export function productsReducer (state: IProductState = initialState, {type, pay
 	switch (type) {
 		case ActionTypes.GET_LIST_SUCCESS: {
 			let entities = {...state.entities};
-			(payload as Product[]).forEach((product: Product) => entities = {...setEntities(entities, product)});
+			entities = (payload as Product[]).reduce((acc, product) => ({...acc, ...setEntities(entities, product)}), {});
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
 		}

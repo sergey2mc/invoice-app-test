@@ -8,7 +8,7 @@ export function customersReducer (state: ICustomerState = initialState, {type, p
 	switch (type) {
 		case ActionTypes.GET_LIST_SUCCESS: {
 			let entities = {...state.entities};
-			payload.forEach((customer: Customer) => entities = {...setEntities(entities, customer)});
+			entities = (payload as Customer[]).reduce((acc, product) => ({...acc, ...setEntities(entities, product)}), {});
 			const collectionIds = getIdsArrEntities(entities);
 			return {...state, entities, collectionIds};
 		}

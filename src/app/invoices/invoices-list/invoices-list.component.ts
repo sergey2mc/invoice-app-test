@@ -44,7 +44,7 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
 		this.invoicesList$ = this.invoiceService.allInvoices$;
 
 		this.deleteInvoicesSubscription = this.deleteInvoice$
-			.switchMap(id => this.invoiceService.deleteInvoice(id))
+			.switchMap(id => this.invoiceService.deleteInvoice(id).take(1))
 			.subscribe(
 				(delInvoice: Invoice) => {
 					openDialog(this.dialog, {id: delInvoice.id, message: ModalMessageTypes.INFO_INVOICE_DELETED});

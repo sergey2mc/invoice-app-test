@@ -91,7 +91,7 @@ export class InvoiceItemComponent implements OnInit, OnDestroy {
 				.distinctUntilChanged()
 				.filter(() => this.item.valid)
 				.mergeMap(() => this.invoiceItemsService.updateInvoiceItem(this.item.value.invoice_id, this.item.value))
-				.subscribe( null, () => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_UPDATE}));
+				.subscribe( undefined, (err) => openDialog(this.dialog, {message: ModalMessageTypes.ERROR_INVOICEITEM_UPDATE}));
 		}
 
 		/**

@@ -24,3 +24,13 @@ export const getInvoiceDeleteRequestState = createSelector(
 	getInvoicesRequestState,
 	(state: IInvoicesState) => state.invoiceDeleteState
 );
+
+export const getInvoiceAddRequestState = createSelector(
+	getInvoicesRequestState,
+	(state: IInvoicesState) => state.invoiceAddState
+);
+
+export const getInvoiceUpdateRequestState = createSelector(
+	getInvoicesRequestState,
+	(state: IInvoicesState) => state.invoiceUpdateState
+);

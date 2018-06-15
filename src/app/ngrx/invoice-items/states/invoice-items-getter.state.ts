@@ -15,6 +15,11 @@ export const getInvoiceItemsCollectionIds = createSelector(
 	(state: IInvoiceItemState) => state.collectionIds
 );
 
+export const getInvoiceItem = createSelector(
+	getInvoiceItemsState,
+	(state: IInvoiceItemState) => state.invoiceItem
+);
+
 export const getInvoiceItems = createSelector(
 	getInvoiceItemsEntities,
 	getInvoiceItemsCollectionIds,

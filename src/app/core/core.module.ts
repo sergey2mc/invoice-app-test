@@ -9,16 +9,25 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { reducers } from '../ngrx';
+
 import { CustomersEffects } from '../ngrx/customers/effects';
 import { CustomersRequestsEffects } from '../ngrx/requests/nested-states/customers/effects';
+
 import { ProductsEffects } from '../ngrx/products/effects';
 import { ProductsRequestsEffects } from '../ngrx/requests/nested-states/products/nested-states/products-get/effects';
+
 import { InvoicesEffects } from '../ngrx/invoices/effects';
 import { InvoicesRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoices-get/effects';
 import { InvoiceGetRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-get/effects';
 import { InvoiceDeleteRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-delete/effects';
+import { InvoiceAddRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-add/effects';
+import { InvoiceUpdateRequestsEffects } from '../ngrx/requests/nested-states/invoices/nested-states/invoice-update/effects';
+
 import { InvoiceItemsEffects } from '../ngrx/invoice-items/effects';
 import { InvoiceItemsRequestsEffects } from '../ngrx/requests/nested-states/invoice-items/nested-states/invoice-items-get/effects';
+import { InvoiceItemDeleteRequestsEffects } from '../ngrx/requests/nested-states/invoice-items/nested-states/invoice-item-delete/effects';
+import { InvoiceItemAddRequestsEffects } from '../ngrx/requests/nested-states/invoice-items/nested-states/invoice-item-add/effects';
+import { InvoiceItemUpdateRequestsEffects } from '../ngrx/requests/nested-states/invoice-items/nested-states/invoice-item-update/effects';
 
 import { NavbarModule } from '../shared/navbar/navbar.module';
 import { APP_SERVICE_PROVIDERS } from './services';
@@ -45,8 +54,13 @@ import { ModalMessageTypesModule } from '../shared/modal/messages/modal-messages
 			InvoicesRequestsEffects,
 			InvoiceGetRequestsEffects,
 			InvoiceDeleteRequestsEffects,
+			InvoiceAddRequestsEffects,
+			InvoiceUpdateRequestsEffects,
 			InvoiceItemsEffects,
 			InvoiceItemsRequestsEffects,
+			InvoiceItemDeleteRequestsEffects,
+			InvoiceItemAddRequestsEffects,
+			InvoiceItemUpdateRequestsEffects
 		]),
 		StoreDevtoolsModule.instrument({
 			maxAge: 25,

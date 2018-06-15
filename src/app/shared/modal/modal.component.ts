@@ -1,4 +1,4 @@
-import { Component, ComponentFactoryResolver, Inject, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, Inject, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { ModalMessageTypes } from './modal-message-types';
@@ -12,7 +12,7 @@ import { ErrorMessageComponent } from './messages/error/error-message.component'
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent {
+export class ModalComponent implements OnInit {
 
 	factoryResolver: ComponentFactoryResolver;
 
